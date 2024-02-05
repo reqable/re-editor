@@ -11,7 +11,7 @@
 - Content collapsing and expanding.
 - Input hints and auto-completion.
 - Search and replace.
-- Custom conext menu builder.
+- Custom context menu builder.
 - Shortcut keys.
 - Large text display and editing.
 - Line numbers and focus line builder.
