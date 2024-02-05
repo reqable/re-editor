@@ -5,3 +5,7 @@
 ## 0.0.2
 
 * Update pubspec.yaml and README
+
+## 0.0.3
+
+* Update publisher
