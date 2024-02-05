@@ -21,7 +21,7 @@
 
 您可以运行`example`项目进行体验各项功能。
 
-
+![](arts/art01.gif)
 
 ## 开始使用
 
@@ -182,7 +182,7 @@ CodeAutocomplete(
 
 `Re-Editor`在Reqable项目中有着深度实践，欢迎下载 [Reqable](https://reqable.com/download) 进行体验。
 
-![](arts/art01.png)
+![](arts/art02.png)
 
 ## 许可证
 

@@ -23,6 +23,8 @@
 
 You can run the `example` project to experience it.
 
+![](arts/art01.gif)
+
 ## Getting Started
 
 Add the followings in `pubspec.yaml`.
@@ -186,7 +188,7 @@ Note that `Re-Editor` is only a lightweight editor and does not have the IDE dyn
 
 `Re-Editor` has been extensively practiced in the Reqable project. You are welcome to download [Reqable](https://reqable.com/download) to experience it.
 
-![](arts/art01.png)
+![](arts/art02.png)
 
 ## License
 
