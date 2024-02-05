@@ -277,7 +277,7 @@ extension _CodePromptExtension on CodePrompt {
     final InlineSpan span = style.createSpan(
       value: word,
       anchor: input,
-      color: Colors.green,
+      color: Colors.blue,
       fontWeight: FontWeight.bold,
     );
     final CodePrompt prompt = this;
