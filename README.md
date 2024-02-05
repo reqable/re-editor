@@ -1,6 +1,6 @@
 # Re-Editor
 
-![latest version](https://img.shields.io/badge/pub-0.0.1-blue)
+[![latest version](https://img.shields.io/pub/v/re_editor.svg?color=blue)](https://pub.dev/packages/re_editor)
 
 [中文版本](./README_CN.md)
 

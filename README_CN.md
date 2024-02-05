@@ -1,6 +1,6 @@
 # Re-Editor
 
-![latest version](https://img.shields.io/badge/pub-0.0.1-blue)
+[![latest version](https://img.shields.io/pub/v/re_editor.svg?color=blue)](https://pub.dev/packages/re_editor)
 
 `Re-Editor`是一个强大的轻量级代码编辑器组件，是[Reqable](https://reqable.com)项目中的一个模块。`Re-Editor`既可以作为一个简单文本组件，也可以用来开发一个功能复杂的代码编辑器。和Flutter官方默认的`TextField`组件不一样的是，`Re-Editor`是专为多行文本的显示和输入量身定制，具备下面这些特性：
 
