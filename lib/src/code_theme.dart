@@ -4,7 +4,7 @@ part of re_editor;
 /// Re-Highlight provides some built-in syntax highlighting rules for dozens of programming languages,
 /// and many theme styles.
 ///
-/// Please see [Re-Highlight](https://reqable/reqable-highlight).
+/// Please see [Re-Highlight](https://reqable/re-highlight).
 class CodeHighlightTheme {
 
   const CodeHighlightTheme({

@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "reqable-editor",
+            "name": "re-editor",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "reqable-editor (profile mode)",
+            "name": "re-editor (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "reqable-editor (release mode)",
+            "name": "re-editor (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

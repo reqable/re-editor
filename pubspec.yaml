@@ -1,8 +1,8 @@
 name: re_editor
-description: Re-Editor is a powerful lightweight text and code editor component.
-version: 0.0.1
+description: Re-Editor is a powerful lightweight text and code editor widget.
+version: 0.0.2
 homepage: https://reqable.com
-repository: https://github.com/reqable/reqable-editor
+repository: https://github.com/reqable/re-editor
 
 environment:
   sdk: ">=2.17.3 <4.0.0"

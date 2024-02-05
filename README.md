@@ -4,7 +4,7 @@
 
 [中文版本](./README_CN.md)
 
-`Re-Editor` is a powerful lightweight code editor component and a module in the [Reqable](https://reqable.com) project. It can be used as a simple text component or to develop a code editor with complex functions. Unlike Flutter's default `TextField` component, `Re-Editor` is specifically tailored for the display and input of multi-line text and offers the following features:
+`Re-Editor` is a powerful lightweight text and code editor widget and a module in the [Reqable](https://reqable.com) project. It can be used as a simple text area or to develop a code editor with complex functions. Unlike Flutter's default `TextField` component, `Re-Editor` is specifically tailored for the display and input of multi-line text and offers the following features:
 
 - Two-way horizontal and vertical scrolling.
 - Text syntax highlighting.
@@ -21,11 +21,7 @@
 
 `Re-Editor` offers a high degree of freedom. For example, developers can control whether to enable horizontal scrolling (word wrap), enable read-only mode, display line numbers, display content folding, define custom shortcut keys, and specify text syntax highlighting.
 
-`Re-Editor` has been extensively practiced in the [Reqable](https://reqable.com) project. You are welcome to download [Reqable](https://reqable.com/download) to experience it.
-
-![](arts/art01.png)
-
-You can also run the `example` project to experience it.
+You can run the `example` project to experience it.
 
 ## Getting Started
 
@@ -33,7 +29,7 @@ Add the followings in `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  re_editor: ^0.0.1
+  re_editor: ^0.0.2
 ```
 
 Like `TextField`, `Re-Editor` uses `CodeLineEditingController` as the controller. The following sample code creates the simplest editor component, which is not much different from `TextField`.
@@ -48,7 +44,7 @@ Widget build(BuildContext context) {
 
 ### Text Syntax Highlighting
 
-The text highlighting of `Re-Editor` is based on [Re-Highlight](https://github.com/reqable/reqable-highlight) and supports nearly a hundred languages ​​and theme styles. Developers can freely choose and configure the code Highlight. The following code specifies the `JSON` syntax highlighting rules and applies the `Atom One Light` code coloring.
+The text highlighting of `Re-Editor` is based on [Re-Highlight](https://github.com/reqable/re-highlight) and supports nearly a hundred languages ​​and theme styles. Developers can freely choose and configure the code Highlight. The following code specifies the `JSON` syntax highlighting rules and applies the `Atom One Light` code coloring.
 
 ```dart
 CodeEditor(
@@ -185,6 +181,12 @@ CodeAutocomplete(
 ```
 
 Note that `Re-Editor` is only a lightweight editor and does not have the IDE dynamic syntax analysis, so the code prompts and completion have many limitations. You can refer to the code in `example` to implement a simple code prompt and completion.
+
+## Used By
+
+`Re-Editor` has been extensively practiced in the Reqable project. You are welcome to download [Reqable](https://reqable.com/download) to experience it.
+
+![](arts/art01.png)
 
 ## License
 
