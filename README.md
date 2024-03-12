@@ -31,7 +31,7 @@ Add the followings in `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  re_editor: ^0.0.3
+  re_editor: ^0.0.4
 ```
 
 Like `TextField`, `Re-Editor` uses `CodeLineEditingController` as the controller. The following sample code creates the simplest editor component, which is not much different from `TextField`.
