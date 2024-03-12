@@ -90,6 +90,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   late _CodeHighlighter _highlighter;
   late CodeIndicatorValueNotifier _codeIndicatorValueNotifier;
   bool _touchMove = false;
+  bool _disposed = false;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
@@ -160,6 +161,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   @override
   void dispose() {
+    _disposed = true;
     _inputController.removeListener(_onCodeInputChanged);
     _inputController.dispose();
     _highlighter.dispose();
@@ -376,6 +378,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _updateAutoCompleteState(bool isCodeLineChanged) {
+    if (_disposed) {
+      return;
+    }
     if (!context.mounted) {
       return;
     }
