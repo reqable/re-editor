@@ -152,7 +152,7 @@ class CodeAutocomplete extends StatefulWidget {
   final Mode language;
   final List<CodeKeywordPrompt> keywordPrompts;
   final List<CodePrompt> directPrompts;
-  final Map<String, List<CodePrompt>> releatedPrompts;
+  final Map<String, List<CodePrompt>> relatedPrompts;
   final Widget child;
 
   const CodeAutocomplete({
@@ -161,7 +161,7 @@ class CodeAutocomplete extends StatefulWidget {
     required this.language,
     this.keywordPrompts = const [],
     this.directPrompts = const [],
-    this.releatedPrompts = const {},
+    this.relatedPrompts = const {},
     required this.child,
   });
 
@@ -328,7 +328,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
         }
       }
       final String target = charactersBefore.getRange(start + 1, charactersBefore.length - 1).string;
-      prompts = widget.releatedPrompts[target] ?? const [];
+      prompts = widget.relatedPrompts[target] ?? const [];
     } else {
       int start = charactersBefore.length - 1;
       for (; start >= 0; start--) {
@@ -348,7 +348,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
           }
         }
         final String target = charactersBefore.getRange(start + 1, mark).string;
-        prompts = widget.releatedPrompts[target]?.where(
+        prompts = widget.relatedPrompts[target]?.where(
           (prompt) => prompt.word.startsWith(word) && prompt.word != word
         ) ?? const [];
       } else {

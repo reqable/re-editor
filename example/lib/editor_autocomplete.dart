@@ -130,7 +130,7 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
           }
         )
       ],
-      releatedPrompts: {
+      relatedPrompts: {
         'foo': _kStringPrompts,
         'bar': _kStringPrompts,
       },
