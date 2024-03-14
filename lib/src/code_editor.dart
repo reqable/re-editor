@@ -310,7 +310,7 @@ class _CodeEditorState extends State<CodeEditor> {
 
     _editingController.bindEditor(_editorKey);
 
-    _selectionOverlayController = Platform.isAndroid || Platform.isIOS ? _MobileSelectionOverlayController(
+    _selectionOverlayController = kIsAndroid || kIsIOS ? _MobileSelectionOverlayController(
       context: context,
       controller: _editingController,
       editorKey: _editorKey,
@@ -465,7 +465,7 @@ class _CodeEditorState extends State<CodeEditor> {
       child: editable
     );
     final Widget child;
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       child = Focus(
         autofocus: autofocus,
         focusNode: _focusNode,

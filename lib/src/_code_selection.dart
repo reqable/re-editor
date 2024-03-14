@@ -138,7 +138,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     }
   }
 
-  bool get _isMobile => Platform.isAndroid || Platform.isIOS;
+  bool get _isMobile => kIsAndroid || kIsIOS;
 
   bool get _isShiftPressed => _isMobile ? false : HardwareKeyboard.instance.logicalKeysPressed
     .any(<LogicalKeyboardKey>{
@@ -486,7 +486,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   TextSelectionControls get selectionControls {
-    if (Platform.isAndroid) {
+    if (kIsAndroid) {
       return materialTextSelectionControls;
     } else {
       return cupertinoTextSelectionControls;
@@ -742,7 +742,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
       controller.selection = newSelection;
       return;
     }
-    if (Platform.isAndroid) {
+    if (kIsAndroid) {
       newSelection = CodeLineSelection(
         baseIndex: position.index,
         baseOffset: position.offset,
@@ -821,7 +821,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
       return;
     }
 
-    if (Platform.isAndroid) {
+    if (kIsAndroid) {
       newSelection = CodeLineSelection(
         baseIndex: controller.selection.baseIndex,
         baseOffset: controller.selection.baseOffset,
@@ -1132,14 +1132,14 @@ class _MobileSelectionToolbar extends StatelessWidget {
     }
     final List<Widget> resultChildren = _getAdaptiveButtons(context, items).toList();
     Widget? toolbar;
-    if (Platform.isIOS) {
+    if (kIsIOS) {
       toolbar = CupertinoTextSelectionToolbar(
         anchorAbove: anchors.primaryAnchor,
         anchorBelow: anchors.secondaryAnchor == null ? anchors.primaryAnchor : anchors.secondaryAnchor!,
         children: resultChildren,
       );
     }
-    if (Platform.isAndroid) {
+    if (kIsAndroid) {
       toolbar = TextSelectionToolbar(
         anchorAbove: anchors.primaryAnchor,
         anchorBelow: anchors.secondaryAnchor == null ? anchors.primaryAnchor : anchors.secondaryAnchor!,
@@ -1158,7 +1158,7 @@ class _MobileSelectionToolbar extends StatelessWidget {
   }
 
   Iterable<Widget> _getAdaptiveButtons(BuildContext context, List<ToolbarMenuItem> buttonItems) {
-    if (Platform.isAndroid) {
+    if (kIsAndroid) {
       final List<Widget> buttons = <Widget>[];
       for (int i = 0; i < buttonItems.length; i++) {
         final ToolbarMenuItem buttonItem = buttonItems[i];
@@ -1177,7 +1177,7 @@ class _MobileSelectionToolbar extends StatelessWidget {
       }
       return buttons;
     }
-    if (Platform.isIOS) {
+    if (kIsIOS) {
       return buttonItems.map((ToolbarMenuItem buttonItem) {
         return CupertinoTextSelectionToolbarButton.text(
           onPressed: () {

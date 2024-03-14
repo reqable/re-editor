@@ -258,7 +258,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           }
           return false;
         },
-        child: Platform.isAndroid || Platform.isIOS ? Listener(
+        child: kIsAndroid || kIsIOS ? Listener(
           onPointerUp: (_) {
             if (!_touchMove) {
               _inputController.ensureInput();
@@ -318,7 +318,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _updateAutoCompleteState(false);
     updateKeepAlive();
     if (!widget.focusNode.hasFocus) {
-      if (Platform.isAndroid || Platform.isIOS) {
+      if (kIsAndroid || kIsIOS) {
         widget.controller.cancelSelection();
       }
       widget.selectionOverlayController.hideHandle();
@@ -430,7 +430,7 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
       _timer!.cancel();
     }
     _timer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       // Wait selection position to update
       Future.delayed(const Duration(milliseconds: 100), () {
         value = true;
