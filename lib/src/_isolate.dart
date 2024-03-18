@@ -13,7 +13,7 @@ class _IsolateTasker<Req, Res> {
     _closed = false;
     _isolateManager = IsolateManager.create(
       runnable,
-      concurrent: 4,
+      concurrent: 1, // one is enough
     );
   }
 
