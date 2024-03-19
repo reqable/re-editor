@@ -122,7 +122,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     ], style);
   }
 
-  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle? baseStyle) {
+  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle baseStyle) {
     return TextSpan(
       children: nodes.map((e) => TextSpan(
           text: e.value,

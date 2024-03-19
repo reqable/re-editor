@@ -1076,6 +1076,10 @@ class CodeLineRenderParagraph {
     range: paragraph.getWord(offset)
   );
 
+  InlineSpan? getSpanForPosition(Offset offset) => paragraph.getSpanForPosition(getPosition(offset));
+
+  TextRange getRangeForSpan(InlineSpan span) => paragraph.getRangeForSpan(span);
+
   Offset? getOffset(TextPosition position) => paragraph.getOffset(position);
 
   List<Rect> getRangeRects(TextRange range) => paragraph.getRangeRects(range);
