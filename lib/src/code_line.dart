@@ -356,6 +356,19 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   });
 }
 
+/// A delegate controller for an editor field.
+///
+/// We can override some default behaviors of the controller.
+class CodeLineEditingControllerDelegate extends _CodeLineEditingControllerDelegate {
+
+  CodeLineEditingControllerDelegate({
+    required CodeLineEditingController delegate,
+  }) {
+    super.delegate = delegate;
+  }
+
+}
+
 class CodeLine {
 
   static const CodeLine empty = CodeLine('');
