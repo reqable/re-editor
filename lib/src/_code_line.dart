@@ -1573,8 +1573,19 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
-  TextSpan? buildTextSpan(int index, TextStyle baseStyle) {
-    return spanBuilder?.call(index, codeLines[index], baseStyle);
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    required int index,
+    required TextSpan textSpan,
+    required TextStyle style,
+  }) {
+    return spanBuilder?.call(
+      context: context,
+      index: index,
+      codeLine: codeLines[index],
+      textSpan: textSpan,
+      style: style
+    ) ?? textSpan;
   }
 
 }
@@ -1775,8 +1786,18 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   }
 
   @override
-  TextSpan? buildTextSpan(int index, TextStyle baseStyle) {
-    return _delegate.buildTextSpan(index, baseStyle);
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    required int index,
+    required TextSpan textSpan,
+    required TextStyle style,
+  }) {
+    return _delegate.buildTextSpan(
+      context: context,
+      index: index,
+      textSpan: textSpan,
+      style: style
+    );
   }
 
   @override

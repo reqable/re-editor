@@ -20,6 +20,9 @@ abstract class CodePrompt {
   /// e.g. User input is 'he', 'hello(String name)' will be auto completed.
   String get autocomplete;
 
+  /// Check whether the input meets this prompt condition.
+  bool match(String input);
+
 }
 
 /// The keyword autocomplate prompt. such as 'return', 'class', 'new' and so on.
@@ -31,6 +34,11 @@ class CodeKeywordPrompt extends CodePrompt {
 
   @override
   String get autocomplete => word;
+
+  @override
+  bool match(String input) {
+    return word != input && word.startsWith(input);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -61,6 +69,11 @@ class CodeFieldPrompt extends CodePrompt {
 
   @override
   String get autocomplete => word;
+
+  @override
+  bool match(String input) {
+    return word != input && word.startsWith(input);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -96,6 +109,11 @@ class CodeFunctionPrompt extends CodePrompt {
 
   @override
   String get autocomplete => '$word(${parameters.keys.join(', ')})';
+
+  @override
+  bool match(String input) {
+    return word != input && word.startsWith(input);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -318,9 +336,9 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
     }
     // TODO Should check operator `->` for some languages like c/c++
     final Iterable<CodePrompt> prompts;
-    final String word;
+    final String input;
     if (charactersBefore.takeLast(1).string == '.') {
-      word = '';
+      input = '';
       int start = charactersBefore.length - 2;
       for (; start >= 0; start--) {
         if (!charactersBefore.elementAt(start).isValidVariablePart) {
@@ -336,8 +354,8 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
           break;
         }
       }
-      word = charactersBefore.getRange(start + 1, charactersBefore.length).string;
-      if (word.isEmpty) {
+      input = charactersBefore.getRange(start + 1, charactersBefore.length).string;
+      if (input.isEmpty) {
         return null;
       }
       if (start > 0 && charactersBefore.elementAt(start) == '.') {
@@ -349,11 +367,11 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
         }
         final String target = charactersBefore.getRange(start + 1, mark).string;
         prompts = widget.relatedPrompts[target]?.where(
-          (prompt) => prompt.word.startsWith(word) && prompt.word != word
+          (prompt) => prompt.match(input)
         ) ?? const [];
       } else {
         prompts = _allKeyPromptWords.where(
-          (prompt) => prompt.word.startsWith(word) && prompt.word != word
+          (prompt) => prompt.match(input)
         );
       }
     }
@@ -361,7 +379,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
       return null;
     }
     return CodeAutocompleteEditingValue(
-      word: word,
+      word: input,
       prompts: prompts.toList(),
       index: 0
     );

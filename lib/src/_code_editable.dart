@@ -109,6 +109,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _inputController.bindEditor(widget.editorKey);
 
     _highlighter = _CodeHighlighter(
+      context: context,
       controller: widget.controller,
       theme: widget.codeTheme,
     );

@@ -6,6 +6,7 @@ class _ParagraphImpl extends IParagraph {
   static const int _zwjUtf16 = 0x200d;
 
   final String text;
+  final TextSpan span;
   final ui.Paragraph paragraph;
   final double _preferredLineHeight;
   final int _lineCount;
@@ -15,6 +16,7 @@ class _ParagraphImpl extends IParagraph {
 
   _ParagraphImpl({
     required this.text,
+    required this.span,
     required this.paragraph,
     required double preferredLineHeight,
   }) : _preferredLineHeight = preferredLineHeight,
@@ -51,7 +53,32 @@ class _ParagraphImpl extends IParagraph {
 
   @override
   TextPosition getPosition(Offset offset) {
-    return paragraph.getPositionForOffset(offset);
+    final TextPosition position = paragraph.getPositionForOffset(offset);
+    return position;
+  }
+
+  @override
+  InlineSpan? getSpanForPosition(TextPosition position) {
+    if (position.offset >= length - 1) {
+      return null;
+    }
+    return span.getSpanForPosition(position);
+  }
+
+  @override
+  TextRange getRangeForSpan(InlineSpan span) {
+    int offset = 0;
+    this.span.visitChildren((child) {
+      if (identical(child, span)) {
+        return false;
+      }
+      offset += child.length;
+      return true;
+    });
+    return TextRange(
+      start: offset,
+      end: offset + span.length
+    );
   }
 
   @override
@@ -225,6 +252,7 @@ class _CodeParagraphProvider {
     paragraph.layout(_constraints!);
     return _ParagraphImpl(
       text: span.toPlainText(),
+      span: span,
       paragraph: paragraph,
       preferredLineHeight: _preferredLineHeight!
     );

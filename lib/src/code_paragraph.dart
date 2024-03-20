@@ -13,6 +13,10 @@ abstract class IParagraph {
   TextPosition getPosition(Offset offset);
 
   TextRange getWord(Offset offset);
+  
+  InlineSpan? getSpanForPosition(TextPosition position);
+
+  TextRange getRangeForSpan(InlineSpan span);
 
   TextRange getLineBoundary(TextPosition position);
 

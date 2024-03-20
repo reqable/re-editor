@@ -1,6 +1,12 @@
 part of re_editor;
 
-typedef CodeLineSpanBuilder = TextSpan? Function(int index, CodeLine codeLine, TextStyle baseStyle);
+typedef CodeLineSpanBuilder = TextSpan Function({
+  required BuildContext context,
+  required int index,
+  required CodeLine codeLine,
+  required TextSpan textSpan,
+  required TextStyle style,
+});
 
 /// A controller for an editor field.
 ///
@@ -336,13 +342,31 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// Scroll the editor to make sure the given position is visible.
   void makePositionVisible(CodeLinePosition position);
 
-  /// Perform an operation. If the editor content changes, it will 
+  /// Perform an operation. If the editor content changes, it will
   /// be recorded in the undo history.
   void runRevocableOp(VoidCallback op);
 
   /// Builds [TextSpan] from current editing value.
   /// This can override the code syntax highlighting styles.
-  TextSpan? buildTextSpan(int index, TextStyle baseStyle);
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    required int index,
+    required TextSpan textSpan,
+    required TextStyle style,
+  });
+}
+
+/// A delegate controller for an editor field.
+///
+/// We can override some default behaviors of the controller.
+class CodeLineEditingControllerDelegate extends _CodeLineEditingControllerDelegate {
+
+  CodeLineEditingControllerDelegate({
+    required CodeLineEditingController delegate,
+  }) {
+    super.delegate = delegate;
+  }
+
 }
 
 class CodeLine {
@@ -1051,6 +1075,10 @@ class CodeLineRenderParagraph {
     index: index,
     range: paragraph.getWord(offset)
   );
+
+  InlineSpan? getSpanForPosition(Offset offset) => paragraph.getSpanForPosition(getPosition(offset));
+
+  TextRange getRangeForSpan(InlineSpan span) => paragraph.getRangeForSpan(span);
 
   Offset? getOffset(TextPosition position) => paragraph.getOffset(position);
 

@@ -2,6 +2,7 @@ part of re_editor;
 
 class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
 
+  final BuildContext _context;
   final _CodeParagraphProvider _provider;
   final _CodeHighlightEngine _engine;
 
@@ -9,9 +10,11 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   CodeHighlightTheme? _theme;
 
   _CodeHighlighter({
+    required BuildContext context,
     required CodeLineEditingController controller,
     CodeHighlightTheme? theme,
-  }) : _provider = _CodeParagraphProvider(),
+  }) : _context = context,
+    _provider = _CodeParagraphProvider(),
     _controller = controller,
     _theme = theme,
     _engine = _CodeHighlightEngine(theme),
@@ -45,7 +48,12 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     required double maxWidth,
   }) {
     _provider.updateBaseStyle(style);
-    return _provider.build(_controller.buildTextSpan(index, style) ?? _buildSpan(index, style), maxWidth);
+    return _provider.build(_controller.buildTextSpan(
+      context: _context,
+      index: index,
+      textSpan: _buildSpan(index, style),
+      style: style
+    ), maxWidth);
   }
 
   @override
@@ -114,7 +122,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     ], style);
   }
 
-  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle? baseStyle) {
+  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle baseStyle) {
     return TextSpan(
       children: nodes.map((e) => TextSpan(
           text: e.value,
