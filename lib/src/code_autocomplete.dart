@@ -18,7 +18,7 @@ abstract class CodePrompt {
   /// For example, for functions, auto completion of parameters may be required.
   ///
   /// e.g. User input is 'he', 'hello(String name)' will be auto completed.
-  String get autocomplete;
+  CodeAutocompleteResult get autocomplete;
 
   /// Check whether the input meets this prompt condition.
   bool match(String input);
@@ -33,7 +33,7 @@ class CodeKeywordPrompt extends CodePrompt {
   });
 
   @override
-  String get autocomplete => word;
+  CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromText(word);
 
   @override
   bool match(String input) {
@@ -62,13 +62,17 @@ class CodeFieldPrompt extends CodePrompt {
   const CodeFieldPrompt({
     required super.word,
     required this.type,
+    this.customAutocomplete,
   });
 
   /// The field type name.
   final String type;
 
+  /// Will use custom autocomplete rather than word if this is not null.
+  final CodeAutocompleteResult? customAutocomplete;
+
   @override
-  String get autocomplete => word;
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText(word);
 
   @override
   bool match(String input) {
@@ -80,11 +84,12 @@ class CodeFieldPrompt extends CodePrompt {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeFieldPrompt && other.word == word && other.type == type;
+    return other is CodeFieldPrompt && other.word == word && other.type == type
+      && other.customAutocomplete == customAutocomplete;
   }
 
   @override
-  int get hashCode => Object.hash(word, type);
+  int get hashCode => Object.hash(word, type, customAutocomplete);
 
 }
 
@@ -96,6 +101,7 @@ class CodeFunctionPrompt extends CodePrompt {
     required this.type,
     this.parameters = const {},
     this.optionalParameters = const {},
+    this.customAutocomplete,
   });
 
   /// The function return type.
@@ -107,8 +113,11 @@ class CodeFunctionPrompt extends CodePrompt {
   /// The function optional parameters.
   final Map<String, String> optionalParameters;
 
+  /// Will use custom autocomplete rather than word if this is not null.
+  final CodeAutocompleteResult? customAutocomplete;
+
   @override
-  String get autocomplete => '$word(${parameters.keys.join(', ')})';
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText('$word(${parameters.keys.join(', ')})');
 
   @override
   bool match(String input) {
@@ -121,11 +130,33 @@ class CodeFunctionPrompt extends CodePrompt {
       return true;
     }
     return other is CodeFunctionPrompt && other.word == word && other.type == type &&
-      mapEquals(other.parameters, parameters) && mapEquals(other.optionalParameters, optionalParameters);
+      mapEquals(other.parameters, parameters) && mapEquals(other.optionalParameters, optionalParameters)
+      && other.customAutocomplete == customAutocomplete;
   }
 
   @override
-  int get hashCode => Object.hash(word, type, parameters, optionalParameters);
+  int get hashCode => Object.hash(word, type, parameters, optionalParameters, customAutocomplete);
+
+}
+
+class CodeAutocompleteResult {
+
+  final String text;
+  final TextSelection selection;
+
+  const CodeAutocompleteResult({
+    required this.text,
+    required this.selection
+  });
+
+  factory CodeAutocompleteResult.fromText(String text) {
+    return CodeAutocompleteResult(
+      text: text,
+      selection: TextSelection.collapsed(
+        offset: text.length
+      )
+    );
+  }
 
 }
 
@@ -155,9 +186,21 @@ class CodeAutocompleteEditingValue {
     );
   }
 
-  String get currentPrompt => prompts[index].autocomplete;
-
-  String get autocomplete => currentPrompt.isEmpty ? currentPrompt : currentPrompt.substring(word.length);
+  CodeAutocompleteResult get autocomplete {
+    final CodeAutocompleteResult result = prompts[index].autocomplete;
+    if (result.text.isEmpty) {
+      return result;
+    }
+    final String finalText = result.text.substring(word.length);
+    final TextSelection finalSelection = result.selection.copyWith(
+      baseOffset: result.selection.baseOffset - word.length,
+      extentOffset: result.selection.extentOffset - word.length,
+    );
+    return CodeAutocompleteResult(
+      text: finalText,
+      selection: finalSelection,
+    );
+  }
 
 }
 
@@ -193,7 +236,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
   late final _CodeAutocompleteNavigateAction _navigateAction;
   late final _CodeAutocompleteAction _selectAction;
 
-  ValueChanged? _onAutocomplete;
+  ValueChanged<CodeAutocompleteResult>? _onAutocomplete;
   OverlayEntry? _overlayEntry;
   ValueNotifier<CodeAutocompleteEditingValue>? _notifier;
 
@@ -262,7 +305,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
     required Offset position,
     required double lineHeight,
     required CodeLineEditingValue value,
-    required ValueChanged onAutocomplete,
+    required ValueChanged<CodeAutocompleteResult> onAutocomplete,
   }) {
     dismiss();
     final CodeAutocompleteEditingValue? autocompleteEditingValue = _buildAutocompleteOptions(value);
@@ -414,7 +457,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
             onTapOutside: (event) {
               dismiss();
             },
-            child: _CodeEditorTapRegion(
+            child: CodeEditorTapRegion(
               child: ExcludeSemantics(
                 child: child,
               )
