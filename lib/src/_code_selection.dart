@@ -642,7 +642,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   Widget _buildStartHandle(BuildContext context, TextSelectionHandleType type) {
-    return _CodeEditorTapRegion(
+    return CodeEditorTapRegion(
       child: ExcludeSemantics(
         child: _SelectionHandleOverlay(
           type: type,
@@ -699,7 +699,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         preferredLineHeight: lineHeight,
       );
     }
-    return _CodeEditorTapRegion(
+    return CodeEditorTapRegion(
       child: ExcludeSemantics(
         child: handle,
       ),
@@ -1262,7 +1262,7 @@ class _SelectionToolbarWrapperState extends State<_SelectionToolbarWrapper> with
 
   @override
   Widget build(BuildContext context) {
-    return _CodeEditorTapRegion(
+    return CodeEditorTapRegion(
       child: Directionality(
         textDirection: Directionality.of(this.context),
         child: FadeTransition(

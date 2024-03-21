@@ -457,7 +457,7 @@ class _CodeAutocompleteState extends State<CodeAutocomplete> {
             onTapOutside: (event) {
               dismiss();
             },
-            child: _CodeEditorTapRegion(
+            child: CodeEditorTapRegion(
               child: ExcludeSemantics(
                 child: child,
               )

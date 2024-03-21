@@ -517,3 +517,31 @@ class _CodeEditorState extends State<CodeEditor> {
   }
 
 }
+
+/// A [TapRegion] that adds its children to the tap region group for widgets
+/// based on the [CodeEditor] widget.
+///
+/// Widgets that are wrapped with a [CodeEditorTapRegion] are considered to be
+/// part of the editor for purposes of unfocus behavior. So, when the user
+/// taps on them, the currently focused editor won't be unfocused by
+/// default.
+///
+/// See also:
+///
+///  * [TapRegion], the widget that this widget uses to add widgets to the group
+///    of text fields.
+class CodeEditorTapRegion extends TapRegion {
+
+  /// Creates a const [CodeEditorTapRegion].
+  ///
+  /// The [child] field is required.
+  const CodeEditorTapRegion({
+    super.key,
+    required super.child,
+    super.enabled = true,
+    super.behavior = HitTestBehavior.deferToChild,
+    super.onTapOutside,
+    super.onTapInside,
+  }) : super(groupId: CodeEditor);
+
+}

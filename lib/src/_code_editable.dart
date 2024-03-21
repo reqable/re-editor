@@ -248,7 +248,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       },
       scrollbarBuilder: widget.scrollbarBuilder
     );
-    return _CodeEditorTapRegion(
+    return CodeEditorTapRegion(
       onTapOutside: (_) {
         widget.focusNode.unfocus();
       },
@@ -464,14 +464,5 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
     stopBlink();
     super.dispose();
   }
-
-}
-
-class _CodeEditorTapRegion extends TapRegion {
-
-  const _CodeEditorTapRegion({
-    required super.child,
-    super.onTapOutside,
-  }) : super(groupId: CodeEditor);
 
 }
