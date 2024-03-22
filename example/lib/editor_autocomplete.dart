@@ -106,34 +106,36 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
   @override
   Widget build(BuildContext context) {
     return CodeAutocomplete(
-      builder: (context, notifier, onSelected) {
+      viewBuilder: (context, notifier, onSelected) {
         return _DefaultCodeAutocompleteListView(
           notifier: notifier,
           onSelected: onSelected,
         );
       },
-      language: langDart,
-      directPrompts: [
-        CodeFieldPrompt(
-          word: 'foo',
-          type: 'String'
-        ),
-        CodeFieldPrompt(
-          word: 'bar',
-          type: 'String'
-        ),
-        CodeFunctionPrompt(
-          word: 'hello',
-          type: 'void',
-          parameters: {
-            'value': 'String',
-          }
-        )
-      ],
-      relatedPrompts: {
-        'foo': _kStringPrompts,
-        'bar': _kStringPrompts,
-      },
+      promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
+        language: langDart,
+        directPrompts: [
+          CodeFieldPrompt(
+            word: 'foo',
+            type: 'String'
+          ),
+          CodeFieldPrompt(
+            word: 'bar',
+            type: 'String'
+          ),
+          CodeFunctionPrompt(
+            word: 'hello',
+            type: 'void',
+            parameters: {
+              'value': 'String',
+            }
+          )
+        ],
+        relatedPrompts: {
+          'foo': _kStringPrompts,
+          'bar': _kStringPrompts,
+        },
+      ),
       child: CodeEditor(
         style: CodeEditorStyle(
           fontSize: 18,
@@ -180,7 +182,7 @@ class _DefaultCodeAutocompleteListView extends StatefulWidget implements Preferr
   static const double kItemHeight = 26;
 
   final ValueNotifier<CodeAutocompleteEditingValue> notifier;
-  final ValueChanged<CodeAutocompleteEditingValue> onSelected;
+  final ValueChanged<CodeAutocompleteResult> onSelected;
 
   const _DefaultCodeAutocompleteListView({
     required this.notifier,
@@ -237,7 +239,7 @@ class _DefaultCodeAutocompleteListViewState extends State<_DefaultCodeAutocomple
             onTap: () {
               widget.onSelected(widget.notifier.value.copyWith(
                 index: index
-              ));
+              ).autocomplete);
             },
             child: Container(
               width: double.infinity,
@@ -252,7 +254,7 @@ class _DefaultCodeAutocompleteListViewState extends State<_DefaultCodeAutocomple
                 borderRadius: radius
               ),
               child: RichText(
-                text: prompt.createSpan(context, widget.notifier.value.word),
+                text: prompt.createSpan(context, widget.notifier.value.input),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),

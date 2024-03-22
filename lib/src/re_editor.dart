@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 
 import 'package:re_highlight/re_highlight.dart';
 
+part '_code_autocomplete.dart';
 part '_code_editable.dart';
 part '_code_extensions.dart';
 part '_code_field.dart';
