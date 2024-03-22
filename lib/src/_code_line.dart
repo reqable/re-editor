@@ -859,6 +859,11 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
+  void forceRepaint() {
+    _render?.forceRepaint();
+  }
+
+  @override
   void runRevocableOp(VoidCallback op) {
     _cache.markNewRecord(true);
     op();
@@ -1993,6 +1998,11 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   @override
   void moveSelectionLinesUp() {
     _delegate.moveSelectionLinesUp();
+  }
+
+  @override
+  void forceRepaint() {
+    _delegate.forceRepaint();
   }
 
   @override
