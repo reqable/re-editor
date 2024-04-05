@@ -521,6 +521,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
 
   @override
   void showToolbar(BuildContext context, Offset globalPosition) {
+    globalPosition = _clampPosition(globalPosition);
     final Rect editingRegion = Rect.fromPoints(
       ensureRender.localToGlobal(Offset.zero),
       ensureRender.localToGlobal(ensureRender.size.bottomRight(Offset.zero)),
@@ -652,7 +653,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
             if (position == null) {
               return;
             }
-            showToolbar(context, position);
+            showToolbar(_context, position);
           },
           onSelectionHandleDragStart: _handleStartHandleDragStart,
           onSelectionHandleDragUpdate: (details) {
@@ -684,7 +685,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
           if (position == null) {
             return;
           }
-          showToolbar(context, position);
+          showToolbar(_context, position);
         },
         onSelectionHandleDragStart: _handleEndHandleDragStart,
         onSelectionHandleDragUpdate: (details) {
@@ -895,6 +896,12 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     final int linesDragged =
         dragDirection * (distanceDragged.abs() / ensureRender.lineHeight).floor();
     return handleDy + linesDragged * ensureRender.lineHeight;
+  }
+
+  Offset _clampPosition(Offset position) {
+    final RenderBox box = _context.findRenderObject() as RenderBox;
+    final Offset offset = box.globalToLocal(position);
+    return box.localToGlobal(Offset(min(max(0, offset.dx), box.size.width), min(max(0, offset.dy), box.size.height)));
   }
 
 }
