@@ -507,6 +507,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   @override
   void hideHandle() {
     _handlesVisible = false;
+    _handleCollapsed = null;
     if (_handles != null) {
       _handles![0].remove();
       _handles![1].remove();
@@ -643,6 +644,9 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   Widget _buildStartHandle(BuildContext context, TextSelectionHandleType type) {
+    if (Platform.isIOS && type == TextSelectionHandleType.collapsed) {
+      type = TextSelectionHandleType.right;
+    }
     return CodeEditorTapRegion(
       child: ExcludeSemantics(
         child: _SelectionHandleOverlay(
