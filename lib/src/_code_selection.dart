@@ -160,12 +160,6 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       widget.selectionOverlayController.showHandle(context);
       widget.selectionOverlayController.showToolbar(context, position);
     } else {
-      if (widget.controller.selection.baseOffset != -1) {
-        if (_isShiftPressed) {
-          _extendSelection(position, _SelectionChangedCause.tapUp);
-          return;
-        }
-      }
       _pointerTapTimestamp = now;
       _pointerTapPosition = position;
       _selectPosition(position, _SelectionChangedCause.tapUp);
