@@ -91,7 +91,6 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   late CodeIndicatorValueNotifier _codeIndicatorValueNotifier;
   bool _touchMove = false;
   bool _disposed = false;
-  late Offset _touchPointer;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
@@ -261,12 +260,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           return false;
         },
         child: Platform.isAndroid || Platform.isIOS ? Listener(
-          onPointerDown: (event) {
-            _touchPointer = event.position;
-          },
-          onPointerUp: (event) {
-            if (!_touchMove ||
-                _touchPointer.isSamePosition(event.position)) {
+          onPointerUp: (_) {
+            if (!_touchMove) {
               _inputController.ensureInput();
             }
             _touchMove = false;
