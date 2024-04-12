@@ -49,6 +49,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         },
         onLongPressStart: (details) {
           _dragPosition = details.globalPosition;
+          widget.inputController.ensureInput();
           _longPressOnSelection = _isPositionOnSelection(details.globalPosition);
           if (_longPressOnSelection != true) {
             _onMobileTapDown(details.globalPosition);
@@ -69,6 +70,8 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         onLongPressCancel: () {
           _dragPosition = null;
           _longPressOnSelection = false;
+          widget.selectionOverlayController.hideToolbar();
+          widget.selectionOverlayController.hideHandle();
         },
         onLongPressUp: () {
           _dragPosition = null;
@@ -170,8 +173,8 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       _selectPosition(position, _SelectionChangedCause.tapUp);
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
-      widget.inputController.ensureInput();
     }
+    widget.inputController.ensureInput();
   }
 
   void _onDesktopTapDown(Offset position) {
