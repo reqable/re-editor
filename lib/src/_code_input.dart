@@ -94,6 +94,9 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
 
   @override
   void performAction(TextInputAction action) {
+    if (action == TextInputAction.newline) {
+      _controller.applyNewLine();
+    }
   }
 
   @override
