@@ -201,7 +201,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   void _onCodeEditingChanged() {
     notifyListeners();
     _updateRemoteEditingValueIfNeeded();
-    _updateRemoteComposingeIfNeeded();
+    _updateRemoteComposingIfNeeded();
   }
 
   void _updateRemoteEditingValueIfNeeded() {
@@ -225,7 +225,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     _textInputConnection!.setEditingState(localValue);
   }
 
-  void _updateRemoteComposingeIfNeeded({
+  void _updateRemoteComposingIfNeeded({
     bool retry = false
   }) {
     if (!_hasInputConnection) {
@@ -249,7 +249,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       _textInputConnection!.setCaretRect(Rect.fromLTWH(caret.dx, caret.dy, render.cursorWidth, render.lineHeight));
     } else if (!retry) {
       Future.delayed(const Duration(milliseconds: 10), () {
-        _updateRemoteComposingeIfNeeded(
+        _updateRemoteComposingIfNeeded(
           retry: true
         );
       });
@@ -297,7 +297,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     } else {
       _textInputConnection?.show();
     }
-    _updateRemoteComposingeIfNeeded();
+    _updateRemoteComposingIfNeeded();
     _updateRemoteEditableSizeAndTransform();
   }
 
