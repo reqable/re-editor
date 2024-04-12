@@ -5,7 +5,6 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   CodeLineEditingController _controller;
   FocusNode _focusNode;
   bool _readOnly;
-  TextStyle _textStyle;
 
   TextInputConnection? _textInputConnection;
   TextEditingValue? _remoteEditingValue;
@@ -16,11 +15,9 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     required CodeLineEditingController controller,
     required FocusNode focusNode,
     required bool readOnly,
-    required TextStyle textStyle,
   }) : _controller = controller,
     _focusNode = focusNode,
-    _readOnly = readOnly,
-    _textStyle = textStyle {
+    _readOnly = readOnly {
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
   }
@@ -53,13 +50,6 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       return;
     }
     _readOnly = value;
-  }
-
-  set textStyle(TextStyle value) {
-    if (_textStyle == value) {
-      return;
-    }
-    _textStyle = value;
   }
 
   set value(CodeLineEditingValue value) {

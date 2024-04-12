@@ -3,6 +3,7 @@ part of re_editor;
 class _CodeSelectionGestureDetector extends StatefulWidget {
 
   final CodeLineEditingController controller;
+  final _CodeInputController inputController;
   final CodeChunkController chunkController;
   final HitTestBehavior? behavior;
   final GlobalKey editorKey;
@@ -11,6 +12,7 @@ class _CodeSelectionGestureDetector extends StatefulWidget {
 
   const _CodeSelectionGestureDetector({
     required this.controller,
+    required this.inputController,
     required this.chunkController,
     this.behavior,
     required this.editorKey,
@@ -116,6 +118,9 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         onSecondaryTapDown: (detail) {
           _onSecondaryTapDown(context, detail);
         },
+        onTapUp: (_) {
+          widget.inputController.ensureInput();
+        },
         child: Listener(
           onPointerDown: (event) {
             _tapping = true;
@@ -165,6 +170,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       _selectPosition(position, _SelectionChangedCause.tapUp);
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
+      widget.inputController.ensureInput();
     }
   }
 

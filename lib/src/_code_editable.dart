@@ -29,6 +29,7 @@ class _CodeEditable extends StatefulWidget {
   final ValueChanged<CodeLineEditingValue>? onChanged;
   final FocusNode focusNode;
   final CodeLineEditingController controller;
+  final _CodeInputController inputController;
   final CodeHighlightTheme? codeTheme;
   final bool readOnly;
   final bool autofocus;
@@ -63,6 +64,7 @@ class _CodeEditable extends StatefulWidget {
     this.onChanged,
     required this.focusNode,
     required this.controller,
+    required this.inputController,
     required this.codeTheme,
     required this.readOnly,
     required this.autofocus,
@@ -84,12 +86,11 @@ class _CodeEditable extends StatefulWidget {
 class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable> {
 
   late bool _didAutoFocus;
-  late final _CodeInputController _inputController;
+  late _CodeInputController _inputController;
   late final _CodeCursorBlinkController _cursorController;
 
   late _CodeHighlighter _highlighter;
   late CodeIndicatorValueNotifier _codeIndicatorValueNotifier;
-  bool _touchMove = false;
   bool _disposed = false;
 
   @override
@@ -99,14 +100,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   void initState() {
     super.initState();
     _didAutoFocus = false;
-    _inputController = _CodeInputController(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      readOnly: widget.readOnly,
-      textStyle: widget.textStyle,
-    );
+
+    _inputController = widget.inputController;
     _inputController.addListener(_onCodeInputChanged);
-    _inputController.bindEditor(widget.editorKey);
 
     _highlighter = _CodeHighlighter(
       context: context,
@@ -124,16 +120,15 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   @override
   void didUpdateWidget(covariant _CodeEditable oldWidget) {
-    _inputController.bindEditor(widget.editorKey);
     if (oldWidget.controller != widget.controller) {
-      _inputController.controller = widget.controller;
       _highlighter.controller = widget.controller;
     }
-    if (oldWidget.readOnly != widget.readOnly) {
-      _inputController.readOnly = widget.readOnly;
+    if (oldWidget.inputController != widget.inputController) {
+      _inputController.removeListener(_onCodeInputChanged);
+      _inputController = widget.inputController;
+      _inputController.addListener(_onCodeInputChanged);
     }
     if (oldWidget.focusNode != widget.focusNode) {
-      _inputController.focusNode = widget.focusNode;
       oldWidget.focusNode.removeListener(_onFocusChanged);
       widget.focusNode.addListener(_onFocusChanged);
     }
@@ -164,7 +159,6 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   void dispose() {
     _disposed = true;
     _inputController.removeListener(_onCodeInputChanged);
-    _inputController.dispose();
     _highlighter.dispose();
     _codeIndicatorValueNotifier.dispose();
     _cursorController.dispose();
@@ -259,26 +253,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           }
           return false;
         },
-        child: Platform.isAndroid || Platform.isIOS ? Listener(
-          onPointerUp: (_) {
-            if (!_touchMove) {
-              _inputController.ensureInput();
-            }
-            _touchMove = false;
-          },
-          onPointerMove: (event) {
-            _touchMove = true;
-          },
-          onPointerPanZoomStart: (event) {
-            _touchMove = true;
-          },
-          child: child
-        ) : TapRegion(
-          onTapInside: (_) {
-            _inputController.ensureInput();
-          },
-          child: child
-        ),
+        child: child
       )
     );
   }

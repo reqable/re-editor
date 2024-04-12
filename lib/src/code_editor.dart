@@ -281,12 +281,13 @@ class CodeEditor extends StatefulWidget {
 
 class _CodeEditorState extends State<CodeEditor> {
 
+  late final GlobalKey _editorKey;
   late FocusNode _focusNode;
   late _CodeLineEditingControllerDelegate _editingController;
+  late final _CodeInputController _inputController;
   late CodeScrollController _scrollController;
   late CodeFindController _findController;
   late CodeChunkController _chunkController;
-  late final GlobalKey _editorKey;
 
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
@@ -302,13 +303,20 @@ class _CodeEditorState extends State<CodeEditor> {
     _focusNode = widget.focusNode ?? FocusNode();
     _editingController = _CodeLineEditingControllerDelegate();
     _editingController.delegate =  widget.controller ?? CodeLineEditingController();
+    _editingController.bindEditor(_editorKey);
+
+    _inputController = _CodeInputController(
+      controller: _editingController,
+      focusNode: _focusNode,
+      readOnly: widget.readOnly ?? false,
+    );
+    _inputController.bindEditor(_editorKey);
+
     _findController = widget.findController ?? CodeFindController(_editingController);
+    _findController.addListener(_updateWidget);
     _scrollController = widget.scrollController ?? CodeScrollController();
     _scrollController.bindEditor(_editorKey);
-    _findController.addListener(_updateWidget);
     _chunkController = CodeChunkController(_editingController, widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer());
-
-    _editingController.bindEditor(_editorKey);
 
     _selectionOverlayController = Platform.isAndroid || Platform.isIOS ? _MobileSelectionOverlayController(
       context: context,
@@ -357,6 +365,7 @@ class _CodeEditorState extends State<CodeEditor> {
     if (widget.controller == null) {
       _editingController.dispose();
     }
+    _inputController.dispose();
     if (widget.findController == null) {
       _findController.dispose();
     }
@@ -375,6 +384,7 @@ class _CodeEditorState extends State<CodeEditor> {
         _focusNode.dispose();
       }
       _focusNode = widget.focusNode ?? FocusNode();
+      _inputController.focusNode = _focusNode;
     }
     if (oldWidget.controller != widget.controller) {
       if (oldWidget.controller == null) {
@@ -401,6 +411,9 @@ class _CodeEditorState extends State<CodeEditor> {
     if (oldWidget.chunkAnalyzer != widget.chunkAnalyzer || oldWidget.controller != widget.controller) {
       _chunkController.dispose();
       _chunkController = CodeChunkController(_editingController, widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer());
+    }
+    if (oldWidget.readOnly != widget.readOnly) {
+      _inputController.readOnly = widget.readOnly ?? false;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -444,6 +457,7 @@ class _CodeEditorState extends State<CodeEditor> {
       )),
       margin:  widget.margin ?? EdgeInsets.zero,
       controller: _editingController,
+      inputController: _inputController,
       codeTheme: widget.style?.codeTheme,
       readOnly: readOnly,
       autofocus: autofocus,
@@ -458,6 +472,7 @@ class _CodeEditorState extends State<CodeEditor> {
     );
     final Widget detector = _CodeSelectionGestureDetector(
       controller: _editingController,
+      inputController: _inputController,
       chunkController: _chunkController,
       selectionOverlayController: _selectionOverlayController,
       behavior: HitTestBehavior.translucent,
