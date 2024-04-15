@@ -22,3 +22,11 @@
 * Add `MouseTrackerAnnotationTextSpan` for hovering support.
 * Add `CodeLineEditingControllerDelegate` for delegating the controller.
 * Add an API for editor force repaint.
+
+## 0.1.1
+* Clamp mode selection handle positions for mobile.
+* Add an auto scrolling list for autocomplete example.
+* Fix mobile selection handle invisible issue.
+* Delete shift key selection logic for mobile.
+* Fix newline action not works with some android input methods.
+* Fix a bug that the mobile input keyboard does not popup when tapping the editor.
