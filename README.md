@@ -4,7 +4,7 @@
 
 [中文版本](./README_CN.md)
 
-`Re-Editor` is a powerful lightweight text and code editor widget and a module in the [Reqable](https://reqable.com) project. It can be used as a simple text area or to develop a code editor with complex functions. Unlike Flutter's default `TextField` component, `Re-Editor` is specifically tailored for the display and input of multi-line text and offers the following features:
+`Re-Editor` is a powerful lightweight text and code editor widget and a module in the [Reqable](https://reqable.com) project. It can be used as a simple text area or to develop a code editor with complex functions. Unlike Flutter's default `TextField`, `Re-Editor` is specifically tailored for the display and input of multi-line text and offers the following features:
 
 - Two-way horizontal and vertical scrolling.
 - Text syntax highlighting.
@@ -31,10 +31,10 @@ Add the followings in `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  re_editor: ^0.0.4
+  re_editor: ^0.1.1
 ```
 
-Like `TextField`, `Re-Editor` uses `CodeLineEditingController` as the controller. The following sample code creates the simplest editor component, which is not much different from `TextField`.
+Like `TextField`, `Re-Editor` uses `CodeLineEditingController` as the controller. The following sample code creates the simplest multi-line input area, which is not much different from `TextField`.
 
 ```dart
 Widget build(BuildContext context) {
@@ -170,14 +170,16 @@ The shortcut keys supported by `Re-Editor` are as follows:
 
 ### Code Hints and Auto-Completion
 
-`Re-Editor` supports using the `CodeAutocomplete` component to implement code input prompts and automatic completion. `Re-Editor` implements basic control logic, but the code prompt content, auto-completion rules and display UI need to be defined by the developer.
+`Re-Editor` supports using the `CodeAutocomplete` widget to implement code input prompts and automatic completion. `Re-Editor` implements basic control logic, but the code prompt content, auto-completion rules and display UI need to be defined by the developer.
 
 ```dart
 CodeAutocomplete(
-  builder: (context, notifier, onSelected) {
-    // TODO
+  viewBuilder: (context, notifier, onSelected) {
+    // build the code prompts view
   },
-  language: langDart,
+  promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
+    language: langDart,
+  ),
   child: CodeEditor()
 );
 ```

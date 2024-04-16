@@ -342,6 +342,9 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// Scroll the editor to make sure the given position is visible.
   void makePositionVisible(CodeLinePosition position);
 
+  /// Force the render to repaint.
+  void forceRepaint();
+
   /// Perform an operation. If the editor content changes, it will
   /// be recorded in the undo history.
   void runRevocableOp(VoidCallback op);

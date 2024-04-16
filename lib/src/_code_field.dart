@@ -575,6 +575,12 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
+  void forceRepaint() {
+    _displayParagraphs.clear();
+    _updateDisplayRenderParagraphs();
+    markNeedsPaint();
+  }
+
   void autoScrollWhenDragging(Offset dragPosition) {
     final Offset offset = globalToLocal(dragPosition);
     final double unit = _preferredLineHeight;

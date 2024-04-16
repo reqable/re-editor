@@ -19,8 +19,8 @@ class CodeEditorStyle {
     this.chunkIndicatorColor,
     this.codeTheme,
   }) : assert(fontSize == null || fontSize > 0),
-    assert(fontHeight == null || fontHeight >= 1.0),
-    assert(cursorWidth == null || cursorWidth > 0);
+        assert(fontHeight == null || fontHeight >= 1.0),
+        assert(cursorWidth == null || cursorWidth > 0);
 
   /// The size of fonts (in logical pixels) to use when painting the text.
   ///
@@ -281,12 +281,13 @@ class CodeEditor extends StatefulWidget {
 
 class _CodeEditorState extends State<CodeEditor> {
 
+  late final GlobalKey _editorKey;
   late FocusNode _focusNode;
   late _CodeLineEditingControllerDelegate _editingController;
+  late final _CodeInputController _inputController;
   late CodeScrollController _scrollController;
   late CodeFindController _findController;
   late CodeChunkController _chunkController;
-  late final GlobalKey _editorKey;
 
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
@@ -302,13 +303,20 @@ class _CodeEditorState extends State<CodeEditor> {
     _focusNode = widget.focusNode ?? FocusNode();
     _editingController = _CodeLineEditingControllerDelegate();
     _editingController.delegate =  widget.controller ?? CodeLineEditingController();
+    _editingController.bindEditor(_editorKey);
+
+    _inputController = _CodeInputController(
+      controller: _editingController,
+      focusNode: _focusNode,
+      readOnly: widget.readOnly ?? false,
+    );
+    _inputController.bindEditor(_editorKey);
+
     _findController = widget.findController ?? CodeFindController(_editingController);
+    _findController.addListener(_updateWidget);
     _scrollController = widget.scrollController ?? CodeScrollController();
     _scrollController.bindEditor(_editorKey);
-    _findController.addListener(_updateWidget);
     _chunkController = CodeChunkController(_editingController, widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer());
-
-    _editingController.bindEditor(_editorKey);
 
     _selectionOverlayController = kIsAndroid || kIsIOS ? _MobileSelectionOverlayController(
       context: context,
@@ -357,6 +365,7 @@ class _CodeEditorState extends State<CodeEditor> {
     if (widget.controller == null) {
       _editingController.dispose();
     }
+    _inputController.dispose();
     if (widget.findController == null) {
       _findController.dispose();
     }
@@ -375,6 +384,7 @@ class _CodeEditorState extends State<CodeEditor> {
         _focusNode.dispose();
       }
       _focusNode = widget.focusNode ?? FocusNode();
+      _inputController.focusNode = _focusNode;
     }
     if (oldWidget.controller != widget.controller) {
       if (oldWidget.controller == null) {
@@ -401,6 +411,9 @@ class _CodeEditorState extends State<CodeEditor> {
     if (oldWidget.chunkAnalyzer != widget.chunkAnalyzer || oldWidget.controller != widget.controller) {
       _chunkController.dispose();
       _chunkController = CodeChunkController(_editingController, widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer());
+    }
+    if (oldWidget.readOnly != widget.readOnly) {
+      _inputController.readOnly = widget.readOnly ?? false;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -440,10 +453,11 @@ class _CodeEditorState extends State<CodeEditor> {
       onChanged: widget.onChanged,
       focusNode: _focusNode,
       padding: (widget.padding ?? _kDefaultPadding).add(EdgeInsets.only(
-        top: find == null ? 0 : find.preferredSize.height
+          top: find == null ? 0 : find.preferredSize.height
       )),
       margin:  widget.margin ?? EdgeInsets.zero,
       controller: _editingController,
+      inputController: _inputController,
       codeTheme: widget.style?.codeTheme,
       readOnly: readOnly,
       autofocus: autofocus,
@@ -457,48 +471,49 @@ class _CodeEditorState extends State<CodeEditor> {
       selectionOverlayController: _selectionOverlayController,
     );
     final Widget detector = _CodeSelectionGestureDetector(
-      controller: _editingController,
-      chunkController: _chunkController,
-      selectionOverlayController: _selectionOverlayController,
-      behavior: HitTestBehavior.translucent,
-      editorKey: _editorKey,
-      child: editable
+        controller: _editingController,
+        inputController: _inputController,
+        chunkController: _chunkController,
+        selectionOverlayController: _selectionOverlayController,
+        behavior: HitTestBehavior.translucent,
+        editorKey: _editorKey,
+        child: editable
     );
     final Widget child;
     if (kIsAndroid || kIsIOS) {
       child = Focus(
-        autofocus: autofocus,
-        focusNode: _focusNode,
-        onKey: (node, event) {
-          if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
-            _editingController.deleteBackward();
-            return KeyEventResult.handled;
-          } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-            _editingController.applyNewLine();
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        includeSemantics: false,
-        debugLabel: 'CodeEditor',
-        child: detector
+          autofocus: autofocus,
+          focusNode: _focusNode,
+          onKey: (node, event) {
+            if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
+              _editingController.deleteBackward();
+              return KeyEventResult.handled;
+            } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+              _editingController.applyNewLine();
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
+          includeSemantics: false,
+          debugLabel: 'CodeEditor',
+          child: detector
       );
     } else {
       child = _CodeShortcuts(
         builder: widget.shortcutsActivatorsBuilder ?? const DefaultCodeShortcutsActivatorsBuilder(),
         child: _CodeShortcutActions(
-          editingController: _editingController,
-          findController: find != null ? _findController : null,
-          commentFormatter: widget.commentFormatter,
-          overrideActions: widget.shortcutOverrideActions,
-          readOnly: readOnly,
-          child: Focus(
-            autofocus: autofocus,
-            focusNode: _focusNode,
-            includeSemantics: false,
-            debugLabel: 'CodeEditor',
-            child: detector
-          )
+            editingController: _editingController,
+            findController: find != null ? _findController : null,
+            commentFormatter: widget.commentFormatter,
+            overrideActions: widget.shortcutOverrideActions,
+            readOnly: readOnly,
+            child: Focus(
+                autofocus: autofocus,
+                focusNode: _focusNode,
+                includeSemantics: false,
+                debugLabel: 'CodeEditor',
+                child: detector
+            )
         ),
       );
     }

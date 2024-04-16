@@ -76,7 +76,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.4"
+    version: "0.1.1"
   re_highlight:
     dependency: "direct main"
     description:
