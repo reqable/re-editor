@@ -19,8 +19,8 @@ class CodeEditorStyle {
     this.chunkIndicatorColor,
     this.codeTheme,
   }) : assert(fontSize == null || fontSize > 0),
-    assert(fontHeight == null || fontHeight >= 1.0),
-    assert(cursorWidth == null || cursorWidth > 0);
+        assert(fontHeight == null || fontHeight >= 1.0),
+        assert(cursorWidth == null || cursorWidth > 0);
 
   /// The size of fonts (in logical pixels) to use when painting the text.
   ///
@@ -318,7 +318,7 @@ class _CodeEditorState extends State<CodeEditor> {
     _scrollController.bindEditor(_editorKey);
     _chunkController = CodeChunkController(_editingController, widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer());
 
-    _selectionOverlayController = Platform.isAndroid || Platform.isIOS ? _MobileSelectionOverlayController(
+    _selectionOverlayController = kIsAndroid || kIsIOS ? _MobileSelectionOverlayController(
       context: context,
       controller: _editingController,
       editorKey: _editorKey,
@@ -453,7 +453,7 @@ class _CodeEditorState extends State<CodeEditor> {
       onChanged: widget.onChanged,
       focusNode: _focusNode,
       padding: (widget.padding ?? _kDefaultPadding).add(EdgeInsets.only(
-        top: find == null ? 0 : find.preferredSize.height
+          top: find == null ? 0 : find.preferredSize.height
       )),
       margin:  widget.margin ?? EdgeInsets.zero,
       controller: _editingController,
@@ -471,49 +471,49 @@ class _CodeEditorState extends State<CodeEditor> {
       selectionOverlayController: _selectionOverlayController,
     );
     final Widget detector = _CodeSelectionGestureDetector(
-      controller: _editingController,
-      inputController: _inputController,
-      chunkController: _chunkController,
-      selectionOverlayController: _selectionOverlayController,
-      behavior: HitTestBehavior.translucent,
-      editorKey: _editorKey,
-      child: editable
+        controller: _editingController,
+        inputController: _inputController,
+        chunkController: _chunkController,
+        selectionOverlayController: _selectionOverlayController,
+        behavior: HitTestBehavior.translucent,
+        editorKey: _editorKey,
+        child: editable
     );
     final Widget child;
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       child = Focus(
-        autofocus: autofocus,
-        focusNode: _focusNode,
-        onKey: (node, event) {
-          if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
-            _editingController.deleteBackward();
-            return KeyEventResult.handled;
-          } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-            _editingController.applyNewLine();
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        includeSemantics: false,
-        debugLabel: 'CodeEditor',
-        child: detector
+          autofocus: autofocus,
+          focusNode: _focusNode,
+          onKey: (node, event) {
+            if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
+              _editingController.deleteBackward();
+              return KeyEventResult.handled;
+            } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+              _editingController.applyNewLine();
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
+          includeSemantics: false,
+          debugLabel: 'CodeEditor',
+          child: detector
       );
     } else {
       child = _CodeShortcuts(
         builder: widget.shortcutsActivatorsBuilder ?? const DefaultCodeShortcutsActivatorsBuilder(),
         child: _CodeShortcutActions(
-          editingController: _editingController,
-          findController: find != null ? _findController : null,
-          commentFormatter: widget.commentFormatter,
-          overrideActions: widget.shortcutOverrideActions,
-          readOnly: readOnly,
-          child: Focus(
-            autofocus: autofocus,
-            focusNode: _focusNode,
-            includeSemantics: false,
-            debugLabel: 'CodeEditor',
-            child: detector
-          )
+            editingController: _editingController,
+            findController: find != null ? _findController : null,
+            commentFormatter: widget.commentFormatter,
+            overrideActions: widget.shortcutOverrideActions,
+            readOnly: readOnly,
+            child: Focus(
+                autofocus: autofocus,
+                focusNode: _focusNode,
+                includeSemantics: false,
+                debugLabel: 'CodeEditor',
+                child: detector
+            )
         ),
       );
     }

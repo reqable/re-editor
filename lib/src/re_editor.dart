@@ -2,7 +2,6 @@ library re_editor;
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:collection';
@@ -16,7 +15,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'package:re_highlight/re_highlight.dart';
+import 'package:isolate_manager/isolate_manager.dart';
 
+part '_consts.dart';
 part '_code_autocomplete.dart';
 part '_code_editable.dart';
 part '_code_extensions.dart';

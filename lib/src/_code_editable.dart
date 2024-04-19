@@ -171,90 +171,90 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   Widget build(BuildContext context) {
     super.build(context);
     final Widget child = _CodeScrollable(
-      axisDirection: AxisDirection.down,
-      controller: widget.scrollController.verticalScroller,
-      viewportBuilder: (context, ViewportOffset vertical) {
-        Widget codeField;
-        if (widget.wordWrap) {
-          codeField = _buildCodeField(vertical, null);
-        } else {
-          codeField = _CodeScrollable(
-            axisDirection: AxisDirection.right,
-            controller: widget.scrollController.horizontalScroller,
-            viewportBuilder: (context, ViewportOffset horizontal) {
-              return _buildCodeField(vertical, horizontal);
-            },
-            scrollbarBuilder: widget.scrollbarBuilder
-          );
-        }
-        if (_inputController.value.isInitial) {
-          final String? hint = widget.hint;
-          if (hint != null && hint.isNotEmpty) {
-            codeField = Stack(
-              children: [
-                codeField,
-                IgnorePointer(
-                  ignoring: true,
-                  child: Padding(
-                    padding: widget.padding,
-                    child: Text(
-                      hint,
-                      style: widget.textStyle.copyWith(
-                        color: widget.hintTextColor
-                      ),
-                    ),
-                  )
-                )
-              ],
+        axisDirection: AxisDirection.down,
+        controller: widget.scrollController.verticalScroller,
+        viewportBuilder: (context, ViewportOffset vertical) {
+          Widget codeField;
+          if (widget.wordWrap) {
+            codeField = _buildCodeField(vertical, null);
+          } else {
+            codeField = _CodeScrollable(
+                axisDirection: AxisDirection.right,
+                controller: widget.scrollController.horizontalScroller,
+                viewportBuilder: (context, ViewportOffset horizontal) {
+                  return _buildCodeField(vertical, horizontal);
+                },
+                scrollbarBuilder: widget.scrollbarBuilder
             );
           }
-        }
-        final Widget? indicator = widget.indicatorBuilder?.call(
-          context,
-          widget.controller,
-          widget.chunkController,
-          _codeIndicatorValueNotifier
-        );
-        return Container(
-          decoration: BoxDecoration(
-            border: widget.border,
-            color: widget.backgroundColor,
-          ),
-          margin: widget.margin,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (indicator != null)
-                indicator,
-              if (widget.sperator != null)
-                widget.sperator!,
-              Expanded(
-                child: RepaintBoundary(
-                  child: CompositedTransformTarget(
-                    link: widget.toolbarLayerLink,
-                    child: codeField
+          if (_inputController.value.isInitial) {
+            final String? hint = widget.hint;
+            if (hint != null && hint.isNotEmpty) {
+              codeField = Stack(
+                children: [
+                  codeField,
+                  IgnorePointer(
+                      ignoring: true,
+                      child: Padding(
+                        padding: widget.padding,
+                        child: Text(
+                          hint,
+                          style: widget.textStyle.copyWith(
+                              color: widget.hintTextColor
+                          ),
+                        ),
+                      )
+                  )
+                ],
+              );
+            }
+          }
+          final Widget? indicator = widget.indicatorBuilder?.call(
+              context,
+              widget.controller,
+              widget.chunkController,
+              _codeIndicatorValueNotifier
+          );
+          return Container(
+            decoration: BoxDecoration(
+              border: widget.border,
+              color: widget.backgroundColor,
+            ),
+            margin: widget.margin,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (indicator != null)
+                  indicator,
+                if (widget.sperator != null)
+                  widget.sperator!,
+                Expanded(
+                  child: RepaintBoundary(
+                    child: CompositedTransformTarget(
+                        link: widget.toolbarLayerLink,
+                        child: codeField
+                    ),
                   ),
-                ),
-              )
-            ],
-          ),
-        );
-      },
-      scrollbarBuilder: widget.scrollbarBuilder
+                )
+              ],
+            ),
+          );
+        },
+        scrollbarBuilder: widget.scrollbarBuilder
     );
     return CodeEditorTapRegion(
-      onTapOutside: (_) {
-        widget.focusNode.unfocus();
-      },
-      child: NotificationListener(
-        onNotification: (notification) {
-          if (notification is ScrollStartNotification) {
-            widget.selectionOverlayController.hideToolbar();
-          }
-          return false;
+        onTapOutside: (_) {
+          widget.focusNode.unfocus();
         },
-        child: child
-      )
+        child: NotificationListener(
+            onNotification: (notification) {
+              if (notification is ScrollStartNotification) {
+                widget.selectionOverlayController.hideToolbar();
+              }
+              return false;
+            },
+            child: child
+        )
     );
   }
 
@@ -272,8 +272,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       showCursorNotifier: _cursorController,
       onRenderParagraphsChanged: (paragraphs) {
         _codeIndicatorValueNotifier.value = CodeIndicatorValue(
-          paragraphs: paragraphs,
-          focusedIndex: widget.controller.selection.extentIndex
+            paragraphs: paragraphs,
+            focusedIndex: widget.controller.selection.extentIndex
         );
       },
       selectionColor: widget.selectionColor,
@@ -294,7 +294,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _updateAutoCompleteState(false);
     updateKeepAlive();
     if (!widget.focusNode.hasFocus) {
-      if (Platform.isAndroid || Platform.isIOS) {
+      if (kIsAndroid || kIsIOS) {
         widget.controller.cancelSelection();
       }
       widget.selectionOverlayController.hideHandle();
@@ -305,7 +305,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   void _onCodeInputChanged() {
     widget.onChanged?.call(widget.controller.value);
     if (widget.controller.codeLines != widget.controller.preValue?.codeLines &&
-      widget.controller.preValue != null) {
+        widget.controller.preValue != null) {
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
       // Delay 50ms to update the auto-complate prompt words.
@@ -337,8 +337,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     widget.controller.selection = currentMatch;
     if (currentMatch.isSameLine) {
       widget.controller.makePositionCenterIfInvisible(CodeLinePosition(
-        index: currentMatch.start.index,
-        offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1
+          index: currentMatch.start.index,
+          offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1
       ));
     } else {
       widget.controller.makePositionCenterIfInvisible(currentMatch.start);
@@ -383,18 +383,18 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       return;
     }
     autocompleteState.show(
-      layerLink: widget.startHandleLayerLink,
-      position: position,
-      lineHeight: render.lineHeight,
-      value: widget.controller.value,
-      onAutocomplete: (value) {
-        final CodeLineSelection selection = widget.controller.selection;
-        widget.controller.replaceSelection(value.text);
-        widget.controller.selection = selection.copyWith(
-          baseOffset: selection.baseOffset + value.selection.baseOffset,
-          extentOffset: selection.extentOffset + value.selection.extentOffset,
-        );
-      }
+        layerLink: widget.startHandleLayerLink,
+        position: position,
+        lineHeight: render.lineHeight,
+        value: widget.controller.value,
+        onAutocomplete: (value) {
+          final CodeLineSelection selection = widget.controller.selection;
+          widget.controller.replaceSelection(value.text);
+          widget.controller.selection = selection.copyWith(
+            baseOffset: selection.baseOffset + value.selection.baseOffset,
+            extentOffset: selection.extentOffset + value.selection.extentOffset,
+          );
+        }
     );
   }
 
@@ -411,7 +411,7 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
       _timer!.cancel();
     }
     _timer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       // Wait selection position to update
       Future.delayed(const Duration(milliseconds: 100), () {
         value = true;
