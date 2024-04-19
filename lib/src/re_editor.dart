@@ -16,6 +16,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'package:re_highlight/re_highlight.dart';
+import 'package:isolate_manager/isolate_manager.dart';
 
 part '_code_autocomplete.dart';
 part '_code_editable.dart';
@@ -33,6 +34,7 @@ part '_code_scroll.dart';
 part '_code_selection.dart';
 part '_code_shortcuts.dart';
 part '_code_span.dart';
+part '_consts.dart';
 part '_isolate.dart';
 part 'code_autocomplete.dart';
 part 'code_chunk.dart';

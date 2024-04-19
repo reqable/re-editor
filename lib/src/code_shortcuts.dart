@@ -61,7 +61,7 @@ class DefaultCodeShortcutsActivatorsBuilder extends CodeShortcutsActivatorsBuild
 
   @override
   List<ShortcutActivator>? build(CodeShortcutType type) {
-    return Platform.isMacOS ? _kDefaultMacCodeShortcutsActivators[type] :
+    return kIsMacOS ? _kDefaultMacCodeShortcutsActivators[type] :
       _kDefaultCommonCodeShortcutsActivators[type];
   }
 

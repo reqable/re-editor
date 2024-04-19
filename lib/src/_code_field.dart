@@ -230,7 +230,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _backgroundRender.find<_CodeCursorLinePainter>().selection = value;
     _backgroundRender.find<_CodeFieldSelectionPainter>().selection = value;
     _foregroundRender.find<_CodeFieldCursorPainter>().position = value.extent;
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       _foregroundRender.find<_CodeFieldCursorPainter>().willDraw = _selection.isCollapsed;
     }
     markNeedsLayout();
@@ -987,7 +987,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   }
 
   void _updateSelectionExtentsVisibility(Offset effectiveOffset) {
-    if (!Platform.isAndroid && !Platform.isIOS) {
+    if (!kIsAndroid && !kIsIOS) {
       return;
     }
     final Rect visibleRegion = Offset.zero & size;
