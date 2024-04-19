@@ -503,6 +503,7 @@ class _CodeEditorState extends State<CodeEditor> {
         builder: widget.shortcutsActivatorsBuilder ?? const DefaultCodeShortcutsActivatorsBuilder(),
         child: _CodeShortcutActions(
           editingController: _editingController,
+          inputController: _inputController,
           findController: find != null ? _findController : null,
           commentFormatter: widget.commentFormatter,
           overrideActions: widget.shortcutOverrideActions,

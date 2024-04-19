@@ -86,7 +86,6 @@ class _CodeEditable extends StatefulWidget {
 class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable> {
 
   late bool _didAutoFocus;
-  late _CodeInputController _inputController;
   late final _CodeCursorBlinkController _cursorController;
 
   late _CodeHighlighter _highlighter;
@@ -101,8 +100,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     super.initState();
     _didAutoFocus = false;
 
-    _inputController = widget.inputController;
-    _inputController.addListener(_onCodeInputChanged);
+    widget.controller.addListener(_onCodeInputChanged);
+    widget.inputController.addListener(_onCodeUserInputChanged);
 
     _highlighter = _CodeHighlighter(
       context: context,
@@ -122,11 +121,12 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   void didUpdateWidget(covariant _CodeEditable oldWidget) {
     if (oldWidget.controller != widget.controller) {
       _highlighter.controller = widget.controller;
+      oldWidget.controller.removeListener(_onCodeInputChanged);
+      widget.controller.addListener(_onCodeInputChanged);
     }
     if (oldWidget.inputController != widget.inputController) {
-      _inputController.removeListener(_onCodeInputChanged);
-      _inputController = widget.inputController;
-      _inputController.addListener(_onCodeInputChanged);
+      oldWidget.inputController.removeListener(_onCodeUserInputChanged);
+      widget.inputController.addListener(_onCodeUserInputChanged);
     }
     if (oldWidget.focusNode != widget.focusNode) {
       oldWidget.focusNode.removeListener(_onFocusChanged);
@@ -158,7 +158,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   @override
   void dispose() {
     _disposed = true;
-    _inputController.removeListener(_onCodeInputChanged);
+    widget.controller.removeListener(_onCodeInputChanged);
+    widget.inputController.removeListener(_onCodeUserInputChanged);
     _highlighter.dispose();
     _codeIndicatorValueNotifier.dispose();
     _cursorController.dispose();
@@ -187,7 +188,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
             scrollbarBuilder: widget.scrollbarBuilder
           );
         }
-        if (_inputController.value.isInitial) {
+        if (widget.controller.value.isInitial) {
           final String? hint = widget.hint;
           if (hint != null && hint.isNotEmpty) {
             codeField = Stack(
@@ -308,15 +309,18 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       widget.controller.preValue != null) {
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
-      // Delay 50ms to update the auto-complate prompt words.
-      Future.delayed(const Duration(milliseconds: 50), () {
-        _updateAutoCompleteState(true);
-      });
     } else {
       _updateAutoCompleteState(false);
     }
     _updateCursorState();
     setState(() {
+    });
+  }
+
+  void _onCodeUserInputChanged() {
+    // Delay 50ms to update the auto-complate prompt words.
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _updateAutoCompleteState(true);
     });
   }
 
@@ -388,6 +392,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       lineHeight: render.lineHeight,
       value: widget.controller.value,
       onAutocomplete: (value) {
+        autocompleteState.dismiss();
         final CodeLineSelection selection = widget.controller.selection;
         widget.controller.replaceSelection(value.text);
         widget.controller.selection = selection.copyWith(

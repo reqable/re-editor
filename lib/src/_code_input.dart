@@ -148,6 +148,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     } else {
       _controller.edit(newValue);
     }
+    notifyListeners();
     // _Trace.end('updateEditingValue all');
   }
 
@@ -182,6 +183,12 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   }
 
   @override
+  void notifyListeners() {
+    // Do nothing here.
+    super.notifyListeners();
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _closeInputConnectionIfNeeded();
@@ -192,7 +199,6 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   bool get _hasInputConnection => _textInputConnection?.attached ?? false;
 
   void _onCodeEditingChanged() {
-    notifyListeners();
     _updateRemoteEditingValueIfNeeded();
     _updateRemoteComposingIfNeeded();
   }

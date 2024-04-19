@@ -65,6 +65,7 @@ class _CodeShortcutsState extends State<_CodeShortcuts> {
 class _CodeShortcutActions extends StatelessWidget {
 
   final CodeLineEditingController editingController;
+  final _CodeInputController inputController;
   final CodeFindController? findController;
   final CodeCommentFormatter? commentFormatter;
   final Map<Type, Action<Intent>>? overrideActions;
@@ -73,6 +74,7 @@ class _CodeShortcutActions extends StatelessWidget {
 
   const _CodeShortcutActions({
     required this.editingController,
+    required this.inputController,
     this.findController,
     this.commentFormatter,
     required this.overrideActions,
@@ -115,6 +117,7 @@ class _CodeShortcutActions extends StatelessWidget {
     if (editingController.isComposing) {
       return null;
     }
+    bool keepAutoCompleateState = false;
     switch (intent.runtimeType) {
       case CodeShortcutSelectAllIntent: {
         editingController.selectAll();
@@ -237,6 +240,8 @@ class _CodeShortcutActions extends StatelessWidget {
         } else {
           editingController.deleteBackward();
         }
+        inputController.notifyListeners();
+        keepAutoCompleateState = true;
         break;
       }
       case CodeShortcutNewLineIntent: {
@@ -271,6 +276,10 @@ class _CodeShortcutActions extends StatelessWidget {
         }
         break;
       }
+    }
+    if (!keepAutoCompleateState) {
+      final _CodeAutocompleteState? autocompleteState = context.findAncestorStateOfType<_CodeAutocompleteState>();
+      autocompleteState?.dismiss();
     }
     return intent;
   }
