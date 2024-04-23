@@ -51,7 +51,7 @@ class _ScrollBehavior extends MaterialScrollBehavior {
     } else {
       orientation = null;
     }
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (kIsAndroid || kIsIOS) {
       return Scrollbar(
         controller: details.controller,
         scrollbarOrientation: orientation,
