@@ -217,6 +217,7 @@ class _CodeHighlightEngine {
     ), callback);
   }
 
+  @pragma('vm:entry-point')
   static List<_HighlightResult> _run(_HighlightPayload payload) {
     final CodeLines codeLines = payload.codes;
     final int maxSize = payload.maxSizes.reduce(min);

@@ -412,6 +412,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     _expandChunkIfSelectionInvisible(match);
   }
 
+  @pragma('vm:entry-point')
   static CodeFindResult? _run(_CodeFindPayload payload) {
     final RegExp? regExp = payload.option.regExp;
     if (regExp == null) {

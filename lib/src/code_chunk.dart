@@ -11,20 +11,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
 
   CodeChunkController(this.controller, this.analyzer) : super(const []) {
     controller.addListener(_onCodeChanged);
-    _tasker = _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>('CodeChunk', (payload) {
-      final List<CodeChunk> chunks = payload.analyzer.run(payload.codeLines);
-      final List<int> invalidCollapsedChunkIndexes = [];
-      for (int i = 0; i < payload.codeLines.length; i++) {
-        if (!payload.codeLines[i].chunkParent) {
-          continue;
-        }
-        final int index = chunks.indexWhere((e) => e.index == i);
-        if (index < 0 || chunks[index].canCollapse) {
-          invalidCollapsedChunkIndexes.add(i);
-        }
-      }
-      return _CodeChunkAnalyzeResult(chunks, invalidCollapsedChunkIndexes);
-    });
+    _tasker = _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>('CodeChunk', _run);
     _shouldNotUpdateChunks = false;
     _runChunkAnalyzeTask();
   }
@@ -145,6 +132,22 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
     for (int i = indexes.length - 1; i >=0; i--) {
       expand(indexes[i]);
     }
+  }
+
+  @pragma('vm:entry-point')
+  static _CodeChunkAnalyzeResult _run(_CodeChunkAnalyzePayload payload) {
+    final List<CodeChunk> chunks = payload.analyzer.run(payload.codeLines);
+    final List<int> invalidCollapsedChunkIndexes = [];
+    for (int i = 0; i < payload.codeLines.length; i++) {
+      if (!payload.codeLines[i].chunkParent) {
+        continue;
+      }
+      final int index = chunks.indexWhere((e) => e.index == i);
+      if (index < 0 || chunks[index].canCollapse) {
+        invalidCollapsedChunkIndexes.add(i);
+      }
+    }
+    return _CodeChunkAnalyzeResult(chunks, invalidCollapsedChunkIndexes);
   }
 
 }
