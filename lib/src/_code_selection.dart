@@ -1094,121 +1094,32 @@ class _MobileSelectionToolbarController implements MobileSelectionToolbarControl
       return;
     }
     final OverlayEntry entry = OverlayEntry(
-      builder: (context) =>  _MobileSelectionToolbar(
+      builder: (context) => _SelectionToolbarWrapper(
         visibility: visibility,
         layerLink: layerLink,
-        anchors: anchors,
-        renderRect: renderRect,
-        items: builder(context, controller),
-        onDismiss: () {
-          hide(context);
-        },
-        onRefresh: () {
-          show(
-            context: context,
-            controller: controller,
-            anchors: anchors,
-            renderRect: renderRect,
-            layerLink: layerLink,
-            visibility: visibility
-          );
-        },
+        offset: -renderRect!.topLeft,
+        child: builder(
+          context: context,
+          anchors: anchors,
+          controller: controller,
+          onDismiss: () {
+            hide(context);
+          },
+          onRefresh: () {
+            show(
+              context: context,
+              controller: controller,
+              anchors: anchors,
+              renderRect: renderRect,
+              layerLink: layerLink,
+              visibility: visibility
+            );
+          },
+        )
       )
     );
     overlay.insert(entry);
     _entry = entry;
-  }
-
-}
-
-class _MobileSelectionToolbar extends StatelessWidget {
-
-  final LayerLink layerLink;
-  final ValueListenable<bool>? visibility;
-  final TextSelectionToolbarAnchors anchors;
-  final Rect? renderRect;
-  final List<ToolbarMenuItem> items;
-  final VoidCallback onDismiss;
-  final VoidCallback onRefresh;
-
-  const _MobileSelectionToolbar({
-    required this.layerLink,
-    required this.visibility,
-    required this.anchors,
-    this.renderRect,
-    required this.items,
-    required this.onDismiss,
-    required this.onRefresh,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    final List<Widget> resultChildren = _getAdaptiveButtons(context, items).toList();
-    Widget? toolbar;
-    if (kIsIOS) {
-      toolbar = CupertinoTextSelectionToolbar(
-        anchorAbove: anchors.primaryAnchor,
-        anchorBelow: anchors.secondaryAnchor == null ? anchors.primaryAnchor : anchors.secondaryAnchor!,
-        children: resultChildren,
-      );
-    }
-    if (kIsAndroid) {
-      toolbar = TextSelectionToolbar(
-        anchorAbove: anchors.primaryAnchor,
-        anchorBelow: anchors.secondaryAnchor == null ? anchors.primaryAnchor : anchors.secondaryAnchor!,
-        children: resultChildren,
-      );
-    }
-    if (toolbar == null) {
-      throw UnimplementedError();
-    }
-    return _SelectionToolbarWrapper(
-      visibility: visibility,
-      layerLink: layerLink,
-      offset: -renderRect!.topLeft,
-      child: toolbar
-    );
-  }
-
-  Iterable<Widget> _getAdaptiveButtons(BuildContext context, List<ToolbarMenuItem> buttonItems) {
-    if (kIsAndroid) {
-      final List<Widget> buttons = <Widget>[];
-      for (int i = 0; i < buttonItems.length; i++) {
-        final ToolbarMenuItem buttonItem = buttonItems[i];
-        buttons.add(TextSelectionToolbarTextButton(
-          padding: TextSelectionToolbarTextButton.getPadding(i, buttonItems.length),
-          onPressed: () {
-            buttonItem.onTap.call();
-            if (buttonItem.refreshToolbarAfterTap) {
-              onRefresh();
-            } else {
-              onDismiss();
-            }
-          },
-          child: Text(buttonItem.title),
-        ));
-      }
-      return buttons;
-    }
-    if (kIsIOS) {
-      return buttonItems.map((ToolbarMenuItem buttonItem) {
-        return CupertinoTextSelectionToolbarButton.text(
-          onPressed: () {
-            buttonItem.onTap.call();
-            if (buttonItem.refreshToolbarAfterTap) {
-              onRefresh();
-            } else {
-              onDismiss();
-            }
-          },
-          text: buttonItem.title,
-        );
-      });
-    }
-    throw UnimplementedError();
   }
 
 }

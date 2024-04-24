@@ -1,20 +1,12 @@
 part of re_editor;
 
-class ToolbarMenuItem {
-
-  const ToolbarMenuItem({
-    required this.title,
-    required this.onTap,
-    this.refreshToolbarAfterTap = false,
-  });
-
-  final String title;
-  final VoidCallback onTap;
-  final bool refreshToolbarAfterTap;
-
-}
-
-typedef ToolbarMenuBuilder = List<ToolbarMenuItem> Function(BuildContext context, CodeLineEditingController controller);
+typedef ToolbarMenuBuilder = Widget Function({
+  required BuildContext context,
+  required TextSelectionToolbarAnchors anchors,
+  required CodeLineEditingController controller,
+  required VoidCallback onDismiss,
+  required VoidCallback onRefresh,
+});
 
 abstract class SelectionToolbarController {
 
