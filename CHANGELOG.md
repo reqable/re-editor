@@ -30,3 +30,9 @@
 * Delete shift key selection logic for mobile.
 * Fix newline action not works with some android input methods.
 * Fix a bug that the mobile input keyboard does not popup when tapping the editor.
+
+## 0.2.0
+* Web support.
+* Mobile toolbar widget will be built by user rather than the editor.
+* Autocomplete will only update after user input.
+* Fix desktop focus issue.
