@@ -328,7 +328,7 @@ class _CodeEditorState extends State<CodeEditor> {
       focusNode: _focusNode,
       onShowToolbar: (context, anchors, renderRect) {
         widget.toolbarController?.show(
-          context: context,
+          context: _editorKey.currentContext ?? context,
           controller: _editingController,
           anchors: anchors,
           renderRect: renderRect,
