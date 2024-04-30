@@ -383,9 +383,9 @@ const Map<CodeShortcutType, List<ShortcutActivator>>
   ],
   CodeShortcutType.multiLineComment: [
     SingleActivator(
-      LogicalKeyboardKey.digit1,
+      LogicalKeyboardKey.slash,
       meta: true,
-      // shift: true,
+      shift: true,
     )
   ],
   CodeShortcutType.find: [SingleActivator(LogicalKeyboardKey.keyF, meta: true)],

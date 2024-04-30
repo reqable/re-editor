@@ -99,10 +99,6 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
               ],
             );
           },
-          commentFormatter: DefaultCodeCommentFormatter(
-              singleLinePrefix: '//',
-              multiLinePrefix: '/*',
-              multiLineSuffix: '*/'),
           findBuilder: (context, controller, readOnly) =>
               CodeFindPanelView(controller: controller, readOnly: readOnly),
           toolbarController: const ContextMenuControllerImpl(),

@@ -390,19 +390,42 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
           codeLine.text.substring(suffixIndex + suffix.length),
     );
 
-    int relocation(int offset) {
+    int relocationPrefix(int offset, int deletion) {
       if (offset <= prefixIndex) {
         return offset;
       } else {
-        return max(prefixIndex, offset - prefix.length);
+        return max(prefixIndex, offset - deletion);
       }
+    }
+
+    int relocationSuffix(int offset, int deletion) {
+      return min(offset - deletion, newCodeLines[lineIndex].text.length);
+    }
+
+    final int deletion;
+
+    if (prefixIndex + this.prefix.length >= selection.baseOffset) {
+      deletion = this.prefix.length;
+    } else {
+      deletion = prefix.length;
+    }
+
+    final int baseOffset;
+    final int extentOffset;
+
+    if (selection.extentOffset >= selection.baseOffset) {
+      baseOffset = relocationPrefix(selection.baseOffset, deletion);
+      extentOffset = relocationSuffix(selection.extentOffset, deletion);
+    } else {
+      baseOffset = relocationSuffix(selection.baseOffset, deletion);
+      extentOffset = relocationPrefix(selection.extentOffset, deletion);
     }
 
     return value.copyWith(
       codeLines: newCodeLines,
       selection: selection.copyWith(
-        baseOffset: relocation(selection.baseOffset),
-        extentOffset: relocation(selection.extentOffset),
+        baseOffset: baseOffset,
+        extentOffset: extentOffset,
       ),
     );
   }
@@ -580,6 +603,9 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
     final CodeLine codeFirstLine;
     final CodeLine codeLastLine;
 
+    final int baseOffset;
+    final int extentOffset;
+
     if (extentIndex >= baseIndex) {
       codeFirstLine = codeLines[baseIndex];
       codeLastLine = codeLines[extentIndex];
@@ -592,6 +618,20 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
       newCodeLines[extentIndex] = codeLastLine.copyWith(
         text: codeLastLine.text.substring(0, suffixIndex) +
             codeLastLine.text.substring(suffixIndex + suffix.length),
+      );
+
+      final int deletion;
+
+      if (prefixIndex + this.prefix.length >= selection.baseOffset) {
+        deletion = this.prefix.length;
+      } else {
+        deletion = prefix.length;
+      }
+
+      baseOffset = selection.baseOffset - deletion;
+      extentOffset = min(
+        selection.extentOffset,
+        newCodeLines[extentIndex].text.length,
       );
     } else {
       codeFirstLine = codeLines[extentIndex];
@@ -606,19 +646,20 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
         text: codeLastLine.text.substring(0, suffixIndex) +
             codeLastLine.text.substring(suffixIndex + suffix.length),
       );
-    }
 
-    final int baseOffset;
-    final int extentOffset;
+      final int deletion;
 
-    if (extentIndex > baseIndex) {
-      baseOffset = selection.baseOffset - prefix.length;
-      extentOffset = selection.extentOffset;
-    } else {
-      print('baseOffset: ${selection.baseOffset}');
-      print('extentOffset: ${selection.extentOffset}');
-      baseOffset = selection.baseOffset;
-      extentOffset = selection.extentOffset - suffix.length;
+      if (prefixIndex + this.prefix.length >= selection.extentOffset) {
+        deletion = this.prefix.length;
+      } else {
+        deletion = prefix.length;
+      }
+
+      baseOffset = min(
+        selection.baseOffset,
+        newCodeLines[baseIndex].text.length,
+      );
+      extentOffset = selection.extentOffset - deletion;
     }
 
     return value.copyWith(
