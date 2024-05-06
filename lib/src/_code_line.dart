@@ -38,19 +38,6 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     );
   }
 
-  factory _CodeLineEditingControllerImpl.fromFile(File file, [
-    CodeLineOptions options = const CodeLineOptions()
-  ]) {
-    final CodeLines codeLines = file.existsSync() ? CodeLines.of(file.readAsLinesSync().map((e) => CodeLine(e))) : _kInitialCodeLines;
-    if (codeLines.isEmpty) {
-      codeLines.add(CodeLine.empty);
-    }
-     return _CodeLineEditingControllerImpl(
-      codeLines: codeLines,
-      options: const CodeLineOptions(),
-    );
-  }
-
   factory _CodeLineEditingControllerImpl.fromTextAsync(String? text, [
     CodeLineOptions options = const CodeLineOptions()
   ]) {

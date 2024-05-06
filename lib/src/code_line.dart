@@ -64,11 +64,6 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
     CodeLineOptions options = const CodeLineOptions()
   ]) => _CodeLineEditingControllerImpl.fromText(text, options);
 
-  /// Creates a controller for a given file path.
-  factory CodeLineEditingController.fromFile(File file, [
-    CodeLineOptions options = const CodeLineOptions()
-  ]) => _CodeLineEditingControllerImpl.fromFile(file, options);
-
   /// Creates a controller for a given file path. The file content will read async.
   factory CodeLineEditingController.fromTextAsync(String? text, [
     CodeLineOptions options = const CodeLineOptions()

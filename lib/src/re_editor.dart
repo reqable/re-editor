@@ -1,7 +1,6 @@
 library re_editor;
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:collection';
