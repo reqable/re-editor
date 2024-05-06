@@ -40,7 +40,6 @@ abstract class _DefaultCommentFormatter {
 }
 
 class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
-
   const _DefaultSingleLineCommentFormatter(super.symbol);
 
   @override
@@ -156,7 +155,6 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
   }
 
   CodeLineEditingValue _commentSelectedCodeLines(CodeLineEditingValue value, String indent, String prefix) {
-    // TODO Handle code chunks
     final CodeLineSelection selection = value.selection;
     final CodeLines codeLines = value.codeLines;
     int? index;
@@ -181,8 +179,10 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
       if (codeLine.text.isEmpty) {
         continue;
       }
+      final newChunks = _commentChunks(codeLine, prefix, index);
       newCodeLines[i] = codeLine.copyWith(
-        text: codeLine.text.insert(prefix, index)
+        text: codeLine.text.insert(prefix, index), 
+        chunks: newChunks
       );
     }
     final int baseOffset;
@@ -219,8 +219,22 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     );
   }
 
+  List<CodeLine> _commentChunks(CodeLine codeLine, String prefix, int index) {
+    final List<CodeLine> newCodeChunks = List.from(codeLine.chunks);
+    for (int j = 0; j < newCodeChunks.length; j++) {
+      final CodeLine codeLineChunk = newCodeChunks[j];
+      if (codeLineChunk.text.isEmpty) {
+        continue;
+      }
+      final newCodeLineChunks = _commentChunks(codeLineChunk, prefix, index);
+      newCodeChunks[j] = codeLineChunk.copyWith(
+          text: codeLineChunk.text.insert(prefix, index),
+          chunks: newCodeLineChunks);
+    }
+    return newCodeChunks;
+  }
+
   CodeLineEditingValue _uncommentSelectedCodeLines(CodeLineEditingValue value, String indent, String prefix) {
-    // TODO Handle code chunks
     final CodeLineSelection selection = value.selection;
     final CodeLines newCodeLines = CodeLines.from(value.codeLines);
     int? baseOffset;
@@ -238,8 +252,10 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
         deletion = prefix;
       }
       final int index = codeLine.text.indexOf(deletion);
+      final codeChunks = _uncommentChunks(codeLine, deletion, index);
       newCodeLines[i] = codeLine.copyWith(
-        text: codeLine.text.substring(0, index) + codeLine.text.substring(index + deletion.length)
+        text: codeLine.text.substring(0, index) + codeLine.text.substring(index + deletion.length),
+        chunks: codeChunks
       );
       if (i == selection.baseIndex) {
         if (selection.baseOffset > index) {
@@ -261,6 +277,23 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     );
   }
 
+  List<CodeLine> _uncommentChunks(
+      CodeLine codeLine, String deletion, int index) {
+    final List<CodeLine> newCodeChunks = List.from(codeLine.chunks);
+    for (int j = 0; j < newCodeChunks.length; j++) {
+      final CodeLine codeLineChunk = newCodeChunks[j];
+      if (codeLineChunk.text.isEmpty) {
+        continue;
+      }
+      final newCodeLineChunks =
+          _uncommentChunks(codeLineChunk, deletion, index);
+      newCodeChunks[j] = codeLineChunk.copyWith(
+          text: codeLineChunk.text.substring(0, index) +
+              codeLineChunk.text.substring(index + deletion.length),
+          chunks: newCodeLineChunks);
+    }
+    return newCodeChunks;
+  }
 }
 
 class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
