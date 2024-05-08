@@ -223,10 +223,10 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// TODO
   void moveCursorToPageDown();
 
-  /// TODO
+  /// Move the cursor to the start of the word.
   void moveCursorToWordBoundaryForward();
 
-  /// TODO
+  /// Move the cursor to the end of the word.
   void moveCursorToWordBoundaryBackward();
 
   /// Extend the selection to a direction.
@@ -243,6 +243,12 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
 
   /// Extend the selection to the end of document.
   void extendSelectionToPageEnd();
+
+  /// Extend the selection to the start of the word.
+  void extendSelectionToWordBoundaryForward();
+
+  /// Extend the selection to the end of the word.
+  void extendSelectionToWordBoundaryBackward();
 
   /// Delete the selected lines.
   void deleteSelectionLines([bool keepExtentOffset = true]);

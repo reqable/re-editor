@@ -33,6 +33,8 @@ enum CodeShortcutType {
   selectionExtendLineEnd,
   selectionExtendPageStart,
   selectionExtendPageEnd,
+  selectionExtendWordBoundaryForward,
+  selectionExtendWordBoundaryBackward,
   indent,
   outdent,
   newLine,
@@ -161,6 +163,11 @@ class CodeShortcutSelectionExtendPageEdgeIntent extends Intent {
   const CodeShortcutSelectionExtendPageEdgeIntent(this.forward);
 }
 
+class CodeShortcutSelectionExtendWordBoundaryIntent extends Intent {
+  final bool forward;
+  const CodeShortcutSelectionExtendWordBoundaryIntent(this.forward);
+}
+
 class CodeShortcutDeleteIntent extends CodeShortcutEditableIntent {
   final bool forward;
   const CodeShortcutDeleteIntent(this.forward);
@@ -231,6 +238,8 @@ const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.selectionExtendLineEnd: CodeShortcutSelectionExtendLineEdgeIntent(true),
   CodeShortcutType.selectionExtendPageStart: CodeShortcutSelectionExtendPageEdgeIntent(false),
   CodeShortcutType.selectionExtendPageEnd: CodeShortcutSelectionExtendPageEdgeIntent(true),
+  CodeShortcutType.selectionExtendWordBoundaryForward: CodeShortcutSelectionExtendWordBoundaryIntent(true),
+  CodeShortcutType.selectionExtendWordBoundaryBackward: CodeShortcutSelectionExtendWordBoundaryIntent(false),
   CodeShortcutType.indent: CodeShortcutIndentIntent(),
   CodeShortcutType.outdent: CodeShortcutOutdentIntent(),
   CodeShortcutType.newLine: CodeShortcutNewLineIntent(),
@@ -353,6 +362,12 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsAc
   CodeShortcutType.selectionExtendLineEnd: [
     SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, meta: true),
     SingleActivator(LogicalKeyboardKey.end, shift: true)
+  ],
+  CodeShortcutType.selectionExtendWordBoundaryForward: [
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true)
+  ],
+  CodeShortcutType.selectionExtendWordBoundaryBackward: [
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true)
   ],
   CodeShortcutType.indent: [
     SingleActivator(LogicalKeyboardKey.tab)
@@ -499,6 +514,12 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcut
   ],
   CodeShortcutType.selectionExtendLineEnd: [
     SingleActivator(LogicalKeyboardKey.end, shift: true)
+  ],
+  CodeShortcutType.selectionExtendWordBoundaryForward: [
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true)
+  ],
+  CodeShortcutType.selectionExtendWordBoundaryBackward: [
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true)
   ],
   CodeShortcutType.indent: [
     SingleActivator(LogicalKeyboardKey.tab)
