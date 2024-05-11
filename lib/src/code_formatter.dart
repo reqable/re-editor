@@ -10,10 +10,12 @@ abstract class DefaultCodeCommentFormatter implements CodeCommentFormatter {
 
   factory DefaultCodeCommentFormatter({
     String? singleLinePrefix, 
-    String? multiLinePrefix
+    String? multiLinePrefix,
+    String? multiLineSuffix
   }) => _DefaultCodeCommentFormatter(
     singleLinePrefix: singleLinePrefix,
     multiLinePrefix: multiLinePrefix,
+    multiLineSuffix: multiLineSuffix
   );
 
 }
