@@ -479,12 +479,116 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
 
   @override
   void moveCursorToWordBoundaryForward() {
-    // TODO
+    if (selection.extentOffset == 0) {
+      final int newIndex = selection.extentIndex - 1;
+
+      if (newIndex < 0) {
+        return;
+      }
+
+      selection = CodeLineSelection.collapsed(
+        index: newIndex,
+        offset: codeLines[newIndex].length,
+      );
+      makeCursorVisible();
+    }
+
+    final String current = extentLine.text;
+
+    if (current.isEmpty) {
+      return;
+    }
+
+    int offset = selection.extentOffset - 1;
+
+    while (offset > 0) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset--;
+      } else {
+        break;
+      }
+    }
+
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset - 1;
+
+    while (i > 0) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i--;
+    }
+
+    if (i <= 0) {
+      i = 0;
+    } else {
+      i++;
+    }
+
+    selection = CodeLineSelection.collapsed(
+      index: selection.extentIndex,
+      offset: i,
+    );
+    makeCursorVisible();
   }
 
   @override
   void moveCursorToWordBoundaryBackward() {
-    // TODO
+    if (selection.extentOffset == extentLine.text.length) {
+      final int newIndex = selection.extentIndex + 1;
+
+      if (newIndex >= codeLines.length) {
+        return;
+      }
+
+      selection = CodeLineSelection.collapsed(
+        index: newIndex,
+        offset: 0,
+      );
+      makeCursorVisible();
+    }
+
+    final String current = extentLine.text;
+
+    if (current.isEmpty) {
+      return;
+    }
+
+    int offset = selection.extentOffset;
+
+    while (offset < current.length) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset++;
+      } else {
+        break;
+      }
+    }
+
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset + 1;
+
+    while (i < current.length) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i++;
+    }
+
+    selection = CodeLineSelection.collapsed(
+      index: selection.extentIndex,
+      offset: i,
+    );
+    makeCursorVisible();
   }
 
   @override
@@ -609,6 +713,120 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     selection = selection.copyWith(
       extentIndex: codeLines.length - 1,
       extentOffset: codeLines.last.length
+    );
+    makeCursorVisible();
+  }
+
+  @override
+  void extendSelectionToWordBoundaryForward() {
+    if (selection.extentOffset == 0) {
+      final int newIndex = selection.extentIndex - 1;
+
+      if (newIndex < 0) {
+        return;
+      }
+
+      selection = selection.copyWith(
+        extentIndex: newIndex,
+        extentOffset: codeLines[newIndex].length,
+      );
+      makeCursorVisible();
+    }
+
+    final String current = extentLine.text;
+
+    if (current.isEmpty) {
+      return;
+    }
+
+    int offset = selection.extentOffset - 1;
+
+    while (offset > 0) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset--;
+      } else {
+        break;
+      }
+    }
+
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset - 1;
+
+    while (i > 0) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i--;
+    }
+
+    if (i <= 0) {
+      i = 0;
+    } else {
+      i++;
+    }
+
+    selection = selection.copyWith(
+      extentIndex: selection.extentIndex,
+      extentOffset: i,
+    );
+    makeCursorVisible();
+  }
+
+  @override
+  void extendSelectionToWordBoundaryBackward() {
+    if (selection.extentOffset == extentLine.text.length) {
+      final int newIndex = selection.extentIndex + 1;
+
+      if (newIndex >= codeLines.length) {
+        return;
+      }
+
+      selection = selection.copyWith(
+        extentIndex: newIndex,
+        extentOffset: 0,
+      );
+      makeCursorVisible();
+    }
+
+    final String current = extentLine.text;
+
+    if (current.isEmpty) {
+      return;
+    }
+
+    int offset = selection.extentOffset;
+
+    while (offset < current.length) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset++;
+      } else {
+        break;
+      }
+    }
+
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset + 1;
+
+    while (i < current.length) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i++;
+    }
+
+    selection = selection.copyWith(
+      extentIndex: selection.extentIndex,
+      extentOffset: i,
     );
     makeCursorVisible();
   }
@@ -865,6 +1083,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   _CodeFieldRender? get _render => _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+
+  bool _isAlphanumeric(int codeUnit) {
+    return (codeUnit <= 57 && codeUnit >= 48) ||
+        (codeUnit <= 90 && codeUnit >= 65) ||
+        (codeUnit <= 122 && codeUnit >= 97);
+  }
 
   void _moveSelectionLinesUp() {
     if (selection.startIndex == 0) {
@@ -1882,6 +2106,16 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   @override
   void extendSelectionToPageStart() {
     _delegate.extendSelectionToPageStart();
+  }
+
+  @override
+  void extendSelectionToWordBoundaryBackward() {
+    _delegate.extendSelectionToWordBoundaryBackward();
+  }
+
+  @override
+  void extendSelectionToWordBoundaryForward() {
+    _delegate.extendSelectionToWordBoundaryForward();
   }
 
   @override

@@ -234,6 +234,14 @@ class _CodeShortcutActions extends StatelessWidget {
         }
         break;
       }
+      case CodeShortcutSelectionExtendWordBoundaryIntent: {
+        if ((intent as CodeShortcutSelectionExtendWordBoundaryIntent).forward) {
+          editingController.extendSelectionToWordBoundaryForward();
+        } else {
+          editingController.extendSelectionToWordBoundaryBackward();
+        }
+        break;
+      }
       case CodeShortcutDeleteIntent: {
         if ((intent as CodeShortcutDeleteIntent).forward) {
           editingController.deleteForward();
