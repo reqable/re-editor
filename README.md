@@ -31,7 +31,7 @@ Add the followings in `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  re_editor: ^0.2.0
+  re_editor: ^0.3.0
 ```
 
 Like `TextField`, `Re-Editor` uses `CodeLineEditingController` as the controller. The following sample code creates the simplest multi-line input area, which is not much different from `TextField`.
@@ -158,6 +158,7 @@ The shortcut keys supported by `Re-Editor` are as follows:
 - Move current line (Alt + ↑/↓)
 - Continuous selection (Shift + ↑/↓/←/→)
 - Move cursor (↑/↓/←/→)
+- Move cursor between word boundaries (Alt + ←/→)
 - Move to top/bottom of page (Control/Command + ↑/↓)
 - Indent (Tab)
 - Unindent (Shift + Tab)

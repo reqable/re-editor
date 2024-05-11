@@ -36,3 +36,9 @@
 * Mobile toolbar widget will be built by user rather than the editor.
 * Autocomplete will only update after user input.
 * Fix desktop focus issue.
+
+## 0.3.0
+* [IMP] Break changes: remove API `CodeLineEditingController.fromFile`.
+* Feature: singleline chunks comment.
+* Feature: multiline comment formatter
+* Feature: moveCursorToWordBoundary and extendSelectionToWordBoundary(forward and backward).
