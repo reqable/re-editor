@@ -58,6 +58,10 @@ class _CodeShortcutsState extends State<_CodeShortcuts> {
         _shortcuts[activator] = kCodeShortcutIntents[type]!;
       }
     }
+    // Protect space key go to the IME.
+    _shortcuts.addAll({
+      const SingleActivator(LogicalKeyboardKey.space): const DoNothingAndStopPropagationTextIntent(),
+    });
   }
 
 }
@@ -96,6 +100,9 @@ class _CodeShortcutActions extends StatelessWidget {
     return Actions(
       actions: {
         ...actions,
+        ...{
+          DoNothingAndStopPropagationTextIntent: DoNothingAction(consumesKey: false),
+        },
         if (overrideActions != null)
           ...overrideActions!
       },
