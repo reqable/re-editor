@@ -1930,6 +1930,7 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
       value.addListener(listener);
     }
     _delegate = value;
+    notifyListeners();
   }
 
   @override
