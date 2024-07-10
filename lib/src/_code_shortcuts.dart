@@ -90,6 +90,10 @@ class _CodeShortcutActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<Type, Action<Intent>> actions = {};
     for (final Intent intent in kCodeShortcutIntents.values) {
+      // Do not add editable actions when read only.
+      if (intent is CodeShortcutEditableIntent && readOnly) {
+        continue;
+      }
       actions[intent.runtimeType] = _CompoDoNothingCallbackAction(
         controller: editingController,
         onInvoke: (intent) {
