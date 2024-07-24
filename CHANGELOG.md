@@ -42,3 +42,8 @@
 * Feature: singleline chunks comment.
 * Feature: multiline comment formatter
 * Feature: moveCursorToWordBoundary and extendSelectionToWordBoundary(forward and backward).
+
+## 0.3.1
+* Fix space key not works in PageView.
+* Notify delegate listeners when controller was changed.
+* Remove editable shortcut actions when read only.
