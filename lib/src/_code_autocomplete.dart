@@ -1,7 +1,6 @@
 part of re_editor;
 
-class _DefaultCodeAutocompletePromptsBuilder
-    implements DefaultCodeAutocompletePromptsBuilder {
+class _DefaultCodeAutocompletePromptsBuilder implements DefaultCodeAutocompletePromptsBuilder {
   final Mode? language;
   final List<CodeKeywordPrompt> keywordPrompts;
   final List<CodePrompt> directPrompts;
@@ -9,52 +8,40 @@ class _DefaultCodeAutocompletePromptsBuilder
 
   final Set<CodePrompt> _allKeywordPrompts = {};
 
-  _DefaultCodeAutocompletePromptsBuilder(
-      {this.language,
-      required this.keywordPrompts,
-      required this.directPrompts,
-      required this.relatedPrompts}) {
+  _DefaultCodeAutocompletePromptsBuilder({this.language, required this.keywordPrompts, required this.directPrompts, required this.relatedPrompts}) {
     _allKeywordPrompts.addAll(keywordPrompts);
     _allKeywordPrompts.addAll(directPrompts);
     final dynamic keywords = language?.keywords;
     if (keywords is Map) {
       final dynamic keywordList = keywords['keyword'];
       if (keywordList is List) {
-        _allKeywordPrompts.addAll(
-            keywordList.map((keyword) => CodeKeywordPrompt(word: keyword)));
+        _allKeywordPrompts.addAll(keywordList.map((keyword) => CodeKeywordPrompt(word: keyword)));
       }
       final dynamic builtInList = keywords['built_in'];
       if (builtInList is List) {
-        _allKeywordPrompts.addAll(
-            builtInList.map((keyword) => CodeKeywordPrompt(word: keyword)));
+        _allKeywordPrompts.addAll(builtInList.map((keyword) => CodeKeywordPrompt(word: keyword)));
       }
       final dynamic literalList = keywords['literal'];
       if (literalList is List) {
-        _allKeywordPrompts.addAll(
-            literalList.map((keyword) => CodeKeywordPrompt(word: keyword)));
+        _allKeywordPrompts.addAll(literalList.map((keyword) => CodeKeywordPrompt(word: keyword)));
       }
       final dynamic typeList = keywords['type'];
       if (typeList is List) {
-        _allKeywordPrompts.addAll(
-            typeList.map((keyword) => CodeKeywordPrompt(word: keyword)));
+        _allKeywordPrompts.addAll(typeList.map((keyword) => CodeKeywordPrompt(word: keyword)));
       }
     }
   }
 
   @override
-  CodeAutocompleteEditingValue? build(
-      BuildContext context, CodeLine codeLine, CodeLineSelection selection) {
+  CodeAutocompleteEditingValue? build(BuildContext context, CodeLine codeLine, CodeLineSelection selection) {
     final String text = codeLine.text;
-    final Characters charactersBefore =
-        text.substring(0, selection.extentOffset).characters;
+    final Characters charactersBefore = text.substring(0, selection.extentOffset).characters;
     if (charactersBefore.isEmpty) {
       return null;
     }
-    final Characters charactersAfter =
-        text.substring(selection.extentOffset).characters;
+    final Characters charactersAfter = text.substring(selection.extentOffset).characters;
     // FIXME：Check whether the position is inside a string
-    if (charactersBefore.containsSymbols(const ['\'', '"']) &&
-        charactersAfter.containsSymbols(const ['\'', '"'])) {
+    if (charactersBefore.containsSymbols(const ['\'', '"']) && charactersAfter.containsSymbols(const ['\'', '"'])) {
       return null;
     }
     // TODO Should check operator `->` for some languages like c/c++
@@ -68,9 +55,7 @@ class _DefaultCodeAutocompletePromptsBuilder
           break;
         }
       }
-      final String target = charactersBefore
-          .getRange(start + 1, charactersBefore.length - 1)
-          .string;
+      final String target = charactersBefore.getRange(start + 1, charactersBefore.length - 1).string;
       prompts = relatedPrompts[target] ?? const [];
     } else {
       int start = charactersBefore.length - 1;
@@ -79,8 +64,7 @@ class _DefaultCodeAutocompletePromptsBuilder
           break;
         }
       }
-      input =
-          charactersBefore.getRange(start + 1, charactersBefore.length).string;
+      input = charactersBefore.getRange(start + 1, charactersBefore.length).string;
       if (input.isEmpty) {
         return null;
       }
@@ -92,9 +76,7 @@ class _DefaultCodeAutocompletePromptsBuilder
           }
         }
         final String target = charactersBefore.getRange(start + 1, mark).string;
-        prompts =
-            relatedPrompts[target]?.where((prompt) => prompt.match(input)) ??
-                const [];
+        prompts = relatedPrompts[target]?.where((prompt) => prompt.match(input)) ?? const [];
       } else {
         prompts = _allKeywordPrompts.where((prompt) => prompt.match(input));
       }
@@ -102,11 +84,7 @@ class _DefaultCodeAutocompletePromptsBuilder
     if (prompts.isEmpty) {
       return null;
     }
-    return CodeAutocompleteEditingValue(
-        input: input,
-        prompts: prompts.toList(),
-        index: 0,
-        selection: selection);
+    return CodeAutocompleteEditingValue(input: input, prompts: prompts.toList(), index: 0, selection: selection);
   }
 }
 
@@ -196,8 +174,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     required ValueChanged<CodeAutocompleteResult> onAutocomplete,
   }) {
     dismiss();
-    CodeAutocompleteEditingValue? autocompleteEditingValue =
-        widget.promptsBuilder.build(
+    CodeAutocompleteEditingValue? autocompleteEditingValue = widget.promptsBuilder.build(
       context,
       value.codeLines[value.selection.extentIndex],
       value.selection,
@@ -206,11 +183,9 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
       if (!widget.Lsp) {
         return;
       }
-      autocompleteEditingValue = CodeAutocompleteEditingValue(
-          input: '', prompts: [], index: 0, selection: value.selection);
+      autocompleteEditingValue = CodeAutocompleteEditingValue(input: '', prompts: [], index: 0, selection: value.selection);
     } else if (widget.Lsp) {
-      autocompleteEditingValue =
-          autocompleteEditingValue.copyWith(selection: value.selection);
+      autocompleteEditingValue = autocompleteEditingValue.copyWith(selection: value.selection);
     }
 
     _notifier = ValueNotifier(autocompleteEditingValue);
@@ -249,8 +224,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     _selectAction.setEnabled(false);
   }
 
-  Future<Widget> _buildWidget(BuildContext context, LayerLink layerLink,
-      Offset position, double lineHeight) async {
+  Future<Widget> _buildWidget(BuildContext context, LayerLink layerLink, Offset position, double lineHeight) async {
     final PreferredSizeWidget child;
     if (widget.Lsp) {
       child = await widget.viewBuilder(context, _notifier!, (result) {
@@ -308,23 +282,19 @@ class _CodeAutocompleteAction<T extends Intent> extends CallbackAction<T> {
   bool get isActionEnabled => _isEnabled;
 }
 
-class _CodeAutocompleteNavigateAction
-    extends _CodeAutocompleteAction<CodeShortcutCursorMoveIntent> {
+class _CodeAutocompleteNavigateAction extends _CodeAutocompleteAction<CodeShortcutCursorMoveIntent> {
   _CodeAutocompleteNavigateAction({required super.onInvoke});
 
   @override
   bool consumesKey(CodeShortcutCursorMoveIntent intent) {
-    return intent.direction == AxisDirection.up ||
-        intent.direction == AxisDirection.down;
+    return intent.direction == AxisDirection.up || intent.direction == AxisDirection.down;
   }
 }
 
 extension _CodeAutocompleteStringExtension on String {
   bool get isValidVariablePart {
     final int char = codeUnits.first;
-    return (char >= 65 && char <= 90) ||
-        (char >= 97 && char <= 122) ||
-        char == 95;
+    return (char >= 65 && char <= 90) || (char >= 97 && char <= 122) || char == 95;
   }
 }
 

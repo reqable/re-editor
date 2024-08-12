@@ -26,8 +26,7 @@ class CodeKeywordPrompt extends CodePrompt {
   const CodeKeywordPrompt({required super.word});
 
   @override
-  CodeAutocompleteResult get autocomplete =>
-      CodeAutocompleteResult.fromText(word);
+  CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromText(word);
 
   @override
   bool match(String input) {
@@ -64,8 +63,7 @@ class CodeFieldPrompt extends CodePrompt {
   final CodeAutocompleteResult? customAutocomplete;
 
   @override
-  CodeAutocompleteResult get autocomplete =>
-      customAutocomplete ?? CodeAutocompleteResult.fromText(word);
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText(word);
 
   @override
   bool match(String input) {
@@ -77,10 +75,7 @@ class CodeFieldPrompt extends CodePrompt {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeFieldPrompt &&
-        other.word == word &&
-        other.type == type &&
-        other.customAutocomplete == customAutocomplete;
+    return other is CodeFieldPrompt && other.word == word && other.type == type && other.customAutocomplete == customAutocomplete;
   }
 
   @override
@@ -110,9 +105,7 @@ class CodeFunctionPrompt extends CodePrompt {
   final CodeAutocompleteResult? customAutocomplete;
 
   @override
-  CodeAutocompleteResult get autocomplete =>
-      customAutocomplete ??
-      CodeAutocompleteResult.fromText('$word(${parameters.keys.join(', ')})');
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText('$word(${parameters.keys.join(', ')})');
 
   @override
   bool match(String input) {
@@ -133,8 +126,7 @@ class CodeFunctionPrompt extends CodePrompt {
   }
 
   @override
-  int get hashCode => Object.hash(
-      word, type, parameters, optionalParameters, customAutocomplete);
+  int get hashCode => Object.hash(word, type, parameters, optionalParameters, customAutocomplete);
 }
 
 /// The autocomplete result selected by user, the editor will apply this
@@ -143,8 +135,7 @@ class CodeAutocompleteResult {
   const CodeAutocompleteResult({required this.text, required this.selection});
 
   factory CodeAutocompleteResult.fromText(String text) {
-    return CodeAutocompleteResult(
-        text: text, selection: TextSelection.collapsed(offset: text.length));
+    return CodeAutocompleteResult(text: text, selection: TextSelection.collapsed(offset: text.length));
   }
 
   /// The autocomplete text.
@@ -158,11 +149,7 @@ class CodeAutocompleteResult {
 
 /// The current user input and prompts for editing a run of text.
 class CodeAutocompleteEditingValue {
-  const CodeAutocompleteEditingValue(
-      {required this.input,
-      required this.prompts,
-      required this.index,
-      required this.selection});
+  const CodeAutocompleteEditingValue({required this.input, required this.prompts, required this.index, required this.selection});
 
   /// User input content.
   final String input;
@@ -182,11 +169,7 @@ class CodeAutocompleteEditingValue {
     int? index,
     CodeLineSelection? selection,
   }) {
-    return CodeAutocompleteEditingValue(
-        input: input ?? this.input,
-        prompts: prompts ?? this.prompts,
-        index: index ?? this.index,
-        selection: selection ?? this.selection);
+    return CodeAutocompleteEditingValue(input: input ?? this.input, prompts: prompts ?? this.prompts, index: index ?? this.index, selection: selection ?? this.selection);
   }
 
   CodeAutocompleteResult get autocomplete {
@@ -208,9 +191,7 @@ class CodeAutocompleteEditingValue {
 
 /// Builds the overlay autocomplete prompts view.
 typedef CodeAutocompleteWidgetBuilder = Future<PreferredSizeWidget> Function(
-    BuildContext context,
-    ValueNotifier<CodeAutocompleteEditingValue> notifier,
-    ValueChanged<CodeAutocompleteResult> onSelected);
+    BuildContext context, ValueNotifier<CodeAutocompleteEditingValue> notifier, ValueChanged<CodeAutocompleteResult> onSelected);
 
 /// The autocomplete prompts builder.
 abstract class CodeAutocompletePromptsBuilder {
@@ -223,8 +204,7 @@ abstract class CodeAutocompletePromptsBuilder {
 }
 
 /// The default autocomplete prompts builder.
-abstract class DefaultCodeAutocompletePromptsBuilder
-    implements CodeAutocompletePromptsBuilder {
+abstract class DefaultCodeAutocompletePromptsBuilder implements CodeAutocompletePromptsBuilder {
   /// Constructs the builder with defined prompts.
   factory DefaultCodeAutocompletePromptsBuilder({
     Mode? language,
@@ -286,10 +266,6 @@ class CodeAutocomplete extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CodeAutocomplete(
-        viewBuilder: viewBuilder,
-        promptsBuilder: promptsBuilder,
-        Lsp: Lsp,
-        child: child);
+    return _CodeAutocomplete(viewBuilder: viewBuilder, promptsBuilder: promptsBuilder, Lsp: Lsp, child: child);
   }
 }
