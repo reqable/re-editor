@@ -1,10 +1,16 @@
 part of re_editor;
 
+List<String> get triggerCharacters {
+  return const ['.', '[', '"', "'"];
+}
+
 /// Define code autocomplate prompt information.
 ///
 /// See also [CodeKeywordPrompt], [CodeFieldPrompt] and [CodeFunctionPrompt].
-abstract class CodePrompt {
-  const CodePrompt({required this.word});
+class CodePrompt {
+  const CodePrompt({
+    required this.word,
+  });
 
   /// Content associated with user input.
   ///
@@ -15,23 +21,27 @@ abstract class CodePrompt {
   /// For example, for functions, auto completion of parameters may be required.
   ///
   /// e.g. User input is 'he', 'hello(String name)' will be auto completed.
-  CodeAutocompleteResult get autocomplete;
+  CodeAutocompleteResult get autocomplete {
+    return const CodeAutocompleteResult(text: '', selection: TextSelection(baseOffset: 0, extentOffset: 0));
+  }
 
   /// Check whether the input meets this prompt condition.
-  bool match(String input);
+  bool match(String input, {bool caseInsensitive = false}) {
+    // 如果需要大小写不敏感匹配，则将两个字符串都转换为小写
+    String wordToMatch = caseInsensitive ? word.toLowerCase() : word;
+    String inputToMatch = caseInsensitive ? input.toLowerCase() : input;
+    return wordToMatch != inputToMatch && wordToMatch.startsWith(inputToMatch);
+  }
 }
 
 /// The keyword autocomplate prompt. such as 'return', 'class', 'new' and so on.
 class CodeKeywordPrompt extends CodePrompt {
-  const CodeKeywordPrompt({required super.word});
+  const CodeKeywordPrompt({
+    required super.word,
+  });
 
   @override
   CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromText(word);
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
@@ -64,11 +74,6 @@ class CodeFieldPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText(word);
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
@@ -108,11 +113,6 @@ class CodeFunctionPrompt extends CodePrompt {
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText('$word(${parameters.keys.join(', ')})');
 
   @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
@@ -132,7 +132,11 @@ class CodeFunctionPrompt extends CodePrompt {
 /// The autocomplete result selected by user, the editor will apply this
 /// to code content.
 class CodeAutocompleteResult {
-  const CodeAutocompleteResult({required this.text, required this.selection});
+  const CodeAutocompleteResult({
+    required this.text,
+    required this.selection,
+    this.replaceRange,
+  });
 
   factory CodeAutocompleteResult.fromText(String text) {
     return CodeAutocompleteResult(text: text, selection: TextSelection.collapsed(offset: text.length));
@@ -145,6 +149,9 @@ class CodeAutocompleteResult {
 
   /// The new selection after the autocompletion.
   final TextSelection selection;
+
+  ///自动完成需要替换或追加范围,null为追加
+  final CodeLineSelection? replaceRange;
 }
 
 /// The current user input and prompts for editing a run of text.
@@ -173,18 +180,25 @@ class CodeAutocompleteEditingValue {
   }
 
   CodeAutocompleteResult get autocomplete {
-    final CodeAutocompleteResult result = prompts[index].autocomplete;
+    final result = prompts[index].autocomplete;
     if (result.text.isEmpty) {
       return result;
     }
-    final String finalText = result.text.substring(input.length);
+    //final String finalText = result.text.substring(input.length);
     final TextSelection finalSelection = result.selection.copyWith(
-      baseOffset: result.selection.baseOffset - input.length,
-      extentOffset: result.selection.extentOffset - input.length,
+      baseOffset: input.length - 1,
+      extentOffset: input.length - 1,
     );
+    var triggerCharacter = triggerCharacters.contains(input);
     return CodeAutocompleteResult(
-      text: finalText,
+      text: "${triggerCharacter ? input : ''}${result.text}",
       selection: finalSelection,
+      replaceRange: CodeLineSelection(
+        baseIndex: selection.baseIndex,
+        baseOffset: selection.baseOffset - input.length,
+        extentIndex: selection.extentIndex,
+        extentOffset: selection.baseOffset,
+      ),
     );
   }
 }
@@ -192,6 +206,9 @@ class CodeAutocompleteEditingValue {
 /// Builds the overlay autocomplete prompts view.
 typedef CodeAutocompleteWidgetBuilder = Future<PreferredSizeWidget> Function(
     BuildContext context, ValueNotifier<CodeAutocompleteEditingValue> notifier, ValueChanged<CodeAutocompleteResult> onSelected);
+
+/// Builds the overlay autocomplete hovering view.
+typedef CodeHoverWidgetBuilder = Future<PreferredSizeWidget> Function(BuildContext context, CodeLineSelection selection);
 
 /// The autocomplete prompts builder.
 abstract class CodeAutocompletePromptsBuilder {
@@ -257,8 +274,11 @@ class CodeAutocomplete extends StatelessWidget {
     required this.promptsBuilder,
     required this.child,
     this.Lsp = false,
+    required this.HoverViewBuilder,
   });
 
+  ///鼠标悬浮提示框
+  final CodeHoverWidgetBuilder HoverViewBuilder;
   final CodeAutocompleteWidgetBuilder viewBuilder;
   final CodeAutocompletePromptsBuilder promptsBuilder;
   final Widget child;
@@ -266,6 +286,6 @@ class CodeAutocomplete extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CodeAutocomplete(viewBuilder: viewBuilder, promptsBuilder: promptsBuilder, Lsp: Lsp, child: child);
+    return _CodeAutocomplete(viewBuilder: viewBuilder, promptsBuilder: promptsBuilder, Lsp: Lsp, HoverViewBuilder: HoverViewBuilder, child: child);
   }
 }

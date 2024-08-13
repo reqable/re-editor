@@ -48,7 +48,8 @@ class _DefaultCodeAutocompletePromptsBuilder implements DefaultCodeAutocompleteP
     final Iterable<CodePrompt> prompts;
     final String input;
     if (charactersBefore.takeLast(1).string == '.') {
-      input = '';
+      ///这部分其实应该删除，做自动补全应该放在外面
+      input = '.';
       int start = charactersBefore.length - 2;
       for (; start >= 0; start--) {
         if (!charactersBefore.elementAt(start).isValidVariablePart) {
@@ -78,12 +79,15 @@ class _DefaultCodeAutocompletePromptsBuilder implements DefaultCodeAutocompleteP
         final String target = charactersBefore.getRange(start + 1, mark).string;
         prompts = relatedPrompts[target]?.where((prompt) => prompt.match(input)) ?? const [];
       } else {
+        ///匹配allKeyword
         prompts = _allKeywordPrompts.where((prompt) => prompt.match(input));
       }
     }
-    if (prompts.isEmpty) {
+
+    ///禁止内置硬编码
+    /*if (prompts.isEmpty) {
       return null;
-    }
+    }*/
     return CodeAutocompleteEditingValue(input: input, prompts: prompts.toList(), index: 0, selection: selection);
   }
 }
@@ -94,8 +98,9 @@ class _CodeAutocomplete extends StatefulWidget {
     required this.promptsBuilder,
     required this.child,
     required this.Lsp,
+    required this.HoverViewBuilder,
   });
-
+  final CodeHoverWidgetBuilder HoverViewBuilder;
   final CodeAutocompleteWidgetBuilder viewBuilder;
   final CodeAutocompletePromptsBuilder promptsBuilder;
   final Widget child;
@@ -110,9 +115,11 @@ class _CodeAutocomplete extends StatefulWidget {
 class _CodeAutocompleteState extends State<_CodeAutocomplete> {
   late final _CodeAutocompleteNavigateAction _navigateAction;
   late final _CodeAutocompleteAction _selectAction;
+  late final _CodeHoverAction _hoverAction;
 
   ValueChanged<CodeAutocompleteResult>? _onAutocomplete;
   OverlayEntry? _overlayEntry;
+  OverlayEntry? _overlayEntry1;
   ValueNotifier<CodeAutocompleteEditingValue>? _notifier;
 
   @override
@@ -141,6 +148,44 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
         return intent;
       },
     );
+
+    _hoverAction = _CodeHoverAction<cursorHoverIntent>(
+      onInvoke: (intent) {
+        print("baseIndex:${intent.selection?.baseIndex},baseOffset:${intent.selection?.baseOffset}");
+        if (_overlayEntry1 != null) {
+          _overlayEntry1?.remove();
+          _overlayEntry1 = null;
+        }
+
+        if (intent.mouseStatus == MouseStatus.exit || intent.selection == null) {
+          return;
+        }
+
+        _overlayEntry1 = OverlayEntry(
+          builder: (context) {
+            return Center(
+              child: FutureBuilder<Widget>(
+                future: _ToastbuildWidget(context, intent.selection!, intent.layerLink, intent.position, intent.lineHeight),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(); //const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    print('异步错误: ${snapshot.error}');
+                    return Container();
+                  } else if (snapshot.hasData) {
+                    return snapshot.data!;
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
+            );
+          },
+        );
+        Overlay.of(context, rootOverlay: true).insert(_overlayEntry1!);
+        return null;
+      },
+    );
     _selectAction = _CodeAutocompleteAction<CodeShortcutNewLineIntent>(
       onInvoke: (intent) {
         final CodeAutocompleteEditingValue? value = _notifier?.value;
@@ -150,6 +195,46 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
         _onAutocomplete?.call(value.autocomplete);
         return intent;
       },
+    );
+  }
+
+  Future<Widget> _ToastbuildWidget(BuildContext context, CodeLineSelection selection, LayerLink layerLink, Offset position, double lineHeight) async {
+    final PreferredSizeWidget child;
+    child = await widget.HoverViewBuilder(context, selection);
+    /*final Size screenSize = MediaQuery.of(context).size;
+    final double offsetX;
+    if (position.dx + child.preferredSize.width > screenSize.width) {
+      offsetX = screenSize.width - (position.dx + child.preferredSize.width);
+    } else {
+      offsetX = 0;
+    }
+    final double offsetY;
+    if (position.dy + child.preferredSize.height > screenSize.height) {
+      offsetY = -child.preferredSize.height - lineHeight;
+    } else {
+      offsetY = 0;
+    }*/
+    return Stack(
+      children: [
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 300),
+          left: position.dx - child.preferredSize.width / 2,
+          top: position.dy - child.preferredSize.height - 10,
+          child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Material(
+                color: Colors.transparent,
+                child: TapRegion(
+                    onTapOutside: (event) {
+                      dismiss();
+                    },
+                    child: CodeEditorTapRegion(
+                        child: ExcludeSemantics(
+                      child: child,
+                    ))),
+              )),
+        )
+      ],
     );
   }
 
@@ -163,6 +248,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     return Actions(actions: {
       CodeShortcutCursorMoveIntent: _navigateAction,
       CodeShortcutNewLineIntent: _selectAction,
+      cursorHoverIntent: _hoverAction,
     }, child: widget.child);
   }
 
@@ -179,15 +265,22 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
       value.codeLines[value.selection.extentIndex],
       value.selection,
     );
-    if (autocompleteEditingValue == null) {
+    //杜绝硬编码 他只要有输入就可以使用
+    if (autocompleteEditingValue == null || autocompleteEditingValue.input == '') {
+      return;
+    }
+    if (autocompleteEditingValue.prompts.isEmpty && !widget.Lsp) {
+      return;
+    }
+    /*if (autocompleteEditingValue == null) {
       if (!widget.Lsp) {
         return;
       }
       autocompleteEditingValue = CodeAutocompleteEditingValue(input: '', prompts: [], index: 0, selection: value.selection);
     } else if (widget.Lsp) {
       autocompleteEditingValue = autocompleteEditingValue.copyWith(selection: value.selection);
-    }
-
+    }*/
+    //_buildWidget(context, layerLink, position, lineHeight);
     _notifier = ValueNotifier(autocompleteEditingValue);
     _onAutocomplete = onAutocomplete;
     _overlayEntry = OverlayEntry(
@@ -197,13 +290,14 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
             future: _buildWidget(context, layerLink, position, lineHeight),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return Container(); //const CircularProgressIndicator();
               } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
+                print('异步错误: ${snapshot.error}');
+                return Container();
               } else if (snapshot.hasData) {
                 return snapshot.data!;
               } else {
-                return const Text('No data');
+                return Container();
               }
             },
           ),
@@ -226,15 +320,9 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
 
   Future<Widget> _buildWidget(BuildContext context, LayerLink layerLink, Offset position, double lineHeight) async {
     final PreferredSizeWidget child;
-    if (widget.Lsp) {
-      child = await widget.viewBuilder(context, _notifier!, (result) {
-        _onAutocomplete?.call(result);
-      });
-    } else {
-      child = await widget.viewBuilder(context, _notifier!, (result) {
-        _onAutocomplete?.call(result);
-      });
-    }
+    child = await widget.viewBuilder(context, _notifier!, (result) {
+      _onAutocomplete?.call(result);
+    });
     final Size screenSize = MediaQuery.of(context).size;
     final double offsetX;
     if (position.dx + child.preferredSize.width > screenSize.width) {
@@ -251,7 +339,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     return CompositedTransformFollower(
       link: layerLink,
       showWhenUnlinked: false,
-      offset: Offset(offsetX, offsetY),
+      offset: const Offset(0, 0),
       child: Align(
           alignment: Alignment.topLeft,
           child: Material(
@@ -267,6 +355,19 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
           )),
     );
   }
+}
+
+class _CodeHoverAction<T extends Intent> extends CallbackAction<T> {
+  bool _isEnabled = true;
+
+  _CodeHoverAction({required super.onInvoke});
+
+  void setEnabled(bool enabled) {
+    _isEnabled = enabled;
+  }
+
+  @override
+  bool get isActionEnabled => _isEnabled;
 }
 
 class _CodeAutocompleteAction<T extends Intent> extends CallbackAction<T> {
@@ -291,10 +392,16 @@ class _CodeAutocompleteNavigateAction extends _CodeAutocompleteAction<CodeShortc
   }
 }
 
+final RegExp validVariableRegex = RegExp(
+  r'^[\p{L}$_][\p{L}\p{N}$_]*$',
+  unicode: true,
+  dotAll: true,
+);
+
 extension _CodeAutocompleteStringExtension on String {
   bool get isValidVariablePart {
-    final int char = codeUnits.first;
-    return (char >= 65 && char <= 90) || (char >= 97 && char <= 122) || char == 95;
+    // 使用正则表达式检查变量名
+    return validVariableRegex.hasMatch(this);
   }
 }
 

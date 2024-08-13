@@ -7,7 +7,6 @@ const EdgeInsetsGeometry _kDefaultPadding = EdgeInsets.all(5);
 const Duration _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 
 class _CodeEditable extends StatefulWidget {
-
   final GlobalKey editorKey;
   final String? hint;
   final CodeIndicatorBuilder? indicatorBuilder;
@@ -80,11 +79,9 @@ class _CodeEditable extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _CodeEditableState();
-
 }
 
 class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable> {
-
   late bool _didAutoFocus;
   late final _CodeCursorBlinkController _cursorController;
 
@@ -172,91 +169,74 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   Widget build(BuildContext context) {
     super.build(context);
     final Widget child = _CodeScrollable(
-      axisDirection: AxisDirection.down,
-      controller: widget.scrollController.verticalScroller,
-      viewportBuilder: (context, ViewportOffset vertical) {
-        Widget codeField;
-        if (widget.wordWrap) {
-          codeField = _buildCodeField(vertical, null);
-        } else {
-          codeField = _CodeScrollable(
-            axisDirection: AxisDirection.right,
-            controller: widget.scrollController.horizontalScroller,
-            viewportBuilder: (context, ViewportOffset horizontal) {
-              return _buildCodeField(vertical, horizontal);
-            },
-            scrollbarBuilder: widget.scrollbarBuilder
-          );
-        }
-        if (widget.controller.value.isInitial) {
-          final String? hint = widget.hint;
-          if (hint != null && hint.isNotEmpty) {
-            codeField = Stack(
+        axisDirection: AxisDirection.down,
+        controller: widget.scrollController.verticalScroller,
+        viewportBuilder: (context, ViewportOffset vertical) {
+          Widget codeField;
+          if (widget.wordWrap) {
+            codeField = _buildCodeField(vertical, null);
+          } else {
+            codeField = _CodeScrollable(
+                axisDirection: AxisDirection.right,
+                controller: widget.scrollController.horizontalScroller,
+                viewportBuilder: (context, ViewportOffset horizontal) {
+                  return _buildCodeField(vertical, horizontal);
+                },
+                scrollbarBuilder: widget.scrollbarBuilder);
+          }
+          if (widget.controller.value.isInitial) {
+            final String? hint = widget.hint;
+            if (hint != null && hint.isNotEmpty) {
+              codeField = Stack(
+                children: [
+                  codeField,
+                  IgnorePointer(
+                      ignoring: true,
+                      child: Padding(
+                        padding: widget.padding,
+                        child: Text(
+                          hint,
+                          style: widget.textStyle.copyWith(color: widget.hintTextColor),
+                        ),
+                      ))
+                ],
+              );
+            }
+          }
+          final Widget? indicator = widget.indicatorBuilder?.call(context, widget.controller, widget.chunkController, _codeIndicatorValueNotifier);
+          return Container(
+            decoration: BoxDecoration(
+              border: widget.border,
+              color: widget.backgroundColor,
+            ),
+            margin: widget.margin,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                codeField,
-                IgnorePointer(
-                  ignoring: true,
-                  child: Padding(
-                    padding: widget.padding,
-                    child: Text(
-                      hint,
-                      style: widget.textStyle.copyWith(
-                        color: widget.hintTextColor
-                      ),
-                    ),
-                  )
+                if (indicator != null) indicator,
+                if (widget.sperator != null) widget.sperator!,
+                Expanded(
+                  child: RepaintBoundary(
+                    child: CompositedTransformTarget(link: widget.toolbarLayerLink, child: codeField),
+                  ),
                 )
               ],
-            );
-          }
-        }
-        final Widget? indicator = widget.indicatorBuilder?.call(
-          context,
-          widget.controller,
-          widget.chunkController,
-          _codeIndicatorValueNotifier
-        );
-        return Container(
-          decoration: BoxDecoration(
-            border: widget.border,
-            color: widget.backgroundColor,
-          ),
-          margin: widget.margin,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (indicator != null)
-                indicator,
-              if (widget.sperator != null)
-                widget.sperator!,
-              Expanded(
-                child: RepaintBoundary(
-                  child: CompositedTransformTarget(
-                    link: widget.toolbarLayerLink,
-                    child: codeField
-                  ),
-                ),
-              )
-            ],
-          ),
-        );
-      },
-      scrollbarBuilder: widget.scrollbarBuilder
-    );
-    return CodeEditorTapRegion(
-      onTapOutside: (_) {
-        widget.focusNode.unfocus();
-      },
-      child: NotificationListener(
-        onNotification: (notification) {
-          if (notification is ScrollStartNotification) {
-            widget.selectionOverlayController.hideToolbar();
-          }
-          return false;
+            ),
+          );
         },
-        child: child
-      )
-    );
+        scrollbarBuilder: widget.scrollbarBuilder);
+    return CodeEditorTapRegion(
+        onTapOutside: (_) {
+          widget.focusNode.unfocus();
+        },
+        child: NotificationListener(
+            onNotification: (notification) {
+              if (notification is ScrollStartNotification) {
+                widget.selectionOverlayController.hideToolbar();
+              }
+              return false;
+            },
+            child: child));
   }
 
   Widget _buildCodeField(ViewportOffset vertical, ViewportOffset? horizontal) {
@@ -272,10 +252,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       highlighter: _highlighter,
       showCursorNotifier: _cursorController,
       onRenderParagraphsChanged: (paragraphs) {
-        _codeIndicatorValueNotifier.value = CodeIndicatorValue(
-          paragraphs: paragraphs,
-          focusedIndex: widget.controller.selection.extentIndex
-        );
+        _codeIndicatorValueNotifier.value = CodeIndicatorValue(paragraphs: paragraphs, focusedIndex: widget.controller.selection.extentIndex);
       },
       selectionColor: widget.selectionColor,
       highlightColor: widget.highlightColor,
@@ -305,21 +282,26 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   void _onCodeInputChanged() {
     widget.onChanged?.call(widget.controller.value);
-    if (widget.controller.codeLines != widget.controller.preValue?.codeLines &&
-      widget.controller.preValue != null) {
+    if (widget.controller.codeLines != widget.controller.preValue?.codeLines && widget.controller.preValue != null) {
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
     } else {
       _updateAutoCompleteState(false);
     }
     _updateCursorState();
-    setState(() {
-    });
+    setState(() {});
   }
 
+  Timer? _timer;
+
+  ///简单做个节流，防止高频输入导致浪费
   void _onCodeUserInputChanged() {
-    // Delay 50ms to update the auto-complate prompt words.
-    Future.delayed(const Duration(milliseconds: 50), () {
+    if (_timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
+
+    _timer = Timer(const Duration(milliseconds: 50), () {
       _updateAutoCompleteState(true);
     });
   }
@@ -340,10 +322,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     }
     widget.controller.selection = currentMatch;
     if (currentMatch.isSameLine) {
-      widget.controller.makePositionCenterIfInvisible(CodeLinePosition(
-        index: currentMatch.start.index,
-        offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1
-      ));
+      widget.controller.makePositionCenterIfInvisible(CodeLinePosition(index: currentMatch.start.index, offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1));
     } else {
       widget.controller.makePositionCenterIfInvisible(currentMatch.start);
     }
@@ -387,26 +366,23 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       return;
     }
     autocompleteState.show(
-      layerLink: widget.startHandleLayerLink,
-      position: position,
-      lineHeight: render.lineHeight,
-      value: widget.controller.value,
-      onAutocomplete: (value) {
-        autocompleteState.dismiss();
-        final CodeLineSelection selection = widget.controller.selection;
-        widget.controller.replaceSelection(value.text);
-        widget.controller.selection = selection.copyWith(
-          baseOffset: selection.baseOffset + value.selection.baseOffset,
-          extentOffset: selection.extentOffset + value.selection.extentOffset,
-        );
-      }
-    );
+        layerLink: widget.startHandleLayerLink,
+        position: position,
+        lineHeight: render.lineHeight,
+        value: widget.controller.value,
+        onAutocomplete: (value) {
+          autocompleteState.dismiss();
+          //final CodeLineSelection selection = widget.controller.selection;
+          widget.controller.replaceSelection(value.text, value.replaceRange);
+          /*widget.controller.selection = selection.copyWith(
+            baseOffset: selection.baseOffset + value.selection.baseOffset,
+            extentOffset: selection.extentOffset + value.selection.extentOffset,
+          );*/
+        });
   }
-
 }
 
 class _CodeCursorBlinkController extends ValueNotifier<bool> {
-
   Timer? _timer;
 
   _CodeCursorBlinkController() : super(false);
@@ -444,5 +420,4 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
     stopBlink();
     super.dispose();
   }
-
 }
