@@ -208,7 +208,7 @@ typedef CodeAutocompleteWidgetBuilder = Future<PreferredSizeWidget> Function(
     BuildContext context, ValueNotifier<CodeAutocompleteEditingValue> notifier, ValueChanged<CodeAutocompleteResult> onSelected);
 
 /// Builds the overlay autocomplete hovering view.
-typedef CodeHoverWidgetBuilder = Future<PreferredSizeWidget> Function(BuildContext context, CodeLineSelection selection);
+typedef CodeHoverWidgetBuilder = Future<PreferredSizeWidget?> Function(BuildContext context, CodeLineSelection selection);
 
 /// The autocomplete prompts builder.
 abstract class CodeAutocompletePromptsBuilder {

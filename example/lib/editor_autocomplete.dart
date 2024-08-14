@@ -57,18 +57,28 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
   Widget build(BuildContext context) {
     return CodeAutocomplete(
         Lsp: true,
+        HoverViewBuilder: (BuildContext context, CodeLineSelection selection) async {
+          //hover
+          var contentResult = await client.sendHoverRequest(uurl, selection.baseIndex, selection.baseOffset);
+          return _HoverToastView(
+            text: "${contentResult["contents"]?["value"]}",
+          );
+        },
         viewBuilder: (context, notifier, onSelected) async {
           // 创建代码提示View
           //notifier.value.prompts.clear();
           var data = notifier.value.selection;
-          var contentResult = await sendhandleCompletion(uurl, data.baseIndex, data.baseOffset);
-          //debugger();
+          var contentResult = await client.sendhandleCompletion(uurl, data.baseIndex, data.baseOffset);
+
+          /*var aaa = await client.sendhandleresolve(
+                      (contentResult["items"] as List<dynamic>)[0]
+                          as Map<String, dynamic>);*/
           var Autolist = (contentResult["items"] as List<dynamic>).map((a) {
             var m = a as Map<String, dynamic>;
             return CodeFieldPrompt(word: m["label"].toString(), type: "");
           });
           //triggerCharacters
-          if (!const ['.', '[', '"', "'"].contains(notifier.value.input)) {
+          if (!triggerCharacters.contains(notifier.value.input)) {
             Autolist = Autolist.where((prompt) => prompt.match(notifier.value.input, caseInsensitive: true));
           }
           notifier.value.prompts.addAll(Autolist);

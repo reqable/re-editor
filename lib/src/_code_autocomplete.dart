@@ -164,7 +164,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
         _overlayEntry1 = OverlayEntry(
           builder: (context) {
             return Center(
-              child: FutureBuilder<Widget>(
+              child: FutureBuilder<Widget?>(
                 future: _ToastbuildWidget(context, intent.selection!, intent.layerLink, intent.position, intent.lineHeight),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -173,6 +173,9 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
                     print('异步错误: ${snapshot.error}');
                     return Container();
                   } else if (snapshot.hasData) {
+                    if (snapshot.data == null) {
+                      _overlayEntry1?.remove();
+                    }
                     return snapshot.data!;
                   } else {
                     return Container();
@@ -198,9 +201,12 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     );
   }
 
-  Future<Widget> _ToastbuildWidget(BuildContext context, CodeLineSelection selection, LayerLink layerLink, Offset position, double lineHeight) async {
-    final PreferredSizeWidget child;
+  Future<Widget?> _ToastbuildWidget(BuildContext context, CodeLineSelection selection, LayerLink layerLink, Offset position, double lineHeight) async {
+    final PreferredSizeWidget? child;
     child = await widget.HoverViewBuilder(context, selection);
+    if (child == null) {
+      return null;
+    }
     /*final Size screenSize = MediaQuery.of(context).size;
     final double offsetX;
     if (position.dx + child.preferredSize.width > screenSize.width) {
