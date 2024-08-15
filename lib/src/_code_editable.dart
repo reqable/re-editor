@@ -90,7 +90,6 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   late _CodeHighlighter _highlighter;
   late CodeIndicatorValueNotifier _codeIndicatorValueNotifier;
-  bool _disposed = false;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
@@ -157,7 +156,6 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   @override
   void dispose() {
-    _disposed = true;
     widget.controller.removeListener(_onCodeInputChanged);
     widget.inputController.removeListener(_onCodeUserInputChanged);
     _highlighter.dispose();
@@ -291,6 +289,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _onFocusChanged() {
+    if (!mounted) {
+      return;
+    }
     _updateCursorState();
     _updateAutoCompleteState(false);
     updateKeepAlive();
@@ -304,6 +305,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _onCodeInputChanged() {
+    if (!mounted) {
+      return;
+    }
     widget.onChanged?.call(widget.controller.value);
     if (widget.controller.codeLines != widget.controller.preValue?.codeLines &&
       widget.controller.preValue != null) {
@@ -318,6 +322,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _onCodeUserInputChanged() {
+    if (!mounted) {
+      return;
+    }
     // Delay 50ms to update the auto-complate prompt words.
     Future.delayed(const Duration(milliseconds: 50), () {
       _updateAutoCompleteState(true);
@@ -325,6 +332,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _onCodeFindChanged() {
+    if (!mounted) {
+      return;
+    }
     final CodeFindValue? value = widget.findController.value;
     if (value == null) {
       widget.focusNode.requestFocus();
@@ -358,10 +368,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
   }
 
   void _updateAutoCompleteState(bool isCodeLineChanged) {
-    if (_disposed) {
-      return;
-    }
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     final _CodeAutocompleteState? autocompleteState = context.findAncestorStateOfType<_CodeAutocompleteState>();

@@ -2068,6 +2068,7 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
 
   @override
   void dispose() {
+    _listeners.clear();
     _delegate.dispose();
   }
 

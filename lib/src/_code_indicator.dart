@@ -144,6 +144,9 @@ class CodeLineNumberRenderObject extends RenderBox {
   }
 
   void _onCodeLineChanged() {
+    if (!attached) {
+      return;
+    }
     final int newAllLineCount = _controller.lineCount;
     if (max(_minNumberCount, newAllLineCount.toString().length) !=
       max(_minNumberCount, _allLineCount.toString().length)) {
