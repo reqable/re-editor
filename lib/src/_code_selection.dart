@@ -39,6 +39,14 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   Timer? _timer;
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_isMobile) {
       return GestureDetector(
@@ -150,6 +158,9 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
               _timer = null;
             }
             _timer = Timer(const Duration(milliseconds: 300), () {
+              if (widget.editorKey.currentContext == null) {
+                return;
+              }
               final Offset? position = render.calculateTextPositionScreenOffset(widget.controller.selection.extent, true);
               var selection = render.setPositionAt(
                 position: data.position,

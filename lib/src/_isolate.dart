@@ -21,10 +21,14 @@ class _IsolateTasker<Req, Res> {
     if (_closed) {
       return;
     }
-    _isolateManager?.compute(req, callback: (message) async {
-      callback(message);
-      return true;
-    });
+    try {
+      _isolateManager?.compute(req, callback: (message) async {
+        callback(message);
+        return true;
+      });
+    } catch (e) {
+      print("线程提交出错：${e}");
+    }
   }
 
   void close() {
