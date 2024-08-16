@@ -478,7 +478,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
-  void moveCursorToWordBoundaryForward() {
+  void moveCursorToWordBoundaryBackward() {
     if (selection.extentOffset == 0) {
       final int newIndex = selection.extentIndex - 1;
 
@@ -538,7 +538,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
-  void moveCursorToWordBoundaryBackward() {
+  void moveCursorToWordBoundaryForward() {
     if (selection.extentOffset == extentLine.text.length) {
       final int newIndex = selection.extentIndex + 1;
 
@@ -832,6 +832,16 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
+  void deleteLineForward() {
+    runRevocableOp(_deleteLineForward);
+  }
+
+  @override
+  void deleteLineBackward() {
+    runRevocableOp(_deleteLineBackward);
+  }
+
+  @override
   void deleteSelectionLines([bool keepExtentOffset = true]) {
     runRevocableOp(() {
       _deleteSelectionLines(keepExtentOffset);
@@ -851,6 +861,16 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   @override
   void deleteForward() {
     runRevocableOp(_deleteForward);
+  }
+
+  @override
+  void deleteWordBackward() {
+    runRevocableOp(_deleteWordBackward);
+  }
+
+  @override
+  void deleteWordForward() {
+    runRevocableOp(_deleteWordForward);
   }
 
   @override
@@ -1130,6 +1150,48 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     makeCursorCenterIfInvisible();
   }
 
+  void _deleteLineForward() {
+    if (!selection.isCollapsed) {
+      _deleteForward();
+      return;
+    }
+    if (selection.extentOffset >= extentLine.length) {
+      _deleteForward();
+      return;
+    }
+    final CodeLines newCodeLines = CodeLines.from(codeLines);
+    newCodeLines[selection.extentIndex] = extentLine.copyWith(
+      text: _codeTextBefore(selection.extent)
+    );
+    value = value.copyWith(
+      codeLines: newCodeLines,
+    );
+    makeCursorVisible();
+  }
+
+  void _deleteLineBackward() {
+    if (!selection.isCollapsed) {
+      _deleteBackward();
+      return;
+    }
+    if (selection.extentOffset == 0) {
+      _deleteBackward();
+      return;
+    }
+    final CodeLines newCodeLines = CodeLines.from(codeLines);
+    newCodeLines[selection.extentIndex] = extentLine.copyWith(
+      text: _codeTextAfter(selection.extent)
+    );
+    value = value.copyWith(
+      codeLines: newCodeLines,
+      selection: CodeLineSelection.collapsed(
+        index: selection.extentIndex,
+        offset: 0,
+      ),
+    );
+    makeCursorVisible();
+  }
+
   void _deleteSelectionLines([bool keepExtentOffset = true]) {
     if (codeLines.equals(_kInitialCodeLines)) {
       return;
@@ -1341,6 +1403,100 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       _deleteSelection();
     }
     makeCursorCenterIfInvisible();
+  }
+
+  void _deleteWordBackward() {
+    if (!selection.isCollapsed) {
+      _deleteBackward();
+      return;
+    }
+    if (selection.extentOffset == 0) {
+      _deleteBackward();
+      return;
+    }
+    final String current = extentLine.text;
+    int offset = selection.extentOffset - 1;
+    while (offset > 0) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset--;
+      } else {
+        break;
+      }
+    }
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset - 1;
+    while (i > 0) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i--;
+    }
+    if (i <= 0) {
+      i = 0;
+    } else {
+      i++;
+    }
+    final CodeLines newCodeLines = CodeLines.from(codeLines);
+    newCodeLines[selection.extentIndex] = extentLine.copyWith(
+      text: _codeTextBefore(selection.extent.copyWith(
+        offset: i
+      )) + _codeTextAfter(selection.extent)
+    );
+    value = value.copyWith(
+      codeLines: newCodeLines,
+      selection: CodeLineSelection.collapsed(
+        index: selection.extentIndex,
+        offset: i,
+      ),
+    );
+    makeCursorVisible();
+  }
+
+  void _deleteWordForward() {
+    if (!selection.isCollapsed) {
+      _deleteForward();
+      return;
+    }
+    if (selection.extentOffset >= extentLine.length) {
+      _deleteForward();
+      return;
+    }
+    final String current = extentLine.text;
+    if (current.isEmpty) {
+      return;
+    }
+    int offset = selection.extentOffset;
+    while (offset < current.length) {
+      if (current.codeUnitAt(offset) == _kUnitCodeWhitespace) {
+        offset++;
+      } else {
+        break;
+      }
+    }
+    final int codeUnit = current.codeUnitAt(offset);
+    bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
+    int i = offset + 1;
+    while (i < current.length) {
+      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
+        break;
+      }
+      isBeforeAlphanumeric = isCurrentAlphanumeric;
+      i++;
+    }
+    final CodeLines newCodeLines = CodeLines.from(codeLines);
+    newCodeLines[selection.extentIndex] = extentLine.copyWith(
+      text: _codeTextBefore(selection.extent) + _codeTextAfter(selection.extent.copyWith(
+        offset: i
+      ))
+    );
+    value = value.copyWith(
+      codeLines: newCodeLines,
+    );
+    makeCursorVisible();
   }
 
   void _applyNewLine() {
@@ -2054,6 +2210,26 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   @override
   void deleteForward() {
     _delegate.deleteForward();
+  }
+
+  @override
+  void deleteWordBackward() {
+    _delegate.deleteWordBackward();
+  }
+
+  @override
+  void deleteWordForward() {
+    _delegate.deleteWordForward();
+  }
+
+  @override
+  void deleteLineForward() {
+    _delegate.deleteLineForward();
+  }
+
+  @override
+  void deleteLineBackward() {
+    _delegate.deleteLineBackward();
   }
 
   @override

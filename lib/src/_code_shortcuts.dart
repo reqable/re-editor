@@ -162,6 +162,14 @@ class _CodeShortcutActions extends StatelessWidget {
         editingController.deleteSelectionLines(true);
         break;
       }
+      case ShortcutLineDeleteDirectionIntent: {
+        if ((intent as ShortcutLineDeleteDirectionIntent).forward) {
+          editingController.deleteLineForward();
+        } else {
+          editingController.deleteLineBackward();
+        }
+        break;
+      }
       case ShortcutLineMoveIntent: {
         if ((intent as ShortcutLineMoveIntent).direction == VerticalDirection.up) {
           editingController.moveSelectionLinesUp();
@@ -250,6 +258,14 @@ class _CodeShortcutActions extends StatelessWidget {
           editingController.extendSelectionToWordBoundaryForward();
         } else {
           editingController.extendSelectionToWordBoundaryBackward();
+        }
+        break;
+      }
+      case ShortcutWordDeleteDirectionIntent: {
+        if ((intent as ShortcutWordDeleteDirectionIntent).forward) {
+          editingController.deleteWordForward();
+        } else {
+          editingController.deleteWordBackward();
         }
         break;
       }

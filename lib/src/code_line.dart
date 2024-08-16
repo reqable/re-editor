@@ -253,6 +253,12 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// Delete the selected lines.
   void deleteSelectionLines([bool keepExtentOffset = true]);
 
+  /// Delete content before the cursor at the current line.
+  void deleteLineForward();
+
+  /// Delete content after the cursor at the current line.
+  void deleteLineBackward();
+
   /// Delete the selected codes.
   ///
   /// Note that this operation will have no effect if the selection is collapsed.
@@ -271,6 +277,12 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// Note that if the cursor is between closing symbols, such as braces,
   /// the left and right brace will be deleted together.
   void deleteForward();
+
+  /// Delete the word behind the cursor.
+  void deleteWordBackward();
+
+  /// Delete the word in front of the cursor.
+  void deleteWordForward();
 
   /// Insert a newline character.
   void applyNewLine();
