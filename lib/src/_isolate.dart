@@ -22,6 +22,9 @@ class _IsolateTasker<Req, Res> {
       return;
     }
     _isolateManager?.compute(req, callback: (message) async {
+      if (_closed) {
+        return false;
+      }
       callback(message);
       return true;
     });
