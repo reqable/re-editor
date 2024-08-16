@@ -12,7 +12,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
     controller.addListener(_onCodeChanged);
     _tasker = _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>('CodeChunk', _run);
     _shouldNotUpdateChunks = false;
-    _runChunkAnalyzeTask();
+    //_runChunkAnalyzeTask();
   }
 
   void collapse(int index) {

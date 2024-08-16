@@ -19,7 +19,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
         _engine = _CodeHighlightEngine(theme),
         super(const []) {
     _controller.addListener(_onCodesChanged);
-    _processHighlight();
+    //_processHighlight();
   }
 
   set controller(CodeLineEditingController value) {
@@ -134,6 +134,10 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     if (_controller.preValue?.codeLines == _controller.codeLines) {
       return;
     }
+    _processHighlight();
+  }
+
+  void processHighlight() {
     _processHighlight();
   }
 

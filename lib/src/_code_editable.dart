@@ -105,6 +105,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       controller: widget.controller,
       theme: widget.codeTheme,
     );
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _highlighter.processHighlight();
+    });
 
     _codeIndicatorValueNotifier = CodeIndicatorValueNotifier(null);
 
