@@ -2,15 +2,16 @@ part of re_editor;
 
 class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
 
-  final CodeLineEditingController controller;
-  final CodeChunkAnalyzer analyzer;
+  late final CodeLineEditingController _controller;
+  final CodeChunkAnalyzer _analyzer;
 
   late final _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult> _tasker;
 
   late bool _shouldNotUpdateChunks;
 
-  CodeChunkController(this.controller, this.analyzer) : super(const []) {
-    controller.addListener(_onCodeChanged);
+  CodeChunkController(CodeLineEditingController controller, this._analyzer) : super(const []) {
+    _controller = controller is _CodeLineEditingControllerDelegate ? controller.delegate : controller;
+    _controller.addListener(_onCodeChanged);
     _tasker = _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>('CodeChunk', _run);
     _shouldNotUpdateChunks = false;
     _runChunkAnalyzeTask();
@@ -40,12 +41,12 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
     }
     value = codeChunks;
     _shouldNotUpdateChunks = true;
-    controller.collapseChunk(chunk.index, chunk.end);
+    _controller.collapseChunk(chunk.index, chunk.end);
     _shouldNotUpdateChunks = false;
   }
 
   void expand(int index) {
-    final CodeLine codeLine = controller.codeLines[index];
+    final CodeLine codeLine = _controller.codeLines[index];
     if (!codeLine.chunkParent) {
       // Nothing to expand, this should not happen.
       return;
@@ -70,11 +71,11 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
       codeChunks.sort((a, b) => a.index - b.index);
     }
     value = codeChunks;
-    controller.expandChunk(index);
+    _controller.expandChunk(index);
   }
 
   void toggle(int index) {
-    if (controller.codeLines[index].chunkParent) {
+    if (_controller.codeLines[index].chunkParent) {
       expand(index);
     } else {
       collapse(index);
@@ -98,29 +99,29 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
 
   @override
   void dispose() {
-    controller.removeListener(_onCodeChanged);
+    _controller.removeListener(_onCodeChanged);
     _tasker.close();
     super.dispose();
   }
 
-  void _onCodeChanged() async {
+  void _onCodeChanged() {
     if (_shouldNotUpdateChunks) {
       return;
     }
-    if (controller.codeLines.length < 3 && value.isEmpty) {
+    if (_controller.codeLines.length < 3 && value.isEmpty) {
       value = [];
       return;
     }
-    if (controller.codeLines.equals(controller.preValue?.codeLines)) {
+    if (_controller.codeLines.equals(_controller.preValue?.codeLines)) {
       return;
     }
     _runChunkAnalyzeTask();
   }
 
   void _runChunkAnalyzeTask() {
-    final CodeLines codeLines = controller.codeLines;
-    _tasker.run(_CodeChunkAnalyzePayload(analyzer, codeLines), (result) {
-      if (controller.codeLines.equals(codeLines)) {
+    final CodeLines codeLines = _controller.codeLines;
+    _tasker.run(_CodeChunkAnalyzePayload(_analyzer, codeLines), (result) {
+      if (_controller.codeLines.equals(codeLines)) {
         value = result.chunks;
         _expandInvalidCollapsedChunks(result.invalidCollapsedChunkIndexes);
       }

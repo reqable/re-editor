@@ -388,7 +388,7 @@ class _CodeEditorState extends State<CodeEditor> {
     }
     if (oldWidget.controller != widget.controller) {
       if (oldWidget.controller == null) {
-        _editingController.delegate.dispose();
+        _editingController.dispose();
       }
       _editingController.delegate = widget.controller ?? CodeLineEditingController();
       _editingController.bindEditor(_editorKey);

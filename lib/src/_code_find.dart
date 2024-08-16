@@ -2,7 +2,7 @@ part of re_editor;
 
 class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements CodeFindController {
 
-  final CodeLineEditingController controller;
+  late final CodeLineEditingController _controller;
   late final _IsolateTasker<_CodeFindPayload, CodeFindResult?> _tasker;
   late final TextEditingController _findInputController;
   late final FocusNode _findInputFocusNode;
@@ -10,8 +10,9 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
   late final FocusNode _replaceInputFocusNode;
   late bool _shouldNotUpdateResults;
 
-  _CodeFindControllerImpl(this.controller, [CodeFindValue? value]) : super(value) {
-    controller.addListener(_updateResult);
+  _CodeFindControllerImpl(CodeLineEditingController controller, [CodeFindValue? value]) : super(value) {
+    _controller = controller is _CodeLineEditingControllerDelegate ? controller.delegate : controller;
+    _controller.addListener(_updateResult);
     _tasker = _IsolateTasker<_CodeFindPayload, CodeFindResult?>('CodeFind', _run);
     _findInputController = TextEditingController();
     _findInputController.addListener(_onFindPatternChanged);
@@ -25,7 +26,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
   @override
   void dispose() {
     super.dispose();
-    controller.removeListener(_updateResult);
+    _controller.removeListener(_updateResult);
     _findInputController.removeListener(_onFindPatternChanged);
     _findInputController.dispose();
     _findInputFocusNode.dispose();
@@ -222,7 +223,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     if (result.matches.length == 1) {
       final CodeLineSelection? selection = currentMatchSelection;
       if (selection != null) {
-        controller.makePositionCenterIfInvisible(selection.start);
+        _controller.makePositionCenterIfInvisible(selection.start);
       }
     }
   }
@@ -241,7 +242,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     if (result.matches.length == 1) {
       final CodeLineSelection? selection = currentMatchSelection;
       if (selection != null) {
-        controller.makePositionCenterIfInvisible(selection.start);
+        _controller.makePositionCenterIfInvisible(selection.start);
       }
     }
   }
@@ -259,11 +260,11 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     if (selection == null) {
       return;
     }
-    final CodeLines preCodeLine = controller.codeLines;
-    controller.replaceSelection(_replaceInputController.text, selection);
+    final CodeLines preCodeLine = _controller.codeLines;
+    _controller.replaceSelection(_replaceInputController.text, selection);
     final CodeFindValue newValue = value!.copyWith(
       result: result.next.copyWith(
-        dirty: !preCodeLine.equals(controller.codeLines)
+        dirty: !preCodeLine.equals(_controller.codeLines)
       )
     );
     _expandChunkIfNeeded(newValue);
@@ -284,18 +285,18 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     if (regExp == null) {
       return;
     }
-    final CodeLines preCodeLine = controller.codeLines;
-    controller.replaceAll(regExp, _replaceInputController.text);
+    final CodeLines preCodeLine = _controller.codeLines;
+    _controller.replaceAll(regExp, _replaceInputController.text);
     value = value?.copyWith(
       result: result.copyWith(
-        dirty: !preCodeLine.equals(controller.codeLines)
+        dirty: !preCodeLine.equals(_controller.codeLines)
       )
     );
   }
 
   @override
   CodeLineSelection? convertMatchToSelection(CodeLineSelection match) {
-    final CodeLineIndex baseIndex = controller.lineIndex2Index(match.baseIndex);
+    final CodeLineIndex baseIndex = _controller.lineIndex2Index(match.baseIndex);
     if (baseIndex.chunkIndex >= 0) {
       // This match is in a collapsed chunk, invisble
       return null;
@@ -304,7 +305,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     if (match.isSameLine) {
       extentIndex = baseIndex;
     } else {
-      extentIndex = controller.lineIndex2Index(match.extentIndex);
+      extentIndex = _controller.lineIndex2Index(match.extentIndex);
     }
     if (extentIndex.chunkIndex >= 0) {
       // This match is in a collapsed chunk, invisble
@@ -335,11 +336,11 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
   }
 
   String? _autoFilledPattern() {
-    final CodeLineSelection selection = controller.selection;
+    final CodeLineSelection selection = _controller.selection;
     if (selection.isCollapsed || !selection.isSameLine) {
       return null;
     }
-    return controller.selectedText;
+    return _controller.selectedText;
   }
 
   void _updateResult() {
@@ -355,14 +356,14 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
       return;
     }
     final bool optionChanged = value?.result?.option != option;
-    if (!optionChanged && controller.codeLines.equals(value?.result?.codeLines)) {
+    if (!optionChanged && _controller.codeLines.equals(value?.result?.codeLines)) {
       value = value?.copyWith(
         result: value?.result,
         searching: false
       );
       return;
     }
-    _tasker.run(_CodeFindPayload(controller.codeLines, controller.unforldLineSelection, option), (result) {
+    _tasker.run(_CodeFindPayload(_controller.codeLines, _controller.unforldLineSelection, option), (result) {
       if (option == value?.option) {
         final CodeFindValue newValue = value!.copyWith(
           result: result,
@@ -392,18 +393,18 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
 
   void _expandChunkIfSelectionInvisible(CodeLineSelection match) {
     if (match.isSameLine) {
-      final CodeLineIndex start = controller.lineIndex2Index(match.startIndex);
+      final CodeLineIndex start = _controller.lineIndex2Index(match.startIndex);
       if (start.chunkIndex < 0) {
         return;
       }
-      controller.expandChunk(start.index);
+      _controller.expandChunk(start.index);
     } else {
-      final CodeLineIndex start = controller.lineIndex2Index(match.startIndex);
-      final CodeLineIndex end = controller.lineIndex2Index(match.endIndex);
+      final CodeLineIndex start = _controller.lineIndex2Index(match.startIndex);
+      final CodeLineIndex end = _controller.lineIndex2Index(match.endIndex);
       if (start.chunkIndex >= 0) {
-        controller.expandChunk(start.index);
+        _controller.expandChunk(start.index);
       } else if (end.chunkIndex >= 0) {
-        controller.expandChunk(end.index);
+        _controller.expandChunk(end.index);
       } else {
         return;
       }
