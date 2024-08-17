@@ -7,12 +7,21 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
   late final _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult> _tasker;
 
   late bool _shouldNotUpdateChunks;
-
+  StreamSubscription? _subscription;
   CodeChunkController(this.controller, this.analyzer) : super(const []) {
     controller.addListener(_onCodeChanged);
     _tasker = _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>('CodeChunk', _run);
     _shouldNotUpdateChunks = false;
     //_runChunkAnalyzeTask();
+    _subscription = _tasker.resultStream.listen((result) {
+      //callback();
+      if (controller.codeLines.equals(controller.codeLines)) {
+        value = result.$2.chunks;
+        _expandInvalidCollapsedChunks(result.$2.invalidCollapsedChunkIndexes);
+      }
+    }, onError: (error) {
+      print("Error occurred: $error");
+    });
   }
 
   void collapse(int index) {
@@ -94,6 +103,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
   @override
   void dispose() {
     controller.removeListener(_onCodeChanged);
+    _subscription?.cancel();
     _tasker.close();
     super.dispose();
   }
@@ -115,12 +125,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
   void _runChunkAnalyzeTask() {
     final CodeLines codeLines = controller.codeLines;
 
-    _tasker.run(_CodeChunkAnalyzePayload(analyzer, codeLines), ((result) {
-      if (controller.codeLines.equals(codeLines)) {
-        value = result.chunks;
-        _expandInvalidCollapsedChunks(result.invalidCollapsedChunkIndexes);
-      }
-    }));
+    _tasker.run(_CodeChunkAnalyzePayload(analyzer, codeLines), "dddddddddddddddd");
   }
 
   void _expandInvalidCollapsedChunks(List<int> indexes) {

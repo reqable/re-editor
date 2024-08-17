@@ -91,7 +91,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
-
+  Timer? processHighlight_timer;
   @override
   void initState() {
     super.initState();
@@ -106,7 +106,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       theme: widget.codeTheme,
     );
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      _highlighter.processHighlight();
+      processHighlight_timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        _highlighter.processHighlight();
+      });
     });
 
     _codeIndicatorValueNotifier = CodeIndicatorValueNotifier(null);
@@ -160,6 +162,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _disposed = true;
     widget.controller.removeListener(_onCodeInputChanged);
     widget.inputController.removeListener(_onCodeUserInputChanged);
+    processHighlight_timer?.cancel();
+    processHighlight_timer = null;
     _highlighter.dispose();
     _codeIndicatorValueNotifier.dispose();
     _cursorController.dispose();

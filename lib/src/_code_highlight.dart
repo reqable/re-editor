@@ -8,6 +8,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   CodeLineEditingController _controller;
   CodeHighlightTheme? _theme;
 
+  StreamSubscription? _subscription;
   _CodeHighlighter({
     required BuildContext context,
     required CodeLineEditingController controller,
@@ -20,6 +21,12 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
         super(const []) {
     _controller.addListener(_onCodesChanged);
     //_processHighlight();
+    _subscription = _engine.getResultStream().listen((result) {
+      //callback();
+      value = result.$2;
+    }, onError: (error) {
+      print("Error occurred: $error");
+    });
   }
 
   set controller(CodeLineEditingController value) {
@@ -53,6 +60,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   @override
   void dispose() {
     _controller.removeListener(_onCodesChanged);
+    _subscription?.cancel();
     _engine.dispose();
     super.dispose();
   }
@@ -142,7 +150,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   }
 
   void _processHighlight() {
-    _engine.run(_controller.codeLines, (result) => value = result);
+    _engine.run(_controller.codeLines);
   }
 }
 
@@ -151,10 +159,12 @@ class _CodeHighlightEngine {
 
   Highlight? _highlight;
   CodeHighlightTheme? _theme;
-
   _CodeHighlightEngine(final CodeHighlightTheme? theme) {
     this.theme = theme;
     _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>('CodeHighlightEngine', _run);
+  }
+  Stream<(String, List<_HighlightResult>)> getResultStream() {
+    return _tasker.resultStream;
   }
 
   set theme(CodeHighlightTheme? value) {
@@ -176,15 +186,16 @@ class _CodeHighlightEngine {
     _tasker.close();
   }
 
-  void run(CodeLines codes, IsolateCallback<List<_HighlightResult>> callback) {
+  void run(CodeLines codes) {
+    //, IsolateCallback<List<_HighlightResult>> callback
     final Highlight? highlight = _highlight;
     if (highlight == null) {
-      callback(const []);
+      //callback(const []);
       return;
     }
     final Map<String, CodeHighlightThemeMode>? modes = _theme?.languages;
     if (modes == null) {
-      callback(const []);
+      //callback(const []);
       return;
     }
     _tasker.run(
@@ -195,7 +206,7 @@ class _CodeHighlightEngine {
           maxSizes: modes.values.map((e) => e.maxSize).toList(),
           maxLineLengths: modes.values.map((e) => e.maxLineLength).toList(),
         ),
-        (callback));
+        "CodeHighlightEngine");
   }
 
   @pragma('vm:entry-point')

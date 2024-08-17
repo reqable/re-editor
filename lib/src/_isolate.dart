@@ -9,6 +9,9 @@ class _IsolateTasker<Req, Res> {
 
   late IsolateManager<Res, Req>? _isolateManager;
 
+  final _controller = StreamController<(String, Res)>.broadcast();
+  Stream<(String, Res)> get resultStream => _controller.stream;
+
   _IsolateTasker(this.name, IsolateRunnable<Req, Res> runnable) {
     _closed = false;
     _isolateManager = IsolateManager.create(
@@ -17,7 +20,7 @@ class _IsolateTasker<Req, Res> {
     );
   }
 
-  void run(Req req, IsolateCallback<Res> callback) async {
+  void run1(Req req, IsolateCallback<Res> callback) async {
     if (_closed) {
       return;
     }
@@ -31,8 +34,28 @@ class _IsolateTasker<Req, Res> {
     }
   }
 
+  void run(Req req, String name) async {
+    if (_closed) {
+      return;
+    }
+    try {
+      _isolateManager?.compute(req, callback: (message) async {
+        if (!_controller.isClosed) {
+          _controller.add((name, message));
+          return true;
+        }
+
+        return false;
+      });
+    } catch (e) {
+      print("线程提交出错：$e");
+      _controller.addError(e);
+    }
+  }
+
   void close() {
     _closed = true;
+    _controller.close();
     _isolateManager?.stop();
     _isolateManager = null;
   }
