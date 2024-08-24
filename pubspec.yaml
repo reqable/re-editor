@@ -5,13 +5,14 @@ homepage: https://reqable.com
 repository: https://github.com/reqable/re-editor
 
 environment:
-  sdk: ">=2.17.3 <4.0.0"
+  sdk: '>=3.5.0-18.0.dev <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   re_highlight: ^0.0.3
-  isolate_manager: ^4.1.5+1
+  isolate_manager: ^5.2.1
+
 
 dev_dependencies:
   flutter_test:

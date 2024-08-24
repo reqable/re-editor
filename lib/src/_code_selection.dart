@@ -38,6 +38,9 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   ///悬浮提示time
   Timer? _timer;
 
+  ///退出time
+  Timer? _timerexit;
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -165,6 +168,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
               var selection = render.setPositionAt(
                 position: data.position,
               );
+              //var aaa = render.calculateTextPosition(data.localPosition);
               if (selection == null) {
                 return;
               }
@@ -188,20 +192,27 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           },
           behavior: widget.behavior ?? HitTestBehavior.translucent,
           child: MouseRegion(
+            hitTestBehavior: HitTestBehavior.translucent,
             onExit: (PointerExitEvent event) {
-              var cursorhoverIntent = cursorHoverIntent(
-                  mouseStatus: MouseStatus.exit,
-                  position: Offset.zero,
-                  layerLink: LayerLink(), //widget.selectionOverlayController.startHandleLayerLink,
-                  lineHeight: render.lineHeight,
-                  value: widget.controller.value,
-                  selection: null);
-              final Action<Intent>? action = Actions.maybeFind(context, intent: cursorhoverIntent);
-              if (action != null && action.isActionEnabled) {
-                if (action is CallbackAction) {
-                  action.invoke(cursorhoverIntent);
-                }
+              if (_timerexit != null) {
+                _timerexit?.cancel();
+                _timerexit = null;
               }
+              _timerexit = Timer(const Duration(milliseconds: 300), () {
+                var cursorhoverIntent = cursorHoverIntent(
+                    mouseStatus: MouseStatus.exit,
+                    position: Offset.zero,
+                    layerLink: LayerLink(), //widget.selectionOverlayController.startHandleLayerLink,
+                    lineHeight: render.lineHeight,
+                    value: widget.controller.value,
+                    selection: null);
+                final Action<Intent>? action = Actions.maybeFind(context, intent: cursorhoverIntent);
+                if (action != null && action.isActionEnabled) {
+                  if (action is CallbackAction) {
+                    action.invoke(cursorhoverIntent);
+                  }
+                }
+              });
             },
             child: widget.child,
           ),

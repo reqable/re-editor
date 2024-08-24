@@ -119,8 +119,11 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
 
   ValueChanged<CodeAutocompleteResult>? _onAutocomplete;
   OverlayEntry? _overlayEntry;
-  OverlayEntry? _overlayEntry1;
+  List<OverlayEntry> _overlayEntry1 = [];
   ValueNotifier<CodeAutocompleteEditingValue>? _notifier;
+
+  ///是否在操作popup
+  bool isPopup = false;
 
   @override
   void initState() {
@@ -152,40 +155,41 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     _hoverAction = _CodeHoverAction<cursorHoverIntent>(
       onInvoke: (intent) {
         print("baseIndex:${intent.selection?.baseIndex},baseOffset:${intent.selection?.baseOffset}");
-        if (_overlayEntry1 != null) {
-          _overlayEntry1?.remove();
-          _overlayEntry1 = null;
+        if (_overlayEntry1.isNotEmpty && !isPopup) {
+          _clearAllOverlays();
         }
-
         if (intent.mouseStatus == MouseStatus.exit || intent.selection == null) {
           return;
         }
 
-        _overlayEntry1 = OverlayEntry(
+        if (_overlayEntry1.isNotEmpty) {
+          return;
+        }
+
+        final _overlay = OverlayEntry(
           builder: (context) {
-            return Center(
-              child: FutureBuilder<Widget?>(
-                future: _ToastbuildWidget(context, intent.selection!, intent.layerLink, intent.position, intent.lineHeight),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container(); //const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    print('异步错误: ${snapshot.error}');
-                    return Container();
-                  } else if (snapshot.hasData) {
-                    if (snapshot.data == null) {
-                      _overlayEntry1?.remove();
-                    }
-                    return snapshot.data!;
-                  } else {
-                    return Container();
+            return FutureBuilder<Widget?>(
+              future: _ToastbuildWidget(context, intent.selection!, intent.layerLink, intent.position, intent.lineHeight),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(); //const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  print('异步错误: ${snapshot.error}');
+                  return Container();
+                } else if (snapshot.hasData) {
+                  if (snapshot.data == null) {
+                    _clearAllOverlays();
                   }
-                },
-              ),
+                  return snapshot.data!;
+                } else {
+                  return Container();
+                }
+              },
             );
           },
         );
-        Overlay.of(context, rootOverlay: true).insert(_overlayEntry1!);
+        _overlayEntry1.add(_overlay);
+        Overlay.of(context, rootOverlay: true).insert(_overlay);
         return null;
       },
     );
@@ -201,10 +205,17 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     );
   }
 
+  void _clearAllOverlays() {
+    for (var element in _overlayEntry1) {
+      element.remove();
+    }
+    _overlayEntry1.clear();
+  }
+
   Future<Widget?> _ToastbuildWidget(BuildContext context, CodeLineSelection selection, LayerLink layerLink, Offset position, double lineHeight) async {
-    final PreferredSizeWidget? child;
-    child = await widget.HoverViewBuilder(context, selection);
-    if (child == null) {
+    final String? child1;
+    child1 = await widget.HoverViewBuilder(context, selection);
+    if (child1 == null) {
       return null;
     }
     /*final Size screenSize = MediaQuery.of(context).size;
@@ -220,7 +231,56 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     } else {
       offsetY = 0;
     }*/
-    return Stack(
+    return Positioned(
+      left: position.dx + 8,
+      top: position.dy + 18,
+      child: Focus(
+        child: MouseRegion(
+          onExit: (event) {
+            isPopup = false;
+            _clearAllOverlays();
+          },
+          onEnter: (event) {
+            isPopup = true;
+          },
+          child: Material(
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: const ui.Color.fromARGB(255, 32, 32, 32),
+                border: Border.all(
+                  color: const ui.Color.fromARGB(255, 0, 120, 212).withAlpha(100),
+                  width: 2.0,
+                ),
+                borderRadius: BorderRadius.circular(8.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4.0,
+                    offset: Offset(2.0, 2.0),
+                  ),
+                ],
+              ),
+              constraints: const BoxConstraints(maxWidth: 500, maxHeight: 200),
+              child: ScrollbarTheme(
+                data: ScrollbarThemeData().copyWith(
+                  thumbColor: MaterialStateProperty.all(Colors.grey[500]),
+                ),
+                child: SingleChildScrollView(
+                  child: Container(
+                    child: Text(
+                      child1,
+                      style: const TextStyle(fontSize: 15, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    /*return Stack(
       children: [
         AnimatedPositioned(
           duration: const Duration(milliseconds: 300),
@@ -241,7 +301,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
               )),
         )
       ],
-    );
+    ); */
   }
 
   @override

@@ -1,7 +1,6 @@
 part of re_editor;
 
 class _CodeField extends SingleChildRenderObjectWidget {
-
   final ViewportOffset verticalViewport;
   final ViewportOffset? horizontalViewport;
   final CodeLines codes;
@@ -45,31 +44,31 @@ class _CodeField extends SingleChildRenderObjectWidget {
     required this.readOnly,
     required this.startHandleLayerLink,
     required this.endHandleLayerLink,
-  }): assert(codes.isNotEmpty);
+  }) : assert(codes.isNotEmpty);
 
   @override
   RenderObject createRenderObject(BuildContext context) => _CodeFieldRender(
-    verticalViewport: verticalViewport,
-    horizontalViewport: horizontalViewport,
-    codes: codes,
-    selection: selection,
-    highlightSelections: highlightSelections,
-    textStyle: textStyle,
-    hasFocus: hasFocus,
-    highlighter: highlighter,
-    showCursorNotifier: showCursorNotifier,
-    onRenderParagraphsChanged: onRenderParagraphsChanged,
-    selectionColor: selectionColor,
-    highlightColor: highlightColor,
-    cursorColor: cursorColor,
-    cursorLineColor: cursorLineColor,
-    chunkIndicatorColor: chunkIndicatorColor,
-    cursorWidth: cursorWidth,
-    padding: padding,
-    readOnly: readOnly,
-    startHandleLayerLink: startHandleLayerLink,
-    endHandleLayerLink: endHandleLayerLink,
-  );
+        verticalViewport: verticalViewport,
+        horizontalViewport: horizontalViewport,
+        codes: codes,
+        selection: selection,
+        highlightSelections: highlightSelections,
+        textStyle: textStyle,
+        hasFocus: hasFocus,
+        highlighter: highlighter,
+        showCursorNotifier: showCursorNotifier,
+        onRenderParagraphsChanged: onRenderParagraphsChanged,
+        selectionColor: selectionColor,
+        highlightColor: highlightColor,
+        cursorColor: cursorColor,
+        cursorLineColor: cursorLineColor,
+        chunkIndicatorColor: chunkIndicatorColor,
+        cursorWidth: cursorWidth,
+        padding: padding,
+        readOnly: readOnly,
+        startHandleLayerLink: startHandleLayerLink,
+        endHandleLayerLink: endHandleLayerLink,
+      );
 
   @override
   void updateRenderObject(BuildContext context, covariant _CodeFieldRender renderObject) {
@@ -95,11 +94,9 @@ class _CodeField extends SingleChildRenderObjectWidget {
       ..startHandleLayerLink = startHandleLayerLink
       ..endHandleLayerLink = endHandleLayerLink;
   }
-
 }
 
 class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
-
   ViewportOffset _verticalViewport;
   ViewportOffset? _horizontalViewport;
   CodeLines _codes;
@@ -122,6 +119,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   final List<_CodeChunkIndicator> _chunkIndicators;
   late final _CodeFieldExtraRender _foregroundRender;
   late final _CodeFieldExtraRender _backgroundRender;
+  late final _CodeFieldExtraRender _focuforegroundRender;
   late double _preferredLineHeight;
 
   _CodeFieldRender({
@@ -145,43 +143,32 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required bool readOnly,
     required LayerLink startHandleLayerLink,
     required LayerLink endHandleLayerLink,
-  }) : _verticalViewport = verticalViewport,
-    _horizontalViewport = horizontalViewport,
-    _codes = codes,
-    _selection = selection,
-    _textStyle = textStyle,
-    _hasFocus = hasFocus,
-    _highlighter = highlighter,
-    _showCursorNotifier = showCursorNotifier,
-    _onRenderParagraphsChanged = onRenderParagraphsChanged,
-    _padding = padding,
-    _readOnly = readOnly,
-    _chunkIndicatorColor = chunkIndicatorColor,
-    _paint = Paint(),
-    _displayParagraphs = [],
-    _chunkIndicators = [],
-    _cursor = SystemMouseCursors.text,
-    _startHandleLayerLink = startHandleLayerLink,
-    _endHandleLayerLink = endHandleLayerLink {
-    _backgroundRender = _CodeFieldExtraRender(
-      painters: [
-        _CodeCursorLinePainter(cursorLineColor, _selection),
-        _CodeFieldSelectionPainter(selectionColor, _selection),
-        _CodeFieldHighlightPainter(highlightColor, highlightSelections ?? const [])
-      ]
-    );
+  })  : _verticalViewport = verticalViewport,
+        _horizontalViewport = horizontalViewport,
+        _codes = codes,
+        _selection = selection,
+        _textStyle = textStyle,
+        _hasFocus = hasFocus,
+        _highlighter = highlighter,
+        _showCursorNotifier = showCursorNotifier,
+        _onRenderParagraphsChanged = onRenderParagraphsChanged,
+        _padding = padding,
+        _readOnly = readOnly,
+        _chunkIndicatorColor = chunkIndicatorColor,
+        _paint = Paint(),
+        _displayParagraphs = [],
+        _chunkIndicators = [],
+        _cursor = SystemMouseCursors.text,
+        _startHandleLayerLink = startHandleLayerLink,
+        _endHandleLayerLink = endHandleLayerLink {
+    _backgroundRender = _CodeFieldExtraRender(painters: [
+      _CodeCursorLinePainter(cursorLineColor, _selection),
+      _CodeFieldSelectionPainter(selectionColor, _selection),
+      _CodeFieldHighlightPainter(highlightColor, highlightSelections ?? const [])
+    ]);
     adoptChild(_backgroundRender);
-    _foregroundRender = _CodeFieldExtraRender(
-      painters: [
-        _CodeFieldCursorPainter(
-          position: _selection.extent,
-          color: cursorColor,
-          width: cursorWidth,
-          height: 0.0,
-          visible: _showCursorNotifier.value
-        )
-      ]
-    );
+    _foregroundRender =
+        _CodeFieldExtraRender(painters: [_CodeFieldCursorPainter(position: _selection.extent, color: cursorColor, width: cursorWidth, height: 0.0, visible: _showCursorNotifier.value)]);
     adoptChild(_foregroundRender);
     _calculatePreferredLineHeight();
   }
@@ -462,8 +449,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         return null;
       }
     } else {
-      localPosition = Offset(min(size.width, max(0, localPosition.dx)),
-        min(size.height - _preferredLineHeight / 2, max(_preferredLineHeight / 2, localPosition.dy)));
+      localPosition = Offset(min(size.width, max(0, localPosition.dx)), min(size.height - _preferredLineHeight / 2, max(_preferredLineHeight / 2, localPosition.dy)));
     }
     final CodeLinePosition? result = calculateTextPosition(localPosition);
     if (result == null) {
@@ -471,18 +457,14 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
     if (anchor != null) {
       if (result.isBefore(anchor.start)) {
-        return CodeLineSelection.fromPosition(
-          position: result
-        ).copyWith(
+        return CodeLineSelection.fromPosition(position: result).copyWith(
           baseIndex: anchor.end.index,
           baseOffset: anchor.end.offset,
           baseAffinity: anchor.end.affinity,
         );
       }
       if (result.isAfter(anchor.end)) {
-        return CodeLineSelection.fromPosition(
-          position: result
-        ).copyWith(
+        return CodeLineSelection.fromPosition(position: result).copyWith(
           baseIndex: anchor.start.index,
           baseOffset: anchor.start.offset,
           baseAffinity: anchor.start.affinity,
@@ -490,11 +472,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       }
       return anchor;
     }
-    return oldSelection.copyWith(
-      extentIndex: result.index,
-      extentOffset: result.offset,
-      extentAffinity: result.affinity
-    );
+    return oldSelection.copyWith(extentIndex: result.index, extentOffset: result.offset, extentAffinity: result.affinity);
   }
 
   CodeLineRange? selectWord({
@@ -586,13 +564,9 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     final double unit = _preferredLineHeight;
     if (_verticalViewportSize != null) {
       if (offset.dy < unit) {
-        _alignTopEdge(
-          offset: _verticalViewport.pixels - unit
-        );
+        _alignTopEdge(offset: _verticalViewport.pixels - unit);
       } else if (offset.dy > size.height - unit) {
-        _alignBottomEdge(
-          offset: _verticalViewport.pixels + unit
-        );
+        _alignBottomEdge(offset: _verticalViewport.pixels + unit);
       }
     }
     if (_horizontalViewport != null && _horizontalViewportSize != null) {
@@ -637,10 +611,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         return null;
       }
     }
-    return CodeLinePosition.from(
-      index: position.index - 1,
-      position: upParagraph.getPosition(Offset(offset.dx, upParagraph.height - upParagraph.preferredLineHeight))
-    );
+    return CodeLinePosition.from(index: position.index - 1, position: upParagraph.getPosition(Offset(offset.dx, upParagraph.height - upParagraph.preferredLineHeight)));
   }
 
   CodeLinePosition? getDownPosition(CodeLinePosition position) {
@@ -664,10 +635,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         return null;
       }
     }
-    return CodeLinePosition.from(
-      index: position.index + 1,
-      position: downParagraph.getPosition(Offset(offset.dx, 0))
-    );
+    return CodeLinePosition.from(index: position.index + 1, position: downParagraph.getPosition(Offset(offset.dx, 0)));
   }
 
   @override
@@ -683,7 +651,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   bool get validForMouseTracker => true;
 
   @override
-  bool hitTest(BoxHitTestResult result, { required Offset position }) {
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
     bool hitTarget = false;
     if (size.contains(position)) {
       result.add(BoxHitTestEntry(this, position));
@@ -760,10 +728,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   @override
   void performLayout() {
     // _Trace.begin('CodeField performLayout');
-    assert(constraints.maxWidth > 0 && constraints.maxWidth != double.infinity,
-      '_CodeField should have an explicit width.');
-    assert(constraints.maxHeight > 0 && constraints.maxHeight != double.infinity,
-      '_CodeField should have an explicit height.');
+    assert(constraints.maxWidth > 0 && constraints.maxWidth != double.infinity, '_CodeField should have an explicit width.');
+    assert(constraints.maxHeight > 0 && constraints.maxHeight != double.infinity, '_CodeField should have an explicit height.');
     size = Size(constraints.maxWidth, constraints.maxHeight);
     _foregroundRender.layout(constraints);
     _backgroundRender.layout(constraints);
@@ -783,11 +749,13 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     final Canvas canvas = context.canvas;
     canvas.save();
     canvas.clipRect(Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height));
+    //canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height), Paint()..color = Colors.black);
     _drawText(canvas, offset);
     canvas.restore();
 
     _updateSelectionExtentsVisibility(offset);
 
+    //绘制光标
     context.paintChild(_foregroundRender, offset);
 
     final Offset? startHandlePosition = calculateTextPositionViewportOffset(_selection.start);
@@ -865,11 +833,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         double delta = 0;
         double offset = _displayParagraphs.first.top;
         for (int i = _displayParagraphs.first.index - 1; i >= 0; i--) {
-          final IParagraph paragraph = _highlighter.build(
-            index: i,
-            style: _textStyle,
-            maxWidth: effectiveWidth
-          );
+          final IParagraph paragraph = _highlighter.build(index: i, style: _textStyle, maxWidth: effectiveWidth);
           delta += paragraph.height - _preferredLineHeight;
           offset -= paragraph.height;
           if (target >= offset) {
@@ -927,9 +891,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       return;
     }
 
-    _onRenderParagraphsChanged(_displayParagraphs.map((e) => e.copyWith(
-      offset: Offset(e.offset.dx - (_horizontalViewport?.pixels ?? 0) , e.offset.dy - _verticalViewport.pixels)
-    )).toList());
+    _onRenderParagraphsChanged(_displayParagraphs.map((e) => e.copyWith(offset: Offset(e.offset.dx - (_horizontalViewport?.pixels ?? 0), e.offset.dy - _verticalViewport.pixels))).toList());
   }
 
   void _drawText(Canvas canvas, Offset offset) {
@@ -1002,17 +964,13 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     if (startOffset == null) {
       _selectionStartInViewport.value = false;
     } else {
-      _selectionStartInViewport.value = visibleRegion
-        .inflate(visibleRegionSlop)
-        .contains(startOffset);
+      _selectionStartInViewport.value = visibleRegion.inflate(visibleRegionSlop).contains(startOffset);
     }
     final Offset? endOffset = calculateTextPositionViewportOffset(_selection.end);
     if (endOffset == null) {
       _selectionEndInViewport.value = false;
     } else {
-      _selectionEndInViewport.value = visibleRegion
-        .inflate(visibleRegionSlop)
-        .contains(endOffset.dy < 0 ? endOffset : endOffset + Offset(0, _preferredLineHeight));
+      _selectionEndInViewport.value = visibleRegion.inflate(visibleRegionSlop).contains(endOffset.dy < 0 ? endOffset : endOffset + Offset(0, _preferredLineHeight));
     }
   }
 
@@ -1077,9 +1035,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     return null;
   }
 
-  void _alignTopEdge({
-    double? offset
-  }) {
+  void _alignTopEdge({double? offset}) {
     final double position = offset ?? _verticalViewport.pixels;
     if (position < paddingTop) {
       _verticalViewport.jumpTo(max(position, 0));
@@ -1091,9 +1047,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
-  void _alignBottomEdge({
-    double? offset
-  }) {
+  void _alignBottomEdge({double? offset}) {
     final double? viewportMax = _verticalViewportSize;
     if (viewportMax == null) {
       return;
@@ -1115,12 +1069,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     final List<CodeLineRenderParagraph> paragraphs = [];
     for (int i = startIndex; i < _codes.length; i++) {
       final IParagraph paragraph = _buildParagraph(i, maxWidth);
-      _displayParagraphs.add(CodeLineRenderParagraph(
-        index: i,
-        paragraph: paragraph,
-        offset: Offset(paddingLeft, offset + paddingTop),
-        chunkParent: _codes[i].chunkParent
-      ));
+      _displayParagraphs.add(CodeLineRenderParagraph(index: i, paragraph: paragraph, offset: Offset(paddingLeft, offset + paddingTop), chunkParent: _codes[i].chunkParent));
       offset += paragraph.height;
       if (offset + paddingTop >= _verticalViewport.pixels + size.height) {
         break;
@@ -1136,11 +1085,9 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       maxWidth: maxWidth ?? (_horizontalViewport == null ? size.width - padding.horizontal : double.infinity),
     );
   }
-
 }
 
 class _CodeChunkIndicator {
-
   final Rect region;
   final int index;
 
@@ -1148,18 +1095,13 @@ class _CodeChunkIndicator {
 }
 
 abstract class _CodeFieldExtraPainter extends ChangeNotifier {
-
   void paint(Canvas canvas, Size size, _CodeFieldRender render);
-
 }
 
 class _CodeFieldExtraRender extends RenderBox {
-
   final List<_CodeFieldExtraPainter> painters;
 
-  _CodeFieldExtraRender({
-    required this.painters
-  });
+  _CodeFieldExtraRender({required this.painters});
 
   @override
   _CodeFieldRender? get parent => super.parent as _CodeFieldRender?;
@@ -1218,15 +1160,14 @@ class _CodeFieldExtraRender extends RenderBox {
 }
 
 class _CodeCursorLinePainter extends _CodeFieldExtraPainter {
-
   final Paint _paint;
   Color? _color;
   CodeLineSelection _selection;
 
   _CodeCursorLinePainter(this._color, this._selection) : _paint = Paint() {
     _paint
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1;
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
   }
 
   set color(Color? value) {
@@ -1267,14 +1208,11 @@ class _CodeCursorLinePainter extends _CodeFieldExtraPainter {
     }
     _paint.color = _color!;
     canvas.drawLine(Offset(0, offset.dy), Offset(size.width, offset.dy), _paint);
-    canvas.drawLine(Offset(0, offset.dy + paragraph.preferredLineHeight),
-      Offset(size.width, offset.dy + paragraph.preferredLineHeight), _paint);
+    canvas.drawLine(Offset(0, offset.dy + paragraph.preferredLineHeight), Offset(size.width, offset.dy + paragraph.preferredLineHeight), _paint);
   }
-
 }
 
 abstract class _CodeFieldSelectionsPainter extends _CodeFieldExtraPainter {
-
   static const Offset _newLinePadding = Offset(5.0, 0.0);
 
   final Paint _paint;
@@ -1336,23 +1274,17 @@ abstract class _CodeFieldSelectionsPainter extends _CodeFieldExtraPainter {
           if (offset == null) {
             rects = const [];
           } else {
-            rects = [
-              Rect.fromLTWH(offset.dx, offset.dy, 0, paragraph.preferredLineHeight)
-            ];
+            rects = [Rect.fromLTWH(offset.dx, offset.dy, 0, paragraph.preferredLineHeight)];
           }
         } else {
-          rects = paragraph.getRangeRects(TextRange(
-            start: startIndex,
-            end: endIndex
-          ));
+          rects = paragraph.getRangeRects(TextRange(start: startIndex, end: endIndex));
         }
         if (rects.isEmpty) {
           continue;
         }
         for (final Rect rect in rects) {
           if (rect == rects.last && paragraph.index < end.index) {
-            _drawRect(canvas, Rect.fromPoints(rect.topLeft, rect.bottomRight + _newLinePadding),
-              paragraph.offset - render.paintOffset);
+            _drawRect(canvas, Rect.fromPoints(rect.topLeft, rect.bottomRight + _newLinePadding), paragraph.offset - render.paintOffset);
           } else if (!rect.isEmpty) {
             _drawRect(canvas, rect, paragraph.offset - render.paintOffset);
           }
@@ -1365,28 +1297,21 @@ abstract class _CodeFieldSelectionsPainter extends _CodeFieldExtraPainter {
     _paint.color = _color;
     canvas.drawRect(Rect.fromPoints(rect.topLeft + offset, rect.bottomRight + offset), _paint);
   }
-
 }
 
 class _CodeFieldSelectionPainter extends _CodeFieldSelectionsPainter {
-
-  _CodeFieldSelectionPainter(Color color, CodeLineSelection selection) :
-    super(color, [selection]);
+  _CodeFieldSelectionPainter(Color color, CodeLineSelection selection) : super(color, [selection]);
 
   set selection(CodeLineSelection value) {
     selections = [value];
   }
-
 }
 
 class _CodeFieldHighlightPainter extends _CodeFieldSelectionsPainter {
-
   _CodeFieldHighlightPainter(super.color, super.selections);
-
 }
 
 class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
-
   final Paint _paint;
   CodeLinePosition _position;
   Color _color;
@@ -1401,13 +1326,13 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
     required double width,
     required double height,
     required bool visible,
-  }) : _position = position,
-    _color = color,
-    _width = width,
-    _height = height,
-    _visible = visible,
-    _willDraw = true,
-    _paint = Paint();
+  })  : _position = position,
+        _color = color,
+        _width = width,
+        _height = height,
+        _visible = visible,
+        _willDraw = true,
+        _paint = Paint();
 
   set position(CodeLinePosition value) {
     if (_position == value) {
@@ -1443,6 +1368,10 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
     notifyListeners();
   }
 
+  double getHeight() {
+    return _height;
+  }
+
   set visible(bool value) {
     if (_visible == value) {
       return;
@@ -1461,7 +1390,7 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (!_visible || !_willDraw || _color == Colors.transparent || _color.alpha == 0) {
+    if (!_willDraw || _color == Colors.transparent || _color.alpha == 0) {
       return;
     }
     final CodeLineRenderParagraph? paragraph = render.findDisplayParagraphByLineIndex(_position.index);
@@ -1472,16 +1401,30 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
     if (offset == null) {
       return;
     }
-    offset += paragraph.offset - render.paintOffset;
+    var doffset = paragraph.offset - render.paintOffset;
+    offset += doffset;
     if (offset.dx + _width < 0 || offset.dx >= size.width || offset.dy + _height < 0 || offset.dy >= size.height) {
       return;
     }
-    _drawCaret(canvas, offset, size);
+    canvas.drawRect(
+        Rect.fromLTWH(0, doffset.dy, size.width, paragraph.height),
+        Paint()
+          ..color = const ui.Color.fromARGB(255, 14, 80, 80).withOpacity(0.1)
+          ..strokeWidth = 1.0
+          ..style = PaintingStyle.fill);
+    canvas.drawRect(
+        Rect.fromLTWH(0, doffset.dy, size.width, paragraph.height),
+        Paint()
+          ..color = const ui.Color.fromARGB(255, 9, 192, 192).withOpacity(0.3)
+          ..strokeWidth = 1.0
+          ..style = PaintingStyle.stroke);
+    if (!_visible) {
+      _drawCaret(canvas, offset, size);
+    }
   }
 
   void _drawCaret(Canvas canvas, Offset offset, Size size) {
     _paint.color = _color;
     canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
   }
-
 }

@@ -1,7 +1,6 @@
 part of re_editor;
 
 class CodeLineNumberRenderObject extends RenderBox {
-
   CodeLineEditingController _controller;
   CodeIndicatorValueNotifier _notifier;
   TextStyle _textStyle;
@@ -17,15 +16,15 @@ class CodeLineNumberRenderObject extends RenderBox {
     required TextStyle textStyle,
     required TextStyle focusedTextStyle,
     required int minNumberCount,
-  }) : _controller = controller,
-    _notifier = notifier,
-    _textStyle = textStyle,
-    _focusedTextStyle = focusedTextStyle,
-    _minNumberCount = minNumberCount,
-    _allLineCount = controller.lineCount,
-    _textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-    );
+  })  : _controller = controller,
+        _notifier = notifier,
+        _textStyle = textStyle,
+        _focusedTextStyle = focusedTextStyle,
+        _minNumberCount = minNumberCount,
+        _allLineCount = controller.lineCount,
+        _textPainter = TextPainter(
+          textDirection: TextDirection.ltr,
+        );
 
   set controller(CodeLineEditingController value) {
     if (_controller == value) {
@@ -110,8 +109,7 @@ class CodeLineNumberRenderObject extends RenderBox {
 
   @override
   void performLayout() {
-    assert(constraints.maxHeight > 0 && constraints.maxHeight != double.infinity,
-      'CodeLineNumber should have an explicit height.');
+    assert(constraints.maxHeight > 0 && constraints.maxHeight != double.infinity, 'CodeLineNumber should have an explicit height.');
     _textPainter.text = TextSpan(
       text: '0' * max(_minNumberCount, _allLineCount.toString().length),
       style: _textStyle,
@@ -132,12 +130,10 @@ class CodeLineNumberRenderObject extends RenderBox {
     canvas.clipRect(Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height));
     int firstLineIndex = _controller.index2lineIndex(value.paragraphs.first.index);
     for (final CodeLineRenderParagraph paragraph in value.paragraphs) {
-      _textPainter.text = TextSpan(
-        text: (firstLineIndex + 1).toString(),
-        style: paragraph.index == value.focusedIndex ? _focusedTextStyle : _textStyle
-      );
+      _textPainter.text = TextSpan(text: (firstLineIndex + 1).toString(), style: paragraph.index == value.focusedIndex ? _focusedTextStyle : _textStyle);
       _textPainter.layout();
       _textPainter.paint(canvas, Offset(offset.dx + size.width - _textPainter.width, offset.dy + paragraph.offset.dy));
+
       firstLineIndex += _controller.codeLines[paragraph.index].lineCount;
     }
     canvas.restore();
@@ -145,8 +141,7 @@ class CodeLineNumberRenderObject extends RenderBox {
 
   void _onCodeLineChanged() {
     final int newAllLineCount = _controller.lineCount;
-    if (max(_minNumberCount, newAllLineCount.toString().length) !=
-      max(_minNumberCount, _allLineCount.toString().length)) {
+    if (max(_minNumberCount, newAllLineCount.toString().length) != max(_minNumberCount, _allLineCount.toString().length)) {
       _allLineCount = newAllLineCount;
       markNeedsLayout();
     } else {
@@ -156,18 +151,15 @@ class CodeLineNumberRenderObject extends RenderBox {
   }
 
   CodeLineRenderParagraph? _findParagraphByPosition(Offset position) {
-    final int? index = _notifier.value?.paragraphs.indexWhere((e) => position.dy > e.top
-      && position.dy < e.bottom);
+    final int? index = _notifier.value?.paragraphs.indexWhere((e) => position.dy > e.top && position.dy < e.bottom);
     if (index == null || index < 0) {
       return null;
     }
     return _notifier.value?.paragraphs[index];
   }
-
 }
 
 class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAnnotation {
-
   double _width;
   CodeChunkController _controller;
   CodeIndicatorValueNotifier _notifier;
@@ -183,13 +175,13 @@ class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAn
     required CodeChunkIndicatorPainter painter,
     required bool collapseIndicatorVisible,
     required bool expandIndicatorVisible,
-  }) : _width = width,
-    _controller = controller,
-    _notifier = notifier,
-    _painter = painter,
-    _collapseIndicatorVisible = collapseIndicatorVisible,
-    _expandIndicatorVisible = expandIndicatorVisible,
-    _cursor = MouseCursor.defer;
+  })  : _width = width,
+        _controller = controller,
+        _notifier = notifier,
+        _painter = painter,
+        _collapseIndicatorVisible = collapseIndicatorVisible,
+        _expandIndicatorVisible = expandIndicatorVisible,
+        _cursor = MouseCursor.defer;
 
   set width(double value) {
     if (_width == value) {
@@ -306,9 +298,7 @@ class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAn
 
   @override
   void performLayout() {
-    assert(_width > 0 && _width != double.infinity &&
-      constraints.maxHeight > 0 && constraints.maxHeight != double.infinity,
-      'CodeChunkIndicator should have an explicit width and height.');
+    assert(_width > 0 && _width != double.infinity && constraints.maxHeight > 0 && constraints.maxHeight != double.infinity, 'CodeChunkIndicator should have an explicit width and height.');
     size = Size(_width, constraints.maxHeight);
   }
 
@@ -348,8 +338,7 @@ class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAn
   }
 
   CodeLineRenderParagraph? _findParagraphByPosition(Offset position) {
-    final int? index = _notifier.value?.paragraphs.indexWhere((e) => position.dy > e.top
-      && position.dy < e.top + e.preferredLineHeight);
+    final int? index = _notifier.value?.paragraphs.indexWhere((e) => position.dy > e.top && position.dy < e.top + e.preferredLineHeight);
     if (index == null || index < 0) {
       return null;
     }
@@ -362,5 +351,4 @@ class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAn
     }
     return null;
   }
-
 }
