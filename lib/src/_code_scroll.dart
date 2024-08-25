@@ -3,18 +3,12 @@ part of re_editor;
 const double _kScrollbarThickness = 8.0;
 
 class _CodeScrollable extends StatelessWidget {
-
   final AxisDirection axisDirection;
   final ScrollController? controller;
   final ViewportBuilder viewportBuilder;
   final CodeScrollbarBuilder? scrollbarBuilder;
 
-  const _CodeScrollable({
-    required this.axisDirection,
-    this.controller,
-    required this.viewportBuilder,
-    this.scrollbarBuilder
-  });
+  const _CodeScrollable({required this.axisDirection, this.controller, required this.viewportBuilder, this.scrollbarBuilder});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +21,9 @@ class _CodeScrollable extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
     );
   }
-
 }
 
 class _ScrollBehavior extends MaterialScrollBehavior {
-
   final _ScrollPhysics physics;
   final CodeScrollbarBuilder? scrollbarBuilder;
 
@@ -72,11 +64,9 @@ class _ScrollBehavior extends MaterialScrollBehavior {
   ScrollPhysics getScrollPhysics(BuildContext context) {
     return physics;
   }
-
 }
 
 class _RawScrollbar extends RawScrollbar {
-
   final _ScrollPhysics physics;
 
   const _RawScrollbar({
@@ -86,22 +76,20 @@ class _RawScrollbar extends RawScrollbar {
     ScrollbarOrientation? scrollbarOrientation,
     required bool thumbVisibility,
   }) : super(
-    controller: controller,
-    scrollbarOrientation: scrollbarOrientation,
-    thumbVisibility: thumbVisibility,
-    thickness: _kScrollbarThickness,
-    radius: const Radius.circular(10),
-    crossAxisMargin: 2,
-    child: child,
-  );
+          controller: controller,
+          scrollbarOrientation: scrollbarOrientation,
+          thumbVisibility: thumbVisibility,
+          thickness: _kScrollbarThickness,
+          radius: const Radius.circular(10),
+          crossAxisMargin: 2,
+          child: child,
+        );
 
   @override
   RawScrollbarState<_RawScrollbar> createState() => _RawScrollbarState();
-
 }
 
 class _RawScrollbarState extends RawScrollbarState<_RawScrollbar> {
-
   Offset? downPosition;
   double? downOffset;
 
@@ -119,12 +107,10 @@ class _RawScrollbarState extends RawScrollbarState<_RawScrollbar> {
     }
     super.handleThumbPressUpdate(localPosition);
   }
-
 }
 
 // ignore: must_be_immutable
 class _ScrollPhysics extends ScrollPhysics {
-
   double? _position;
 
   void setScrollPosition(double position) {
@@ -138,5 +124,4 @@ class _ScrollPhysics extends ScrollPhysics {
     }
     return value - _position!;
   }
-
 }

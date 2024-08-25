@@ -48,6 +48,7 @@ enum CodeShortcutType {
   replace,
   save,
   esc,
+  run,
 }
 
 abstract class CodeShortcutsActivatorsBuilder {
@@ -218,6 +219,10 @@ class CodeShortcutEscIntent extends Intent {
   const CodeShortcutEscIntent();
 }
 
+class CodeShortcutRunIntent extends Intent {
+  const CodeShortcutRunIntent();
+}
+
 const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.selectAll: CodeShortcutSelectAllIntent(),
   CodeShortcutType.cut: CodeShortcutCutIntent(),
@@ -265,6 +270,7 @@ const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.replace: CodeShortcutReplaceIntent(),
   CodeShortcutType.save: CodeShortcutSaveIntent(),
   CodeShortcutType.esc: CodeShortcutEscIntent(),
+  CodeShortcutType.run: CodeShortcutRunIntent(),
 };
 
 const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsActivators = {
@@ -338,6 +344,7 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsAc
   CodeShortcutType.replace: [SingleActivator(LogicalKeyboardKey.keyF, meta: true, alt: true)],
   CodeShortcutType.save: [SingleActivator(LogicalKeyboardKey.keyS, meta: true)],
   CodeShortcutType.esc: [SingleActivator(LogicalKeyboardKey.escape)],
+  CodeShortcutType.run: [SingleActivator(LogicalKeyboardKey.f5)],
 };
 
 const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcutsActivators = {
@@ -408,4 +415,5 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcut
   CodeShortcutType.replace: [SingleActivator(LogicalKeyboardKey.keyF, control: true, alt: true)],
   CodeShortcutType.save: [SingleActivator(LogicalKeyboardKey.keyS, control: true)],
   CodeShortcutType.esc: [SingleActivator(LogicalKeyboardKey.escape)],
+  CodeShortcutType.run: [SingleActivator(LogicalKeyboardKey.f5)],
 };
