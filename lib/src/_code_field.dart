@@ -421,6 +421,26 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     return null;
   }
 
+  bool QueryElementAtMousePosition({
+    required Offset position,
+  }) {
+    if (_displayParagraphs.isEmpty) {
+      return false;
+    }
+    final Offset localPosition = globalToLocal(position);
+    if (!_isValid(localPosition)) {
+      return false;
+    }
+    for (var element in _displayParagraphs) {
+      var doffset = element.offset - paintOffset;
+      var rect = Rect.fromLTWH(doffset.dx, doffset.dy, element.width, element.height);
+      if (rect.contains(localPosition)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   CodeLineSelection? setPositionAt({
     required Offset position,
   }) {

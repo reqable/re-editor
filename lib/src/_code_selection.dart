@@ -160,7 +160,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
               _timer?.cancel();
               _timer = null;
             }
-            _timer = Timer(const Duration(milliseconds: 300), () {
+            _timer = Timer(const Duration(milliseconds: 100), () {
               if (widget.editorKey.currentContext == null) {
                 return;
               }
@@ -168,14 +168,15 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
               var selection = render.setPositionAt(
                 position: data.position,
               );
+              final ismouse = render.QueryElementAtMousePosition(position: data.position);
               //var aaa = render.calculateTextPosition(data.localPosition);
               if (selection == null) {
                 return;
               }
-              var end = widget.controller.value.codeLines[selection.baseIndex].length == selection.baseOffset;
+              //var end = widget.controller.value.codeLines[selection.baseIndex].length == selection.baseOffset;
               if (position != null) {
                 var cursorhoverIntent = cursorHoverIntent(
-                    mouseStatus: end ? MouseStatus.exit : MouseStatus.hover,
+                    mouseStatus: ismouse ? MouseStatus.hover : MouseStatus.exit,
                     selection: selection,
                     position: data.position,
                     layerLink: LayerLink(), //widget.selectionOverlayController.startHandleLayerLink,
