@@ -200,6 +200,9 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
                 _timerexit = null;
               }
               _timerexit = Timer(const Duration(milliseconds: 300), () {
+                if (widget.editorKey.currentContext == null) {
+                  return;
+                }
                 var cursorhoverIntent = cursorHoverIntent(
                     mouseStatus: MouseStatus.exit,
                     position: Offset.zero,
