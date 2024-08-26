@@ -415,7 +415,7 @@ class _SmartTextEditingDelta {
       if (delta.textInserted != symbol) {
         continue;
       }
-      if (!_shouldAutoQuoted(delta.oldText, delta.insertionOffset)) {
+      if (!_shouldAutoQuoted(delta.oldText, symbol, delta.insertionOffset)) {
         break;
       }
       return TextEditingDeltaInsertion(
@@ -489,23 +489,35 @@ class _SmartTextEditingDelta {
     return text.substring(offset, offset + 1) == symbol.right;
   }
 
-  bool _shouldAutoQuoted(String text, int offset) {
-    if (text.isEmpty) {
+  bool _shouldAutoQuoted(String text, String symbol, int offset) {
+    final Characters characters = text.characters;
+    if (characters.isEmpty) {
       return true;
     }
-    final String left;
-    final String right;
-    if (offset == 0) {
-      left = '';
-      right = text.substring(0, 1);
-    } else if (offset == text.length) {
-      left = text.substring(offset - 1, offset);
-      right = '';
-    } else {
-      left = text.substring(offset - 1, offset);
-      right = text.substring(offset, offset + 1);
+    int leftSymbolCount = 0;
+    int rightSymbolCount = 0;
+    for (int i = 0; i < characters.length; i++) {
+      final String character = characters.elementAt(i);
+      if (i < offset) {
+        if (character == symbol) {
+          leftSymbolCount++;
+        }
+      } else {
+        if (character == symbol) {
+          rightSymbolCount++;
+        }
+      }
     }
-    return !_quoteSymbols.contains(left) && !_quoteSymbols.contains(right);
+    if (leftSymbolCount == 0 && rightSymbolCount == 0) {
+      return true;
+    }
+    if (rightSymbolCount == 0) {
+      return leftSymbolCount % 2 == 0;
+    }
+    if (leftSymbolCount == 0) {
+      return rightSymbolCount % 2 == 0;
+    }
+    return leftSymbolCount % 2 == rightSymbolCount % 2;
   }
 
 }
