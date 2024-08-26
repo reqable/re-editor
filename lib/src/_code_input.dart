@@ -5,6 +5,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   CodeLineEditingController _controller;
   FocusNode _focusNode;
   bool _readOnly;
+  bool _autocompleteSymbols;
 
   TextInputConnection? _textInputConnection;
   TextEditingValue? _remoteEditingValue;
@@ -15,9 +16,11 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     required CodeLineEditingController controller,
     required FocusNode focusNode,
     required bool readOnly,
+    required bool autocompleteSymbols,
   }) : _controller = controller,
     _focusNode = focusNode,
-    _readOnly = readOnly {
+    _readOnly = readOnly,
+    _autocompleteSymbols = autocompleteSymbols {
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
   }
@@ -50,6 +53,13 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       return;
     }
     _readOnly = value;
+  }
+
+  set autocompleteSymbols(bool value) {
+    if (_autocompleteSymbols == value) {
+      return;
+    }
+    _autocompleteSymbols = value;
   }
 
   set value(CodeLineEditingValue value) {
@@ -124,11 +134,15 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     TextEditingValue newValue = _remoteEditingValue!;
     bool smartChange = false;
     for (final TextEditingDelta delta in textEditingDeltas) {
-      final TextEditingDelta newDelta = _SmartTextEditingDelta(delta).apply(selection);
-      if (newDelta != delta) {
-        smartChange = true;
+      if (_autocompleteSymbols) {
+        TextEditingDelta newDelta = _SmartTextEditingDelta(delta).apply(selection);
+        if (newDelta != delta) {
+          smartChange = true;
+        }
+        newValue = newDelta.apply(newValue);
+      } else {
+        newValue = delta.apply(newValue);
       }
-      newValue = newDelta.apply(newValue);
     }
     if (newValue == _remoteEditingValue) {
       return;

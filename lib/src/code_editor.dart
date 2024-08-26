@@ -177,6 +177,7 @@ class CodeEditor extends StatefulWidget {
     this.readOnly,
     this.showCursorWhenReadOnly,
     this.wordWrap,
+    this.autocompleteSymbols,
     this.autofocus,
     this.focusNode,
     this.chunkAnalyzer,
@@ -252,6 +253,11 @@ class CodeEditor extends StatefulWidget {
   /// Should wrap the word.
   final bool? wordWrap;
 
+  /// When entering a closed symbol, should the other half be automatically completed.
+  /// For example, when entering a double quote, the other half will be automatically added.
+  /// Defaults to true.
+  final bool? autocompleteSymbols;
+
   /// Whether this editor field should focus itself if nothing else is already
   /// focused.
   ///
@@ -309,6 +315,7 @@ class _CodeEditorState extends State<CodeEditor> {
       controller: _editingController,
       focusNode: _focusNode,
       readOnly: widget.readOnly ?? false,
+      autocompleteSymbols: widget.autocompleteSymbols ?? true,
     );
     _inputController.bindEditor(_editorKey);
 
@@ -414,6 +421,9 @@ class _CodeEditorState extends State<CodeEditor> {
     }
     if (oldWidget.readOnly != widget.readOnly) {
       _inputController.readOnly = widget.readOnly ?? false;
+    }
+    if (oldWidget.autocompleteSymbols != widget.autocompleteSymbols) {
+      _inputController.autocompleteSymbols = widget.autocompleteSymbols ?? true;
     }
     super.didUpdateWidget(oldWidget);
   }
