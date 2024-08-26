@@ -12,18 +12,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
   _CodeFindControllerImpl(this.controller, [CodeFindValue? value]) : super(value) {
     controller.addListener(_updateResult);
     _tasker = _IsolateTasker<_CodeFindPayload, CodeFindResult?>('CodeFind', _run);
-    _subscription = _tasker.resultStream.listen((result) {
-      // 处理结果
-      if (option == value?.option) {
-        final CodeFindValue newValue = value!.copyWith(result: result.$2, searching: false);
-        if (value?.result?.option != option) {
-          _expandChunkIfNeeded(newValue);
-        }
-        value = newValue;
-      } else {
-        value = value?.copyWith(result: null, searching: false);
-      }
-    }, onError: (error) {
+    _subscription = _tasker.resultStream.listen(resultStreamlisten, onError: (error) {
       print("Error occurred: $error");
     });
     _findInputController = TextEditingController();
@@ -33,6 +22,18 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     _replaceInputFocusNode = FocusNode();
     _shouldNotUpdateResults = false;
     _updateResult();
+  }
+  void resultStreamlisten(result) {
+    // 处理结果
+    if (option == value?.option) {
+      final CodeFindValue newValue = value!.copyWith(result: result.$2, searching: false);
+      if (value?.result?.option != option) {
+        _expandChunkIfNeeded(newValue);
+      }
+      value = newValue;
+    } else {
+      value = value?.copyWith(result: null, searching: false);
+    }
   }
 
   @override
@@ -154,6 +155,15 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
   @override
   void close() {
     value = null;
+  }
+
+  @override
+  void closeReplace() {
+    final CodeFindValue? preValue = value;
+    if (preValue == null) {
+      return;
+    }
+    value = preValue.copyWith(replaceMode: false, result: preValue.result);
   }
 
   @override
