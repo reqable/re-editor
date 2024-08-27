@@ -402,10 +402,10 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
     if (kIsAndroid || kIsIOS) {
       // Wait selection position to update
       Future.delayed(const Duration(milliseconds: 100), () {
-        value = true;
+        value = false;
       });
     } else {
-      value = true;
+      value = false;
     }
   }
 
