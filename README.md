@@ -1,5 +1,11 @@
 # Re-Editor
 
+
+#由于和原作者编码风格冲突，所以不得已而开分支，此分支优化了大量的bug，增加了一部分api，增加了稳定性
+
+
+
+
 [![latest version](https://img.shields.io/pub/v/re_editor.svg?color=blue)](https://pub.dev/packages/re_editor)
 
 [中文版本](./README_CN.md)
