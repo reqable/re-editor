@@ -284,7 +284,6 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     final CodeLineSelection? selection = render.extendPositionTo(
       oldSelection: widget.controller.selection,
       position: offset,
-      overflow: true,
       anchor: _isMobile ? null : _anchorSelection,
     );
     if (selection == null) {

@@ -453,19 +453,18 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   CodeLineSelection? extendPositionTo({
     required CodeLineSelection oldSelection,
     required Offset position,
-    bool overflow = false,
     CodeLineSelection? anchor,
   }) {
-    Offset localPosition = globalToLocal(position);
-    if (!overflow) {
-      if (!_isValid(localPosition)) {
-        return null;
-      }
-    } else {
-      localPosition = Offset(min(size.width, max(0, localPosition.dx)),
-        min(size.height - _preferredLineHeight / 2, max(_preferredLineHeight / 2, localPosition.dy)));
+    final Offset localPosition = globalToLocal(position);
+    if (!_isValid(localPosition)) {
+      return null;
     }
-    final CodeLinePosition? result = calculateTextPosition(localPosition);
+    final CodeLinePosition? result = calculateTextPosition(
+      Offset(
+        min(size.width, max(0, localPosition.dx)),
+        min(size.height - _preferredLineHeight / 2, max(_preferredLineHeight / 2, localPosition.dy))
+      )
+    );
     if (result == null) {
       return null;
     }
