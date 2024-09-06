@@ -174,6 +174,8 @@ class CodeEditor extends StatefulWidget {
     this.shortcutOverrideActions,
     this.sperator,
     this.border,
+    this.borderRadius,
+    this.clipBehavior = Clip.none,
     this.readOnly,
     this.showCursorWhenReadOnly,
     this.wordWrap,
@@ -236,6 +238,17 @@ class CodeEditor extends StatefulWidget {
 
   /// The border of the editor.
   final Border? border;
+
+  /// The radius of the editor's border corners.
+  ///
+  /// This defines how rounded the corners of the editor's border will appear.
+  ///
+  /// If null, the corners will not be rounded.
+  final BorderRadius? borderRadius;
+
+
+  /// How the content should be clipped if it overflows the editor's bounds.
+  final Clip clipBehavior;
 
   /// Whether the text can be changed.
   ///
@@ -460,6 +473,8 @@ class _CodeEditorState extends State<CodeEditor> {
       showCursorWhenReadOnly: widget.showCursorWhenReadOnly ?? true,
       sperator: widget.sperator,
       border: widget.border,
+      borderRadius: widget.borderRadius,
+      clipBehavior: widget.clipBehavior,
       onChanged: widget.onChanged,
       focusNode: _focusNode,
       padding: (widget.padding ?? _kDefaultPadding).add(EdgeInsets.only(
