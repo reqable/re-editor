@@ -47,3 +47,14 @@
 * Fix space key not works in PageView.
 * Notify delegate listeners when controller was changed.
 * Remove editable shortcut actions when read only.
+
+## 0.4.0
+* Feature: add shortcuts for word and line direction deleting.
+* Feature: add an option to disable autocomplete closed symbols.
+* Feature: add borderRadius and clipBehavior properties to editor settings.
+* Feature：allow clearing of CodeLineEditingController's undo and redo stack.
+* Opt autocomplete quoted symbol logic.
+* Fix `IsolateCallback` might be invoked after the isolate was closed.
+* Fix controller delegate memory leak issue.
+* Fix issue `xxx is used after being disposed`.
+* Fix the bug that the underlying text will be selected when trying to click-drag the scroll bar.
