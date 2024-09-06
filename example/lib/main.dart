@@ -67,22 +67,25 @@ class _MyHomePageState extends State<MyHomePage> {
         margin: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Row(
-              children: _editors.entries.mapIndexed((index, entry) {
-                return TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _index = index;
-                    });
-                  },
-                  child: Text(
-                    entry.key,
-                    style: TextStyle(
-                      color: _index == index ? null : Colors.black
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _editors.entries.mapIndexed((index, entry) {
+                  return TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _index = index;
+                      });
+                    },
+                    child: Text(
+                      entry.key,
+                      style: TextStyle(
+                        color: _index == index ? null : Colors.black
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
             Expanded(
               child: Container(
