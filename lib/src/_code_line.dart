@@ -1058,6 +1058,11 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
+  void clearHistory() {
+    _cache.clear();
+  }
+
+  @override
   int index2lineIndex(int index) => codeLines.index2lineIndex(index);
 
   @override
@@ -1992,6 +1997,11 @@ class _CodeLineEditingCache {
     }
   }
 
+  void clear() {
+    _node = _CodeLineEditingCacheNode(controller.value);
+    _markNewRecord = false;
+  }
+
   void dispose() {
     controller.removeListener(_onValueChanged);
   }
@@ -2187,6 +2197,11 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   @override
   void clearComposing() {
     _delegate.clearComposing();
+  }
+
+  @override
+  void clearHistory() {
+    _delegate.clearHistory();
   }
 
   @override

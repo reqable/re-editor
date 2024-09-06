@@ -331,6 +331,9 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// actions, not during the build, layout, or paint phases.
   void clearComposing();
 
+  /// Clear the undo and redo history.
+  void clearHistory();
+
   /// Collapse codes form [start] to [end].
   void collapseChunk(int start, int end);
 
