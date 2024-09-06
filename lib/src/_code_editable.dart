@@ -26,6 +26,8 @@ class _CodeEditable extends StatefulWidget {
   final EdgeInsetsGeometry margin;
   final Widget? sperator;
   final Border? border;
+  final BorderRadius? borderRadius;
+  final Clip clipBehavior;
   final ValueChanged<CodeLineEditingValue>? onChanged;
   final FocusNode focusNode;
   final CodeLineEditingController controller;
@@ -61,6 +63,8 @@ class _CodeEditable extends StatefulWidget {
     required this.margin,
     required this.sperator,
     this.border,
+    this.borderRadius,
+    this.clipBehavior = Clip.none,
     this.onChanged,
     required this.focusNode,
     required this.controller,
@@ -218,7 +222,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           decoration: BoxDecoration(
             border: widget.border,
             color: widget.backgroundColor,
+            borderRadius: widget.borderRadius,
           ),
+          clipBehavior: widget.clipBehavior,
           margin: widget.margin,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
