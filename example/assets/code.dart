@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class ReEditor {
 
   final String foo;
@@ -6,7 +8,9 @@ class ReEditor {
   ReEditor(this.foo, this.bar);
 
   void hello(String name) {
-    print('hello $name');
+    if (kDebugMode) {
+      print('hello $name');
+    }
   }
 
 }

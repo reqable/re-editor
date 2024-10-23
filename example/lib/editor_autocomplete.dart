@@ -84,7 +84,7 @@ const List<CodePrompt> _kStringPrompts = [
 
 class AutoCompleteEditor extends StatefulWidget {
 
-  const AutoCompleteEditor();
+  const AutoCompleteEditor({super.key});
 
   @override
   State<StatefulWidget> createState() => _AutoCompleteEditorState();
@@ -114,7 +114,7 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
         language: langDart,
-        directPrompts: [
+        directPrompts: const [
           CodeFieldPrompt(
             word: 'foo',
             type: 'String'
@@ -252,7 +252,7 @@ class _DefaultCodeAutocompleteListViewState extends State<_DefaultCodeAutocomple
               ),
               alignment: Alignment.centerLeft,
               decoration: BoxDecoration(
-                color: index == widget.notifier.value.index ? Color.fromARGB(255, 255, 140, 0) : null,
+                color: index == widget.notifier.value.index ? const Color.fromARGB(255, 255, 140, 0) : null,
                 borderRadius: radius
               ),
               child: RichText(
@@ -277,7 +277,7 @@ class _DefaultCodeAutocompleteListViewState extends State<_DefaultCodeAutocomple
 extension _CodePromptExtension on CodePrompt {
 
   InlineSpan createSpan(BuildContext context, String input) {
-    final TextStyle style = TextStyle();
+    const TextStyle style = TextStyle();
     final InlineSpan span = style.createSpan(
       value: word,
       anchor: input,

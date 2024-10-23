@@ -6,7 +6,7 @@ import 'package:re_editor_exmaple/menu.dart';
 
 class LargeTextEditor extends StatefulWidget {
 
-  const LargeTextEditor();
+  const LargeTextEditor({super.key});
 
   @override
   State<StatefulWidget> createState() => _LargeTextEditorState();

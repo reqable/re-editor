@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Re-Editor',
       theme: ThemeData(
-        colorScheme: ColorScheme.light(
+        colorScheme: const ColorScheme.light(
           primary: Color.fromARGB(255, 255, 140, 0),
         )
       ),

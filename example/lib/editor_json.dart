@@ -8,7 +8,7 @@ import 'package:re_highlight/styles/atom-one-light.dart';
 
 class JsonEditor extends StatefulWidget {
 
-  const JsonEditor();
+  const JsonEditor({super.key});
 
   @override
   State<StatefulWidget> createState() => _JsonEditorState();

@@ -11,10 +11,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  collection: ^1.17.1  
-  re_highlight: ^0.0.2  
+  collection: ^1.17.1
+  re_highlight: ^0.0.2
   re_editor:
-    path: ../  
+    path: ../
+
+dev_dependencies:
+  flutter_lints: ^2.0.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
