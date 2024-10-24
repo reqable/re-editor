@@ -95,7 +95,11 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   @override
   void performAction(TextInputAction action) {
     if (action == TextInputAction.newline) {
-      _controller.applyNewLine();
+      // Fix issue #42, iOS will insert duplicate new lines.
+      // We only do this on Android.
+      if (kIsAndroid) {
+        _controller.applyNewLine();
+      }
     }
   }
 
