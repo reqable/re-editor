@@ -285,6 +285,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       oldSelection: widget.controller.selection,
       position: offset,
       anchor: _isMobile ? null : _anchorSelection,
+      allowOverflow: cause == _SelectionChangedCause.drag,
     );
     if (selection == null) {
       return;
