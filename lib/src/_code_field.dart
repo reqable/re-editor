@@ -468,7 +468,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required Offset position,
   }) {
     final Offset localPosition = globalToLocal(position);
-    if (!_isValid(localPosition)) {
+    if (!isValidPointer(localPosition)) {
       return null;
     }
     final CodeLinePosition? result = calculateTextPosition(localPosition);
@@ -487,7 +487,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     bool allowOverflow = false,
   }) {
     final Offset localPosition = globalToLocal(position);
-    if (!allowOverflow && !_isValid(localPosition)) {
+    if (!allowOverflow && !isValidPointer(localPosition)) {
       return null;
     }
     final CodeLinePosition? result = calculateTextPosition(
@@ -531,7 +531,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required Offset position,
   }) {
     final Offset localPosition = globalToLocal(position);
-    if (!_isValid(localPosition)) {
+    if (!isValidPointer(localPosition)) {
       return null;
     }
     return _selectWord(localPosition);
@@ -636,7 +636,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   int chunkIndicatorHitIndex(Offset position) {
     final Offset localPosition = globalToLocal(position);
-    if (!_isValid(localPosition)) {
+    if (!isValidPointer(localPosition)) {
       return -1;
     }
     final int index = _chunkIndicators.indexWhere((element) => element.region.contains(localPosition));
@@ -1062,7 +1062,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldCursorPainter>().visible = _showCursorNotifier.value;
   }
 
-  bool _isValid(Offset localPosition) {
+  bool isValidPointer(Offset localPosition) {
     if (localPosition.dx <= 0 || localPosition.dx >= size.width - _verticalScrollbarWidth) {
       return false;
     }
