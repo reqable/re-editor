@@ -12,6 +12,8 @@ class _CodeEditable extends StatefulWidget {
   final String? hint;
   final CodeIndicatorBuilder? indicatorBuilder;
   final CodeScrollbarBuilder? scrollbarBuilder;
+  final double? verticalScrollbarWidth;
+  final double? horizontalScrollbarHeight;
   final TextStyle textStyle;
   final Color? hintTextColor;
   final Color? backgroundColor;
@@ -49,6 +51,8 @@ class _CodeEditable extends StatefulWidget {
     this.hint,
     this.indicatorBuilder,
     this.scrollbarBuilder,
+    this.verticalScrollbarWidth,
+    this.horizontalScrollbarHeight,
     required this.textStyle,
     this.hintTextColor,
     this.backgroundColor,
@@ -268,6 +272,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       key: widget.editorKey,
       verticalViewport: vertical,
       horizontalViewport: horizontal,
+      verticalScrollbarWidth: widget.verticalScrollbarWidth ?? _kScrollbarThickness,
+      horizontalScrollbarHeight: widget.horizontalScrollbarHeight ?? _kScrollbarThickness,
       selection: widget.controller.selection,
       highlightSelections: widget.findController.allMatchSelections,
       codes: widget.controller.codeLines,

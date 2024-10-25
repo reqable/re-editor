@@ -4,6 +4,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
 
   final ViewportOffset verticalViewport;
   final ViewportOffset? horizontalViewport;
+  final double verticalScrollbarWidth;
+  final double horizontalScrollbarHeight;
   final CodeLines codes;
   final CodeLineSelection selection;
   final List<CodeLineSelection>? highlightSelections;
@@ -27,6 +29,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
     super.key,
     required this.verticalViewport,
     required this.horizontalViewport,
+    required this.verticalScrollbarWidth,
+    required this.horizontalScrollbarHeight,
     required this.codes,
     required this.selection,
     required this.highlightSelections,
@@ -51,6 +55,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) => _CodeFieldRender(
     verticalViewport: verticalViewport,
     horizontalViewport: horizontalViewport,
+    verticalScrollbarWidth: verticalScrollbarWidth,
+    horizontalScrollbarHeight: horizontalScrollbarHeight,
     codes: codes,
     selection: selection,
     highlightSelections: highlightSelections,
@@ -76,6 +82,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
     renderObject
       ..verticalViewport = verticalViewport
       ..horizontalViewport = horizontalViewport
+      ..verticalScrollbarWidth = verticalScrollbarWidth
+      ..horizontalScrollbarHeight = horizontalScrollbarHeight
       ..codes = codes
       ..selection = selection
       ..highlightSelections = highlightSelections
@@ -102,6 +110,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   ViewportOffset _verticalViewport;
   ViewportOffset? _horizontalViewport;
+  double _verticalScrollbarWidth;
+  double _horizontalScrollbarHeight;
   CodeLines _codes;
   CodeLineSelection _selection;
   TextStyle _textStyle;
@@ -127,6 +137,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   _CodeFieldRender({
     required ViewportOffset verticalViewport,
     required ViewportOffset? horizontalViewport,
+    required double verticalScrollbarWidth,
+    required double horizontalScrollbarHeight,
     required CodeLines codes,
     required CodeLineSelection selection,
     required List<CodeLineSelection>? highlightSelections,
@@ -147,6 +159,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required LayerLink endHandleLayerLink,
   }) : _verticalViewport = verticalViewport,
     _horizontalViewport = horizontalViewport,
+    _verticalScrollbarWidth = verticalScrollbarWidth,
+    _horizontalScrollbarHeight = horizontalScrollbarHeight,
     _codes = codes,
     _selection = selection,
     _textStyle = textStyle,
@@ -212,6 +226,22 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       markNeedsLayout();
       _horizontalViewport?.addListener(markNeedsLayout);
     }
+  }
+
+  set verticalScrollbarWidth(double value) {
+    if (_verticalScrollbarWidth == value) {
+      return;
+    }
+    _verticalScrollbarWidth = value;
+    markNeedsLayout();
+  }
+
+  set horizontalScrollbarHeight(double value) {
+    if (_horizontalScrollbarHeight == value) {
+      return;
+    }
+    _horizontalScrollbarHeight = value;
+    markNeedsLayout();
   }
 
   set codes(CodeLines value) {
@@ -1033,13 +1063,13 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   }
 
   bool _isValid(Offset localPosition) {
-    if (localPosition.dx <= 0 || localPosition.dx >= size.width - _kScrollbarThickness) {
+    if (localPosition.dx <= 0 || localPosition.dx >= size.width - _verticalScrollbarWidth) {
       return false;
     }
     if (localPosition.dy <= 0) {
       return false;
     }
-    if (localPosition.dy >= size.height - ((_horizontalViewportSize ?? -1) <= 0 ? 0 : _kScrollbarThickness)) {
+    if (localPosition.dy >= size.height - ((_horizontalViewportSize ?? -1) <= 0 ? 0 : _horizontalScrollbarHeight)) {
       return false;
     }
     return true;

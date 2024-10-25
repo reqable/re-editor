@@ -169,6 +169,8 @@ class CodeEditor extends StatefulWidget {
     this.margin,
     this.indicatorBuilder,
     this.scrollbarBuilder,
+    this.verticalScrollbarWidth,
+    this.horizontalScrollbarHeight,
     this.findBuilder,
     this.shortcutsActivatorsBuilder,
     this.shortcutOverrideActions,
@@ -222,6 +224,12 @@ class CodeEditor extends StatefulWidget {
 
   /// Use this to build your own scroll bar widget.
   final CodeScrollbarBuilder? scrollbarBuilder;
+
+  /// The width of the vertical scrollbar.
+  final double? verticalScrollbarWidth;
+
+  /// The height of the horizontal scrollbar.
+  final double? horizontalScrollbarHeight;
 
   /// Use this to build your own search widget.
   /// The search widget will appear on the top of editor field.
@@ -459,6 +467,8 @@ class _CodeEditorState extends State<CodeEditor> {
       hint: widget.hint,
       indicatorBuilder: widget.indicatorBuilder,
       scrollbarBuilder: widget.scrollbarBuilder,
+      verticalScrollbarWidth: widget.verticalScrollbarWidth,
+      horizontalScrollbarHeight: widget.horizontalScrollbarHeight,
       textStyle: baseStyle.copyWith(
         color: widget.style?.textColor ?? theme.textTheme.bodyLarge?.color,
       ),
