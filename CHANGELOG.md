@@ -58,3 +58,9 @@
 * Fix controller delegate memory leak issue.
 * Fix issue `xxx is used after being disposed`.
 * Fix the bug that the underlying text will be selected when trying to click-drag the scroll bar.
+
+## 0.5.0
+* Fix code lint warnings in the example project.
+* Fix double newline issue on iOS.
+* Allow the gesture pointer overflow when dragging to select text.
+* Give an option to tell editor the size of the custom scrollbar.
