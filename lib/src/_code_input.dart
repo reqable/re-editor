@@ -7,7 +7,6 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   bool _readOnly;
   bool _autocompleteSymbols;
   bool _updateCausedByFloatingCursor;
-  bool _floatingCursorOn;
   late Offset _floatingCursorStartingOffset;
   late CodeLineSelection _newSelection;
 
@@ -25,7 +24,6 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     _focusNode = focusNode,
     _readOnly = readOnly,
     _updateCausedByFloatingCursor = false,
-    _floatingCursorOn = false,
     _autocompleteSymbols = autocompleteSymbols {
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
@@ -190,26 +188,27 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     _updateCausedByFloatingCursor = true;
     final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+    if (render == null) {
+      return;
+    }
     switch(point.state) {
       case FloatingCursorDragState.Start:
-        _floatingCursorOn = true;
-        if (render == null) {
-          break;
-        }
         (render._showCursorNotifier as _CodeCursorBlinkController).stopBlink();
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
         render.floatingCursorOffset = _floatingCursorStartingOffset;
         break;
       case FloatingCursorDragState.Update:
-        final newOffset = _floatingCursorStartingOffset + point.offset!;
-        final newPosition = render!.calculateTextPosition(newOffset)!;
+        final updatedOffset = _floatingCursorStartingOffset + point.offset!;
+        // An adjustment is made to updatedOffset on the y-axis so that whenever it is in between lines, the line where the center 
+        // of the floating cursor is will be selected.
+        final adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight/2);
+        final newPosition = render.calculateTextPosition(adjustedNewOffset)!;
         _newSelection = CodeLineSelection.fromPosition(position: newPosition);
-        render.floatingCursorOffset = newOffset;
+        render.floatingCursorOffset = updatedOffset;
         break;
       case FloatingCursorDragState.End:
         selection = _newSelection;
-        render!.floatingCursorOffset = null;
-        _floatingCursorOn = false;
+        render.floatingCursorOffset = null;
         (render._showCursorNotifier as _CodeCursorBlinkController).startBlink();
     }
   }

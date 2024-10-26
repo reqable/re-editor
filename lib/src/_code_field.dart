@@ -397,6 +397,14 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     return _foregroundRender.find<_CodeFieldCursorPainter>().width;
   }
 
+  double get floatingCursorWidth {
+    return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width;
+  }
+
+    double get floatingCursorHeight {
+    return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().height;
+  }
+
   /// The [LayerLink] of start selection handle.
   ///
   /// [RenderEditable] is responsible for calculating the [Offset] of this
@@ -1597,6 +1605,8 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     _width = value;
     notifyListeners();
   }
+
+  double get height => _height;
 
   set height(double value) {
     if (_height == value) {
