@@ -1611,10 +1611,24 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     if (_offset == null || _color == Colors.transparent || _color.alpha == 0) {
       return;
     }
-    _drawCaret(canvas, _offset!, size);
+    _drawFloatingCaret(canvas, _offset!, size);
   }
 
-  void _drawCaret(Canvas canvas, Offset offset, Size size) {
+  void _drawFloatingCaret(Canvas canvas, Offset offset, Size size) {
+    final caretRect = RRect.fromRectXY(
+      Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height),
+      _width / 2,
+      _width / 2,
+    );
+    final path = Path()..addRRect(caretRect);
+
+    canvas.drawShadow(
+      path,
+      Colors.black,
+      4.0,            
+      true,           
+    );
+
     _paint.color = _color;
     canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
   }
