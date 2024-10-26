@@ -196,6 +196,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         if (render == null) {
           break;
         }
+        (render._showCursorNotifier as _CodeCursorBlinkController).stopBlink();
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
         render.floatingCursorOffset = _floatingCursorStartingOffset;
         break;
@@ -209,6 +210,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         selection = _newSelection;
         render!.floatingCursorOffset = null;
         _floatingCursorOn = false;
+        (render._showCursorNotifier as _CodeCursorBlinkController).startBlink();
     }
   }
 
