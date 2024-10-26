@@ -17,9 +17,11 @@ class _CodeField extends SingleChildRenderObjectWidget {
   final Color selectionColor;
   final Color highlightColor;
   final Color cursorColor;
+  final Color floatingCursorColor;
   final Color? cursorLineColor;
   final Color? chunkIndicatorColor;
   final double cursorWidth;
+  final double floatingCursorWidth;
   final EdgeInsetsGeometry padding;
   final bool readOnly;
   final LayerLink startHandleLayerLink;
@@ -42,14 +44,19 @@ class _CodeField extends SingleChildRenderObjectWidget {
     required this.selectionColor,
     required this.highlightColor,
     required this.cursorColor,
+    floatingCursorColor,
     this.cursorLineColor,
     this.chunkIndicatorColor,
     required this.cursorWidth,
+    floatingCursorWidth,
     required this.padding,
     required this.readOnly,
     required this.startHandleLayerLink,
     required this.endHandleLayerLink,
-  }): assert(codes.isNotEmpty);
+  }): assert(codes.isNotEmpty),
+      floatingCursorColor = floatingCursorColor ?? cursorColor,
+      floatingCursorWidth = floatingCursorWidth ?? cursorWidth;
+      
 
   @override
   RenderObject createRenderObject(BuildContext context) => _CodeFieldRender(
@@ -68,9 +75,11 @@ class _CodeField extends SingleChildRenderObjectWidget {
     selectionColor: selectionColor,
     highlightColor: highlightColor,
     cursorColor: cursorColor,
+    floatingCursorColor: floatingCursorColor,
     cursorLineColor: cursorLineColor,
     chunkIndicatorColor: chunkIndicatorColor,
     cursorWidth: cursorWidth,
+    floatingCursorWidth: floatingCursorWidth,
     padding: padding,
     readOnly: readOnly,
     startHandleLayerLink: startHandleLayerLink,
@@ -95,9 +104,11 @@ class _CodeField extends SingleChildRenderObjectWidget {
       ..selectionColor = selectionColor
       ..highlightColor = highlightColor
       ..cursorColor = cursorColor
+      ..floatingCursorColor = floatingCursorColor
       ..cursorLineColor = cursorLineColor
       ..chunkIndicatorColor = chunkIndicatorColor
       ..cursorWidth = cursorWidth
+      ..floatingCursorWidth = floatingCursorWidth
       ..padding = padding
       ..readOnly = readOnly
       ..startHandleLayerLink = startHandleLayerLink
@@ -151,9 +162,11 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required Color selectionColor,
     required Color highlightColor,
     required Color cursorColor,
+    required Color floatingCursorColor,
     Color? cursorLineColor,
     Color? chunkIndicatorColor,
     required double cursorWidth,
+    required double floatingCursorWidth,
     required EdgeInsetsGeometry padding,
     required bool readOnly,
     required LayerLink startHandleLayerLink,
@@ -197,9 +210,9 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         ),
         _CodeFieldFloatingCursorPainter(
           offset: _floatingCursorOffset, 
-          color: Colors.red, 
-          width: 3, 
-          height: 20, 
+          color: floatingCursorColor, 
+          width: floatingCursorWidth, 
+          height: 0.0, 
         )
       ]
     );
@@ -279,7 +292,6 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
     _floatingCursorOffset = value;
     _foregroundRender.find<_CodeFieldFloatingCursorPainter>().offset = value;
-    //markNeedsLayout();
   }
 
   set highlightSelections(List<CodeLineSelection>? value) {
@@ -357,6 +369,10 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldCursorPainter>().color = value;
   }
 
+  set floatingCursorColor(Color value) {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().color = value;
+  }
+
   set cursorLineColor(Color? value) {
     _backgroundRender.find<_CodeCursorLinePainter>().color = value;
   }
@@ -371,6 +387,10 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   set cursorWidth(double value) {
     _foregroundRender.find<_CodeFieldCursorPainter>().width = value;
+  }
+
+  set floatingCursorWidth(double value) {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width = value;
   }
 
   double get cursorWidth {
@@ -1072,6 +1092,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     );
     _preferredLineHeight = painter.preferredLineHeight;
     _foregroundRender.find<_CodeFieldCursorPainter>().height = painter.preferredLineHeight;
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().height = painter.preferredLineHeight;
   }
 
   void _onCursorVisibleChanged() {
@@ -1539,7 +1560,6 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
   Color _color;
   double _width;
   double _height;
-  bool _willDraw;
 
   _CodeFieldFloatingCursorPainter({
     required Offset? offset,
@@ -1550,7 +1570,6 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     _color = color,
     _width = width,
     _height = height,
-    _willDraw = true,
     _paint = Paint();
 
   set offset(Offset? value) {
@@ -1587,31 +1606,11 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     notifyListeners();
   }
 
-  set willDraw(bool value) {
-    if (_willDraw == value) {
-      return;
-    }
-    _willDraw = value;
-    notifyListeners();
-  }
-
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (_offset == null || !_willDraw || _color == Colors.transparent || _color.alpha == 0) {
+    if (_offset == null || _color == Colors.transparent || _color.alpha == 0) {
       return;
     }
-    // final CodeLineRenderParagraph? paragraph = render.findDisplayParagraphByLineIndex(_position.index);
-    // if (paragraph == null) {
-    //   return;
-    // }
-    // Offset? offset = paragraph.getOffset(_position);
-    // if (offset == null) {
-    //   return;
-    // }
-    // offset += paragraph.offset - render.paintOffset;
-    // if (offset.dx + _width < 0 || offset.dx >= size.width || offset.dy + _height < 0 || offset.dy >= size.height) {
-    //   return;
-    // }
     _drawCaret(canvas, _offset!, size);
   }
 
