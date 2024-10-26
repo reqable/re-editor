@@ -126,6 +126,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   CodeLines _codes;
   CodeLineSelection _selection;
   Offset? _floatingCursorOffset;
+  Offset? _previewCursorOffset;
   TextStyle _textStyle;
   bool _hasFocus;
   _CodeHighlighter _highlighter;
@@ -210,6 +211,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         ),
         _CodeFieldFloatingCursorPainter(
           offset: _floatingCursorOffset, 
+          previewOffset: _previewCursorOffset,
           color: floatingCursorColor, 
           width: floatingCursorWidth, 
           height: 0.0, 
@@ -296,6 +298,14 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   set highlightSelections(List<CodeLineSelection>? value) {
     _backgroundRender.find<_CodeFieldHighlightPainter>().selections = value ?? const [];
+  }
+
+  set previewCursorOffset(Offset? value) {
+    if (_previewCursorOffset == value) {
+      return;
+    }
+    _previewCursorOffset = value;
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().previewOffset = value;
   }
 
   set textStyle(TextStyle value) {
@@ -1565,16 +1575,19 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
 
   final Paint _paint;
   Offset? _offset;
+  Offset? _previewOffset;
   Color _color;
   double _width;
   double _height;
 
   _CodeFieldFloatingCursorPainter({
     required Offset? offset,
+    required Offset? previewOffset,
     required Color color,
     required double width,
     required double height,
   }) : _offset = offset,
+    _previewOffset = previewOffset,
     _color = color,
     _width = width,
     _height = height,
@@ -1585,6 +1598,14 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
       return;
     }
     _offset = value;
+    notifyListeners();
+  }
+
+  set previewOffset(Offset? value) {
+    if (_previewOffset == value) {
+      return;
+    }
+    _previewOffset = value;
     notifyListeners();
   }
 
@@ -1622,6 +1643,9 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
       return;
     }
     _drawFloatingCaret(canvas, _offset!, size);
+    if (_previewOffset != null) {
+      _drawPreviewCursor(canvas, _previewOffset!, size);
+    }
   }
 
   void _drawFloatingCaret(Canvas canvas, Offset offset, Size size) {
@@ -1640,6 +1664,11 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     );
 
     _paint.color = _color;
+    canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
+  }
+
+  void _drawPreviewCursor(Canvas canvas, Offset offset, Size size) {
+    _paint.color = _color.withAlpha(150);
     canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
   }
 

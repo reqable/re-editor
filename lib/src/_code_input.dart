@@ -196,15 +196,29 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         (render._showCursorNotifier as _CodeCursorBlinkController).stopBlink();
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
         render.floatingCursorOffset = _floatingCursorStartingOffset;
+        render.previewCursorOffset = null;
         break;
       case FloatingCursorDragState.Update:
         final updatedOffset = _floatingCursorStartingOffset + point.offset!;
         // An adjustment is made to updatedOffset on the y-axis so that whenever it is in between lines, the line where the center 
         // of the floating cursor is will be selected.
-        final adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight/2);
-        final newPosition = render.calculateTextPosition(adjustedNewOffset)!;
+        final Offset adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight/2);
+        final CodeLinePosition newPosition = render.calculateTextPosition(adjustedNewOffset)!;
+        // debugPrint(adjustedNewOffset.toString());
+        final Offset? snappedNewOffset = render.calculateTextPositionViewportOffset(newPosition);
+        // debugPrint(snappedNewOffset.toString());
+        // debugPrint((adjustedNewOffset.dx > snappedNewOffset!.dx).toString());
+
         _newSelection = CodeLineSelection.fromPosition(position: newPosition);
         render.floatingCursorOffset = updatedOffset;
+        // The 10 has been hardcoded for now. Change it so it scales properly
+        if (adjustedNewOffset.dx > snappedNewOffset!.dx + 10) {
+          render.previewCursorOffset = snappedNewOffset;
+        }
+        else {
+          render.previewCursorOffset = null;
+        }
+        
         break;
       case FloatingCursorDragState.End:
         selection = _newSelection;
