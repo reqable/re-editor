@@ -189,24 +189,25 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     _updateCausedByFloatingCursor = true;
+    final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
     switch(point.state) {
       case FloatingCursorDragState.Start:
         _floatingCursorOn = true;
-        final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
         if (render == null) {
           break;
         }
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
+        render.floatingCursorOffset = _floatingCursorStartingOffset;
         break;
       case FloatingCursorDragState.Update:
-        debugPrint(point.offset!.dx.toString());
-        debugPrint(point.offset!.dy.toString());
-        final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
-        final newPosition = render!.calculateTextPosition(_floatingCursorStartingOffset + point.offset!)!;
+        final newOffset = _floatingCursorStartingOffset + point.offset!;
+        final newPosition = render!.calculateTextPosition(newOffset)!;
         _newSelection = CodeLineSelection.fromPosition(position: newPosition);
+        render.floatingCursorOffset = newOffset;
         break;
       case FloatingCursorDragState.End:
         selection = _newSelection;
+        render!.floatingCursorOffset = null;
         _floatingCursorOn = false;
     }
   }

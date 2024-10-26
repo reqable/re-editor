@@ -114,6 +114,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   double _horizontalScrollbarHeight;
   CodeLines _codes;
   CodeLineSelection _selection;
+  Offset? _floatingCursorOffset;
   TextStyle _textStyle;
   bool _hasFocus;
   _CodeHighlighter _highlighter;
@@ -193,6 +194,12 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
           width: cursorWidth,
           height: 0.0,
           visible: _showCursorNotifier.value
+        ),
+        _CodeFieldFloatingCursorPainter(
+          offset: _floatingCursorOffset, 
+          color: Colors.red, 
+          width: 3, 
+          height: 20, 
         )
       ]
     );
@@ -264,6 +271,15 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       _foregroundRender.find<_CodeFieldCursorPainter>().willDraw = _selection.isCollapsed;
     }
     markNeedsLayout();
+  }
+
+  set floatingCursorOffset(Offset? value) {
+    if (_floatingCursorOffset == value) {
+      return;
+    }
+    _floatingCursorOffset = value;
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().offset = value;
+    //markNeedsLayout();
   }
 
   set highlightSelections(List<CodeLineSelection>? value) {
@@ -1507,6 +1523,96 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
       return;
     }
     _drawCaret(canvas, offset, size);
+  }
+
+  void _drawCaret(Canvas canvas, Offset offset, Size size) {
+    _paint.color = _color;
+    canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
+  }
+
+}
+
+class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
+
+  final Paint _paint;
+  Offset? _offset;
+  Color _color;
+  double _width;
+  double _height;
+  bool _willDraw;
+
+  _CodeFieldFloatingCursorPainter({
+    required Offset? offset,
+    required Color color,
+    required double width,
+    required double height,
+  }) : _offset = offset,
+    _color = color,
+    _width = width,
+    _height = height,
+    _willDraw = true,
+    _paint = Paint();
+
+  set offset(Offset? value) {
+    if (_offset == value) {
+      return;
+    }
+    _offset = value;
+    notifyListeners();
+  }
+
+  set color(Color value) {
+    if (_color == value) {
+      return;
+    }
+    _color = value;
+    notifyListeners();
+  }
+
+  double get width => _width;
+
+  set width(double value) {
+    if (_width == value) {
+      return;
+    }
+    _width = value;
+    notifyListeners();
+  }
+
+  set height(double value) {
+    if (_height == value) {
+      return;
+    }
+    _height = value;
+    notifyListeners();
+  }
+
+  set willDraw(bool value) {
+    if (_willDraw == value) {
+      return;
+    }
+    _willDraw = value;
+    notifyListeners();
+  }
+
+  @override
+  void paint(Canvas canvas, Size size, _CodeFieldRender render) {
+    if (_offset == null || !_willDraw || _color == Colors.transparent || _color.alpha == 0) {
+      return;
+    }
+    // final CodeLineRenderParagraph? paragraph = render.findDisplayParagraphByLineIndex(_position.index);
+    // if (paragraph == null) {
+    //   return;
+    // }
+    // Offset? offset = paragraph.getOffset(_position);
+    // if (offset == null) {
+    //   return;
+    // }
+    // offset += paragraph.offset - render.paintOffset;
+    // if (offset.dx + _width < 0 || offset.dx >= size.width || offset.dy + _height < 0 || offset.dy >= size.height) {
+    //   return;
+    // }
+    _drawCaret(canvas, _offset!, size);
   }
 
   void _drawCaret(Canvas canvas, Offset offset, Size size) {
