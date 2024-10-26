@@ -6,6 +6,10 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   FocusNode _focusNode;
   bool _readOnly;
   bool _autocompleteSymbols;
+  bool _updateCausedByFloatingCursor;
+  bool _floatingCursorOn;
+  late Offset _floatingCursorStartingOffset;
+  late CodeLineSelection _newSelection;
 
   TextInputConnection? _textInputConnection;
   TextEditingValue? _remoteEditingValue;
@@ -20,6 +24,8 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   }) : _controller = controller,
     _focusNode = focusNode,
     _readOnly = readOnly,
+    _updateCausedByFloatingCursor = false,
+    _floatingCursorOn = false,
     _autocompleteSymbols = autocompleteSymbols {
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
@@ -125,6 +131,11 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
 
   @override
   void updateEditingValueWithDeltas(List<TextEditingDelta> textEditingDeltas) {
+    if (_updateCausedByFloatingCursor) {
+      _updateCausedByFloatingCursor = false;
+      return;
+    }
+    
     if (textEditingDeltas.any((delta) => delta is TextEditingDeltaInsertion && delta.textInserted == '\n')) {
       TextEditingValue newValue = _remoteEditingValue!;
       for (final TextEditingDelta delta in textEditingDeltas) {
@@ -134,6 +145,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       _controller.applyNewLine();
       return;
     }
+
     // _Trace.begin('updateEditingValue all');
     TextEditingValue newValue = _remoteEditingValue!;
     bool smartChange = false;
@@ -176,6 +188,27 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
 
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {
+    _updateCausedByFloatingCursor = true;
+    switch(point.state) {
+      case FloatingCursorDragState.Start:
+        _floatingCursorOn = true;
+        final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+        if (render == null) {
+          break;
+        }
+        _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
+        break;
+      case FloatingCursorDragState.Update:
+        debugPrint(point.offset!.dx.toString());
+        debugPrint(point.offset!.dy.toString());
+        final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+        final newPosition = render!.calculateTextPosition(_floatingCursorStartingOffset + point.offset!)!;
+        _newSelection = CodeLineSelection.fromPosition(position: newPosition);
+        break;
+      case FloatingCursorDragState.End:
+        selection = _newSelection;
+        _floatingCursorOn = false;
+    }
   }
 
   @override
