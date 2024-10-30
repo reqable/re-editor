@@ -403,6 +403,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width = value;
   }
 
+  Offset? get floatingCursorOffset => _floatingCursorOffset;
+
   double get cursorWidth {
     return _foregroundRender.find<_CodeFieldCursorPainter>().width;
   }
