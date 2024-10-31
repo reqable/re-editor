@@ -339,7 +339,7 @@ extension _TextStyleExtension on TextStyle {
     int valueIndex = 0;
 
     // match first anchor character
-    if (anchor[0] != value[0]) {
+    if (anchor[0].toLowerCase() != value[0].toLowerCase()) {
       for (; valueIndex < value.length; ++valueIndex) {
         if (value[valueIndex] == anchor[0].toUpperCase()) {
           break;

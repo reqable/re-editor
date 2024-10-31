@@ -26,7 +26,7 @@ abstract class CodePrompt {
     int wordIndex = 0;
 
     // match first input character
-    if (input[0] != word[0]) {
+    if (input[0].toLowerCase() != word[0].toLowerCase()) {
       for (; wordIndex < word.length; ++wordIndex) {
         if (word[wordIndex] == input[0].toUpperCase()) {
           break;
