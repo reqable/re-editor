@@ -21,8 +21,37 @@ abstract class CodePrompt {
   CodeAutocompleteResult get autocomplete;
 
   /// Check whether the input meets this prompt condition.
-  bool match(String input);
+  bool match(String input) {
+    int inputIndex = 0;
+    int wordIndex = 0;
 
+    // match first input character
+    if (input[0] != word[0]) {
+      for (; wordIndex < word.length; ++wordIndex) {
+        if (word[wordIndex] == input[0].toUpperCase()) {
+          break;
+        }
+      }
+    }
+    if (wordIndex >= word.length) {
+      return false;
+    }
+    ++inputIndex;
+    ++wordIndex;
+
+    // match subsequence
+    final lowercaseInput = input.toLowerCase();
+    for (; wordIndex < word.length; ++wordIndex) {
+      if (inputIndex >= input.length) {
+        return true;
+      }
+      final char = word[wordIndex].toLowerCase();
+      if (char == lowercaseInput[inputIndex]) {
+        ++inputIndex;
+      }
+    }
+    return inputIndex >= input.length;
+  }
 }
 
 /// The keyword autocomplate prompt. such as 'return', 'class', 'new' and so on.
@@ -34,11 +63,6 @@ class CodeKeywordPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromWord(word);
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
@@ -73,11 +97,6 @@ class CodeFieldPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord(word);
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
@@ -118,11 +137,6 @@ class CodeFunctionPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord('$word(${parameters.keys.join(', ')})');
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {

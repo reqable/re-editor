@@ -323,44 +323,70 @@ extension _TextStyleExtension on TextStyle {
     required String anchor,
     required Color color,
     FontWeight? fontWeight,
-    bool casesensitive = false,
   }) {
-    if (anchor.isEmpty) {
+    if (anchor.isEmpty || value.isEmpty) {
       return TextSpan(
         text: value,
         style: this,
       );
     }
-    final int index;
-    if (casesensitive) {
-      index = value.indexOf(anchor);
-    } else {
-      index = value.toLowerCase().indexOf(anchor.toLowerCase());
+
+    final lowercaseAnchor = anchor.toLowerCase();
+    final lowercaseValue = value.toLowerCase();
+    final List<int> ranges = [0];
+    bool matched = value[0].toLowerCase() == lowercaseAnchor[0];
+    int anchorIndex = 0;
+    int valueIndex = 0;
+
+    // match first anchor character
+    if (anchor[0] != value[0]) {
+      for (; valueIndex < value.length; ++valueIndex) {
+        if (value[valueIndex] == anchor[0].toUpperCase()) {
+          break;
+        }
+      }
     }
-    if (index < 0) {
-      return TextSpan(
-        text: value,
-        style: this,
-      );
+
+    // match subsequence
+    for (; valueIndex < lowercaseValue.length; valueIndex++) {
+      final String valueChar = lowercaseValue[valueIndex];
+      if (valueChar == lowercaseAnchor[anchorIndex]) {
+        anchorIndex++;
+        if (!matched) {
+          matched = true;
+          ranges.add(valueIndex);
+        }
+        if (anchorIndex >= lowercaseAnchor.length) {
+          ranges.add(valueIndex + 1);
+          break;
+        }
+      } else {
+        if (matched) {
+          matched = false;
+          ranges.add(valueIndex);
+        }
+      }
     }
+    ranges.add(value.length);
+    
+    // match complete
+    matched = value[0].toLowerCase() == lowercaseAnchor[0];
+    final List<TextSpan> textSpans = [];
+    for (int i = 1; i < ranges.length; ++i) {
+      final begin = ranges[i - 1];
+      final end = ranges[i];
+      textSpans.add(TextSpan(
+        text: value.substring(begin, end),
+        style: matched ? copyWith(
+          color: color,
+          fontWeight: fontWeight,
+        ) : this,
+      ));
+      matched = !matched;
+    }
+
     return TextSpan(
-      children: [
-        TextSpan(
-          text: value.substring(0, index),
-          style: this
-        ),
-        TextSpan(
-          text: value.substring(index, index + anchor.length),
-          style: copyWith(
-            color: color,
-            fontWeight: fontWeight,
-          )
-        ),
-        TextSpan(
-          text: value.substring(index + anchor.length),
-          style: this
-        )
-      ]
+      children: textSpans,
     );
   }
 
