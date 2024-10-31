@@ -64,3 +64,7 @@
 * Fix double newline issue on iOS.
 * Allow the gesture pointer overflow when dragging to select text.
 * Give an option to tell editor the size of the custom scrollbar.
+
+## 0.6.0
+* Check tap down pointer whether is in the valid region.
+* Break changes: Change autocomplete behavior to replace user input with complete match to support more pattern match method.
