@@ -126,7 +126,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         },
         child: Listener(
           onPointerDown: (event) {
-            _tapping = render.isValidPointer(event.localPosition);
+            _tapping = render.isValidPointer2(event.position);
             // A trick, delay the focus request here to avoid loss.
             Future(widget.inputController.ensureInput);
             _onDesktopTapDown(event.position);

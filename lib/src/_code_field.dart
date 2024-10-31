@@ -1075,6 +1075,11 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     return true;
   }
 
+  bool isValidPointer2(Offset globalPosition) {
+    final Offset localPosition = globalToLocal(globalPosition);
+    return isValidPointer(localPosition);
+  }
+
   CodeLineRange? _selectWord(Offset localPosition) {
     final Offset offset = localPosition + paintOffset;
     final CodeLineRenderParagraph? target = _findDisplayRenderParagraph(offset);
