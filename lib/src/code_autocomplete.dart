@@ -33,7 +33,7 @@ class CodeKeywordPrompt extends CodePrompt {
   });
 
   @override
-  CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromText(word);
+  CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromWord(word);
 
   @override
   bool match(String input) {
@@ -72,7 +72,7 @@ class CodeFieldPrompt extends CodePrompt {
   final CodeAutocompleteResult? customAutocomplete;
 
   @override
-  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText(word);
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord(word);
 
   @override
   bool match(String input) {
@@ -117,7 +117,7 @@ class CodeFunctionPrompt extends CodePrompt {
   final CodeAutocompleteResult? customAutocomplete;
 
   @override
-  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromText('$word(${parameters.keys.join(', ')})');
+  CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord('$word(${parameters.keys.join(', ')})');
 
   @override
   bool match(String input) {
@@ -149,7 +149,7 @@ class CodeAutocompleteResult {
     required this.selection
   });
 
-  factory CodeAutocompleteResult.fromText(String word) {
+  factory CodeAutocompleteResult.fromWord(String word) {
     return CodeAutocompleteResult(
       input: '',
       word: word,
