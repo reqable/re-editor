@@ -413,7 +413,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       onAutocomplete: (value) {
         autocompleteState.dismiss();
         final CodeLineSelection selection = widget.controller.selection;
-        widget.controller.replaceSelection(value.text);
+        widget.controller.replaceSelection(value.word, selection.copyWith(
+          baseOffset: selection.baseOffset - value.input.length,
+        ));
         widget.controller.selection = selection.copyWith(
           baseOffset: selection.baseOffset + value.selection.baseOffset,
           extentOffset: selection.extentOffset + value.selection.extentOffset,
