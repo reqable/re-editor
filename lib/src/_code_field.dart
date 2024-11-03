@@ -322,6 +322,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
+  TextStyle get textStyle => _textStyle;
+
   bool get hasFocus => _hasFocus;
 
   set hasFocus(bool value) {

@@ -201,24 +201,20 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         break;
       case FloatingCursorDragState.Update:
         final updatedOffset = _floatingCursorStartingOffset + point.offset!;
-        
+
         // An adjustment is made to updatedOffset on the y-axis so that whenever it is in between lines, the line where the center 
         // of the floating cursor is will be selected.
-        Offset adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight/2);
-
-        Offset currentOffset = render.calculateTextPositionViewportOffset(
-          CodeLinePosition(index: _newSelection.baseIndex, offset: _newSelection.baseOffset, affinity: _newSelection.baseAffinity)
-        )!;
-
-        debugPrint(currentOffset.toString());
+        Offset adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight / 2);
 
         final CodeLinePosition newPosition = render.calculateTextPosition(adjustedNewOffset)!;
-        
         final Offset? snappedNewOffset = render.calculateTextPositionViewportOffset(newPosition);
+
+
         render.floatingCursorOffset = Offset(updatedOffset.dx, snappedNewOffset!.dy);
         _newSelection = CodeLineSelection.fromPosition(position: newPosition);
-        // The 10 has been hardcoded for now. Change it so it scales properly
-        if (adjustedNewOffset.dx > snappedNewOffset.dx + 10) {
+        
+        // Only render the preview cursor if we are away from the end of the line (far away relatively to the font size)
+        if (adjustedNewOffset.dx > snappedNewOffset.dx + render.textStyle.fontSize!) {
           render.previewCursorOffset = snappedNewOffset;
         }
         else {
