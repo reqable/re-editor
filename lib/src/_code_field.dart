@@ -13,6 +13,7 @@ class _CodeField extends SingleChildRenderObjectWidget {
   final bool hasFocus;
   final _CodeHighlighter highlighter;
   final ValueNotifier<bool> showCursorNotifier;
+  final ValueNotifier<_FloatingCursorPosition> floatingCursorNotifier;
   final ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged;
   final Color selectionColor;
   final Color highlightColor;
@@ -40,6 +41,7 @@ class _CodeField extends SingleChildRenderObjectWidget {
     required this.hasFocus,
     required this.highlighter,
     required this.showCursorNotifier,
+    required this.floatingCursorNotifier,
     required this.onRenderParagraphsChanged,
     required this.selectionColor,
     required this.highlightColor,
@@ -71,6 +73,7 @@ class _CodeField extends SingleChildRenderObjectWidget {
     hasFocus: hasFocus,
     highlighter: highlighter,
     showCursorNotifier: showCursorNotifier,
+    floatingCursorNotifier: floatingCursorNotifier,
     onRenderParagraphsChanged: onRenderParagraphsChanged,
     selectionColor: selectionColor,
     highlightColor: highlightColor,
@@ -100,6 +103,7 @@ class _CodeField extends SingleChildRenderObjectWidget {
       ..hasFocus = hasFocus
       ..highlighter = highlighter
       ..showCursorNotifier = showCursorNotifier
+      ..floatingCursorNotifier = floatingCursorNotifier
       ..onRenderParagraphsChanged = onRenderParagraphsChanged
       ..selectionColor = selectionColor
       ..highlightColor = highlightColor
@@ -125,12 +129,11 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   double _horizontalScrollbarHeight;
   CodeLines _codes;
   CodeLineSelection _selection;
-  Offset? _floatingCursorOffset;
-  Offset? _previewCursorOffset;
   TextStyle _textStyle;
   bool _hasFocus;
   _CodeHighlighter _highlighter;
   ValueNotifier<bool> _showCursorNotifier;
+  ValueNotifier<_FloatingCursorPosition> _floatingCursorNotifier;
   ValueChanged<List<CodeLineRenderParagraph>> _onRenderParagraphsChanged;
   EdgeInsetsGeometry _padding;
   bool _readOnly;
@@ -159,6 +162,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required bool hasFocus,
     required _CodeHighlighter highlighter,
     required ValueNotifier<bool> showCursorNotifier,
+    required ValueNotifier<_FloatingCursorPosition> floatingCursorNotifier,
     required ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged,
     required Color selectionColor,
     required Color highlightColor,
@@ -182,6 +186,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _hasFocus = hasFocus,
     _highlighter = highlighter,
     _showCursorNotifier = showCursorNotifier,
+    _floatingCursorNotifier = floatingCursorNotifier,
     _onRenderParagraphsChanged = onRenderParagraphsChanged,
     _padding = padding,
     _readOnly = readOnly,
@@ -210,8 +215,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
           visible: _showCursorNotifier.value
         ),
         _CodeFieldFloatingCursorPainter(
-          offset: _floatingCursorOffset, 
-          previewOffset: _previewCursorOffset,
+          position: _floatingCursorNotifier.value,
           color: floatingCursorColor, 
           width: floatingCursorWidth, 
           height: 0.0, 
@@ -288,25 +292,27 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     markNeedsLayout();
   }
 
-  set floatingCursorOffset(Offset? value) {
-    if (_floatingCursorOffset == value) {
-      return;
-    }
-    _floatingCursorOffset = value;
-    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().offset = value;
-  }
+  // set floatingCursorOffset(Offset? value) {
+  //   if (_floatingCursorOffset == value) {
+  //     return;
+  //   }
+  //   _floatingCursorOffset = value;
+  //   _foregroundRender.find<_CodeFieldFloatingCursorPainter>().offset = value;
+  //   markNeedsPaint();
+  // }
 
   set highlightSelections(List<CodeLineSelection>? value) {
     _backgroundRender.find<_CodeFieldHighlightPainter>().selections = value ?? const [];
   }
 
-  set previewCursorOffset(Offset? value) {
-    if (_previewCursorOffset == value) {
-      return;
-    }
-    _previewCursorOffset = value;
-    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().previewOffset = value;
-  }
+  // set previewCursorOffset(Offset? value) {
+  //   if (_previewCursorOffset == value) {
+  //     return;
+  //   }
+  //   _previewCursorOffset = value;
+  //   _foregroundRender.find<_CodeFieldFloatingCursorPainter>().previewOffset = value;
+  //   markNeedsPaint();
+  // }
 
   set textStyle(TextStyle value) {
     if (_textStyle == value) {
@@ -362,6 +368,20 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
+  set floatingCursorNotifier(ValueNotifier<_FloatingCursorPosition> value) {
+    if (_floatingCursorNotifier == value) {
+      return;
+    }
+    if (attached) {
+      _floatingCursorNotifier.removeListener(_onFloatingCursorChanged);
+    }
+    _floatingCursorNotifier = value;
+    if (attached) {
+      _onFloatingCursorChanged();
+      _floatingCursorNotifier.addListener(_onFloatingCursorChanged);
+    }
+  }
+
   set onRenderParagraphsChanged(ValueChanged<List<CodeLineRenderParagraph>> value) {
     if (_onRenderParagraphsChanged == value) {
       return;
@@ -405,8 +425,6 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width = value;
   }
 
-  Offset? get floatingCursorOffset => _floatingCursorOffset;
-
   double get cursorWidth {
     return _foregroundRender.find<_CodeFieldCursorPainter>().width;
   }
@@ -415,9 +433,11 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width;
   }
 
-    double get floatingCursorHeight {
+  double get floatingCursorHeight {
     return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().height;
   }
+
+  ValueNotifier<bool> get showCursorNotifier => _showCursorNotifier;
 
   /// The [LayerLink] of start selection handle.
   ///
@@ -810,6 +830,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _horizontalViewport?.addListener(markNeedsPaint);
     _highlighter.addListener(markNeedsLayout);
     _showCursorNotifier.addListener(_onCursorVisibleChanged);
+    _floatingCursorNotifier.addListener(_onFloatingCursorChanged);
   }
 
   @override
@@ -818,6 +839,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _horizontalViewport?.removeListener(markNeedsPaint);
     _highlighter.removeListener(markNeedsLayout);
     _showCursorNotifier.removeListener(_onCursorVisibleChanged);
+    _floatingCursorNotifier.removeListener(_onFloatingCursorChanged);
     super.detach();
     _foregroundRender.detach();
     _backgroundRender.detach();
@@ -1119,6 +1141,10 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   void _onCursorVisibleChanged() {
     _foregroundRender.find<_CodeFieldCursorPainter>().visible = _showCursorNotifier.value;
+  }
+
+  void _onFloatingCursorChanged() {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().position = _floatingCursorNotifier.value;
   }
 
   bool isValidPointer(Offset localPosition) {
@@ -1578,39 +1604,28 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
 class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
 
   final Paint _paint;
-  Offset? _offset;
-  Offset? _previewOffset;
+  _FloatingCursorPosition _position;
   Color _color;
   double _width;
   double _height;
 
   _CodeFieldFloatingCursorPainter({
-    required Offset? offset,
-    required Offset? previewOffset,
+    required _FloatingCursorPosition position,
     required Color color,
     required double width,
     required double height,
-  }) : _offset = offset,
-    _previewOffset = previewOffset,
+  }) : _position = position,
     _color = color,
     _width = width,
     _height = height,
     _paint = Paint();
 
-  set offset(Offset? value) {
-    if (_offset == value) {
+  set position(_FloatingCursorPosition value) {
+    if (_position == value) {
       return;
     }
-    _offset = value;
-    notifyListeners();
-  }
-
-  set previewOffset(Offset? value) {
-    if (_previewOffset == value) {
-      return;
-    }
-    _previewOffset = value;
-    notifyListeners();
+    _position = value;
+    notifyListeners(); 
   }
 
   set color(Color value) {
@@ -1643,12 +1658,12 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (_offset == null || _color == Colors.transparent || _color.alpha == 0) {
+    if (!_position.isActive() || _color == Colors.transparent || _color.alpha == 0) {
       return;
     }
-    _drawFloatingCaret(canvas, _offset!, size);
-    if (_previewOffset != null) {
-      _drawPreviewCursor(canvas, _previewOffset!, size);
+    _drawFloatingCaret(canvas, _position.floatingCursorOffset!, size);
+    if (_position.previewCursorOffset != null) {
+      _drawPreviewCursor(canvas, _position.previewCursorOffset!, size);
     }
   }
 

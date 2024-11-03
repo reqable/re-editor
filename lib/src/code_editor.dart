@@ -312,6 +312,7 @@ class _CodeEditorState extends State<CodeEditor> {
   late FocusNode _focusNode;
   late _CodeLineEditingControllerDelegate _editingController;
   late final _CodeInputController _inputController;
+  late final _CodeFloatingCursorController _floatingCursorController;
   late CodeScrollController _scrollController;
   late CodeFindController _findController;
   late CodeChunkController _chunkController;
@@ -332,8 +333,11 @@ class _CodeEditorState extends State<CodeEditor> {
     _editingController.delegate =  widget.controller ?? CodeLineEditingController();
     _editingController.bindEditor(_editorKey);
 
+    _floatingCursorController = _CodeFloatingCursorController();
+
     _inputController = _CodeInputController(
       controller: _editingController,
+      floatingCursorController: _floatingCursorController,
       focusNode: _focusNode,
       readOnly: widget.readOnly ?? false,
       autocompleteSymbols: widget.autocompleteSymbols ?? true,
@@ -402,6 +406,7 @@ class _CodeEditorState extends State<CodeEditor> {
     }
     _chunkController.dispose();
     _selectionOverlayController.dispose();
+    _floatingCursorController.dispose();
     super.dispose();
   }
 
@@ -500,6 +505,7 @@ class _CodeEditorState extends State<CodeEditor> {
       findController: _findController,
       scrollController: _scrollController,
       chunkController: _chunkController,
+      floatingCursorController: _floatingCursorController,
       startHandleLayerLink: _startHandleLayerLink,
       endHandleLayerLink: _endHandleLayerLink,
       toolbarLayerLink: _toolbarLayerLink,
