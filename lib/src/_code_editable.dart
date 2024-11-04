@@ -93,10 +93,12 @@ class _CodeEditable extends StatefulWidget {
 
 }
 
-class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable> {
+class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable>, SingleTickerProviderStateMixin {
 
   late bool _didAutoFocus;
   late final _CodeCursorBlinkController _cursorController;
+
+  late AnimationController _floatingCursorAnimationController;
 
   late _CodeHighlighter _highlighter;
   late CodeIndicatorValueNotifier _codeIndicatorValueNotifier;
@@ -121,8 +123,11 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _codeIndicatorValueNotifier = CodeIndicatorValueNotifier(null);
 
     _cursorController = _CodeCursorBlinkController();
+    _floatingCursorAnimationController = AnimationController(vsync: this);
 
-    widget.floatingCursorController.blinkController = _cursorController;
+    widget.floatingCursorController
+      ..blinkController = _cursorController
+      ..animationController = _floatingCursorAnimationController;
 
     widget.focusNode.addListener(_onFocusChanged);
     widget.findController.addListener(_onCodeFindChanged);
@@ -173,6 +178,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     _highlighter.dispose();
     _codeIndicatorValueNotifier.dispose();
     _cursorController.dispose();
+    _floatingCursorAnimationController.dispose();
     widget.focusNode.removeListener(_onFocusChanged);
     widget.findController.removeListener(_onCodeFindChanged);
     super.dispose();

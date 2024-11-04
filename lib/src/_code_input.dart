@@ -198,7 +198,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     switch(point.state) {
       case FloatingCursorDragState.Start:
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
-        _floatingCursorController.setFloatingCursorPosition(_floatingCursorStartingOffset, null);
+        _floatingCursorController.setFloatingCursorPosition(_floatingCursorStartingOffset, null, null);
         _newSelection = selection;
         break;
       case FloatingCursorDragState.Update:
@@ -216,16 +216,17 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         
         // Only render the preview cursor if we are away from the end of the line (far away relatively to the font size)
         if (adjustedNewOffset.dx > snappedNewOffset.dx + render.textStyle.fontSize!) {
-          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, snappedNewOffset);
+          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, snappedNewOffset, snappedNewOffset);
         }
         else {
-          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, null);
+          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, null, snappedNewOffset);
         }
         
         break;
       case FloatingCursorDragState.End:
         selection = _newSelection;
-        _floatingCursorController.setFloatingCursorPosition(null, null);
+        _floatingCursorController.animationController.value = 0.0;
+        _floatingCursorController.animationController.animateTo(1, duration: floatingCursorSnapDuration, curve: Curves.decelerate);
     }
   }
 
