@@ -27,6 +27,7 @@ class _CodeSelectionGestureDetector extends StatefulWidget {
 
 class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDetector> {
   Offset? _dragPosition;
+  bool _dragging = false;
   DateTime? _pointerTapTimestamp;
   Offset? _pointerTapPosition;
   bool? _handleByNextEvent;
@@ -45,6 +46,10 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           if (_longPressOnSelection == true) {
             return;
           }
+          if (details.localOffsetFromOrigin.distance < 1) {
+            return;
+          }
+          _dragging = true;
           _onLongPressMove(details);
         },
         onLongPressStart: (details) {
@@ -52,7 +57,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           widget.inputController.ensureInput();
           _longPressOnSelection = _isPositionOnSelection(details.globalPosition);
           if (_longPressOnSelection != true) {
-            _onMobileTapDown(details.globalPosition);
+            _onMobileLongPressedStart(details.globalPosition);
             _autoScrollWhenDragging();
           } else {
             widget.selectionOverlayController.showToolbar(context, details.globalPosition);
@@ -65,11 +70,13 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
           }
           _dragPosition = null;
           _longPressOnSelection = false;
+          _dragging = false;
           widget.selectionOverlayController.showHandle(context);
         },
         onLongPressCancel: () {
           _dragPosition = null;
           _longPressOnSelection = false;
+          _dragging = false;
           widget.selectionOverlayController.hideToolbar();
           widget.selectionOverlayController.hideHandle();
         },
@@ -96,26 +103,32 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
             return;
           }
           _dragPosition = details.globalPosition;
+          _dragging = true;
           _autoScrollWhenDragging();
         },
         onVerticalDragEnd: (_) {
           _dragPosition = null;
+          _dragging = false;
         },
         onVerticalDragCancel: () {
           _dragPosition = null;
+          _dragging = false;
         },
         onHorizontalDragStart: (details) {
           if (!_tapping) {
             return;
           }
           _dragPosition = details.globalPosition;
+          _dragging = true;
           _autoScrollWhenDragging();
         },
         onHorizontalDragEnd: (_) {
           _dragPosition = null;
+          _dragging = false;
         },
         onHorizontalDragCancel: () {
           _dragPosition = null;
+          _dragging = false;
         },
         behavior: widget.behavior,
         onSecondaryTapDown: (detail) {
@@ -177,6 +190,23 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       widget.selectionOverlayController.hideToolbar();
     }
     widget.inputController.ensureInput();
+  }
+
+  void _onMobileLongPressedStart(Offset position) {
+    final CodeLineRange? range = render.selectWord(
+      position: position,
+    );
+    if (range == null) {
+      return;
+    }
+    final CodeLineSelection selection = CodeLineSelection.fromRange(
+      range: range
+    );
+    widget.controller.selection = selection;
+    widget.controller.makeCursorVisible();
+    _anchorSelection = selection;
+    widget.selectionOverlayController.hideHandle();
+    widget.selectionOverlayController.hideToolbar();
   }
 
   void _onDesktopTapDown(Offset position) {
@@ -348,8 +378,10 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       if (_dragPosition == null || position == null) {
         return;
       }
-      render.autoScrollWhenDragging(_dragPosition!);
-      _extendSelection(_dragPosition!, _SelectionChangedCause.drag);
+      if (_dragging) {
+        render.autoScrollWhenDragging(_dragPosition!);
+        _extendSelection(_dragPosition!, _SelectionChangedCause.drag);
+      }
       _autoScrollWhenDragging();
     }));
   }
