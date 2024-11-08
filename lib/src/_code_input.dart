@@ -13,7 +13,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   TextInputConnection? _textInputConnection;
   TextEditingValue? _remoteEditingValue;
 
-  _CodeFloatingCursorController _floatingCursorController;
+  final _CodeFloatingCursorController _floatingCursorController;
 
   GlobalKey? _editorKey;
 
@@ -134,6 +134,8 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   @override
   void updateEditingValueWithDeltas(List<TextEditingDelta> textEditingDeltas) {
     if (_updateCausedByFloatingCursor) {
+      // This is necessary because otherwise the content of the line where the floating cursor was started
+      // will be pasted over to the line where the floating cursor was stopped.
       _updateCausedByFloatingCursor = false;
       return;
     }
@@ -199,22 +201,26 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       case FloatingCursorDragState.Start:
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
         _floatingCursorController.setFloatingCursorPosition(_floatingCursorStartingOffset, null, null);
+        // TODO move _newSelection to _floatingCursorController
         _newSelection = selection;
         break;
       case FloatingCursorDragState.Update:
         final updatedOffset = _floatingCursorStartingOffset + point.offset!;
 
-        // An adjustment is made to updatedOffset on the y-axis so that whenever it is in between lines, the line where the center 
+        // An adjustment is made on the y-axis so that whenever it is in between lines, the line where the center 
         // of the floating cursor is will be selected.
         Offset adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight / 2);
 
+
         final CodeLinePosition newPosition = render.calculateTextPosition(adjustedNewOffset)!;
+
+        // The offset at which the actual cursor would end up.
         final Offset? snappedNewOffset = render.calculateTextPositionViewportOffset(newPosition);
 
         Offset newFloatingCursorOffset = Offset(updatedOffset.dx, snappedNewOffset!.dy);
         _newSelection = CodeLineSelection.fromPosition(position: newPosition);
         
-        // Only render the preview cursor if we are away from the end of the line (far away relatively to the font size)
+        // Only turn on the preview cursor if we are far away from the end of the line (relatively to the font size)
         if (adjustedNewOffset.dx > snappedNewOffset.dx + render.textStyle.fontSize!) {
           _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, snappedNewOffset, snappedNewOffset);
         }
@@ -225,6 +231,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         break;
       case FloatingCursorDragState.End:
         selection = _newSelection;
+        // TODO move the two lines below to a method within animationController resetCursor()s
         _floatingCursorController.animationController.value = 0.0;
         _floatingCursorController.animationController.animateTo(1, duration: floatingCursorSnapDuration, curve: Curves.decelerate);
     }
