@@ -8,12 +8,13 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   bool _autocompleteSymbols;
   bool _updateCausedByFloatingCursor;
   late Offset _floatingCursorStartingOffset;
-  late CodeLineSelection _newSelection;
 
   TextInputConnection? _textInputConnection;
   TextEditingValue? _remoteEditingValue;
 
   final _CodeFloatingCursorController _floatingCursorController;
+  DateTime? _lastUpdateTime;
+  Timer? _floatingCursorScrollTimer;
 
   GlobalKey? _editorKey;
 
@@ -199,41 +200,80 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     }
     switch(point.state) {
       case FloatingCursorDragState.Start:
+        _lastUpdateTime = DateTime.now();
         _floatingCursorStartingOffset = render.calculateTextPositionViewportOffset(selection.base)!;
-        _floatingCursorController.setFloatingCursorPosition(_floatingCursorStartingOffset, null, null);
-        // TODO move _newSelection to _floatingCursorController
-        _newSelection = selection;
+        _floatingCursorController.setFloatingCursorPosition(
+          floatingCursorOffset: _floatingCursorStartingOffset,
+          finalCursorSelection: selection,
+        );
         break;
       case FloatingCursorDragState.Update:
-        final updatedOffset = _floatingCursorStartingOffset + point.offset!;
+        Offset updatedOffset = _floatingCursorStartingOffset + point.offset!;
+
+        final double topBound = render.paintBounds.top + render.paddingTop;
+        final double leftBound = render.paintBounds.left + render.paddingLeft;
+        final double bottomBound = render.paintBounds.bottom - render.paddingBottom - render.floatingCursorHeight;
+        final double rightBound = render.paintBounds.right - render.paddingRight;
+
+        // Clamp the offset coordinates to the paint bounds
+        Offset clampedOffset = Offset(
+          updatedOffset.dx.clamp(leftBound, rightBound),
+          updatedOffset.dy.clamp(topBound, bottomBound),
+        );
 
         // An adjustment is made on the y-axis so that whenever it is in between lines, the line where the center 
         // of the floating cursor is will be selected.
-        Offset adjustedNewOffset = updatedOffset + Offset(0, render.floatingCursorHeight / 2);
-
+        Offset adjustedNewOffset = clampedOffset + Offset(0, render.floatingCursorHeight / 2);
 
         final CodeLinePosition newPosition = render.calculateTextPosition(adjustedNewOffset)!;
 
         // The offset at which the actual cursor would end up.
         final Offset? snappedNewOffset = render.calculateTextPositionViewportOffset(newPosition);
 
-        Offset newFloatingCursorOffset = Offset(updatedOffset.dx, snappedNewOffset!.dy);
-        _newSelection = CodeLineSelection.fromPosition(position: newPosition);
-        
-        // Only turn on the preview cursor if we are far away from the end of the line (relatively to the font size)
-        if (adjustedNewOffset.dx > snappedNewOffset.dx + render.textStyle.fontSize!) {
-          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, snappedNewOffset, snappedNewOffset);
+        CodeLineSelection newSelection = CodeLineSelection.fromPosition(position: newPosition);
+
+
+        if (clampedOffset != updatedOffset) {
+          // When the cursor is at one of the edges, adjust the starting offset so that the floating cursor
+          // does not get "loose" when starting to move in the opposite direction.
+          _floatingCursorStartingOffset += clampedOffset - updatedOffset;
+        }
+
+        if (clampedOffset.dy == topBound || clampedOffset.dy == bottomBound || clampedOffset.dx == rightBound || clampedOffset.dx == leftBound) {
+          _floatingCursorScrollTimer ??= Timer.periodic(const Duration(milliseconds: 50), (timer) => render.autoScrollWhenDraggingFloatingCursor(clampedOffset));
         }
         else {
-          _floatingCursorController.setFloatingCursorPosition(newFloatingCursorOffset, null, snappedNewOffset);
+          if (_floatingCursorScrollTimer != null) {
+            _floatingCursorScrollTimer!.cancel();
+            _floatingCursorScrollTimer = null;
+          }
+        }
+        
+        // Only turn on the preview cursor if we are far away from the end of the line (relatively to the font size)
+        if (adjustedNewOffset.dx > snappedNewOffset!.dx + render.textStyle.fontSize!) {
+          _floatingCursorController.setFloatingCursorPosition(
+            floatingCursorOffset: clampedOffset, 
+            previewCursorOffset: snappedNewOffset, 
+            finalCursorOffset: snappedNewOffset, 
+            finalCursorSelection:newSelection
+          );
+        }
+        else {
+          _floatingCursorController.setFloatingCursorPosition(
+            floatingCursorOffset: clampedOffset, 
+            finalCursorOffset: snappedNewOffset, 
+            finalCursorSelection: newSelection
+          );
         }
         
         break;
       case FloatingCursorDragState.End:
-        selection = _newSelection;
-        // TODO move the two lines below to a method within animationController resetCursor()s
-        _floatingCursorController.animationController.value = 0.0;
-        _floatingCursorController.animationController.animateTo(1, duration: floatingCursorSnapDuration, curve: Curves.decelerate);
+        if (_floatingCursorScrollTimer != null) {
+          _floatingCursorScrollTimer!.cancel();
+          _floatingCursorScrollTimer = null;
+        }
+        selection = _floatingCursorController.value.finalCursorSelection!;
+        _floatingCursorController.resetFloatingCursor();
     }
   }
 

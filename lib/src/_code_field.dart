@@ -292,27 +292,9 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     markNeedsLayout();
   }
 
-  // set floatingCursorOffset(Offset? value) {
-  //   if (_floatingCursorOffset == value) {
-  //     return;
-  //   }
-  //   _floatingCursorOffset = value;
-  //   _foregroundRender.find<_CodeFieldFloatingCursorPainter>().offset = value;
-  //   markNeedsPaint();
-  // }
-
   set highlightSelections(List<CodeLineSelection>? value) {
     _backgroundRender.find<_CodeFieldHighlightPainter>().selections = value ?? const [];
   }
-
-  // set previewCursorOffset(Offset? value) {
-  //   if (_previewCursorOffset == value) {
-  //     return;
-  //   }
-  //   _previewCursorOffset = value;
-  //   _foregroundRender.find<_CodeFieldFloatingCursorPainter>().previewOffset = value;
-  //   markNeedsPaint();
-  // }
 
   set textStyle(TextStyle value) {
     if (_textStyle == value) {
@@ -698,6 +680,29 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
           offset: _verticalViewport.pixels - unit
         );
       } else if (offset.dy > size.height - unit) {
+        _alignBottomEdge(
+          offset: _verticalViewport.pixels + unit
+        );
+      }
+    }
+    if (_horizontalViewport != null && _horizontalViewportSize != null) {
+      if (offset.dx < unit) {
+        _horizontalViewport!.jumpTo(max(0, _horizontalViewport!.pixels - unit));
+      } else if (offset.dx > size.width - unit) {
+        _horizontalViewport!.jumpTo(min(_horizontalViewport!.pixels + unit, _horizontalViewportSize!));
+      }
+    }
+  }
+
+  void autoScrollWhenDraggingFloatingCursor(Offset offset) {
+    final double unit = _preferredLineHeight;
+    debugPrint((paintBounds.top + paddingTop).toString());
+    if (_verticalViewportSize != null) {
+      if (offset.dy == paintBounds.top + paddingTop) {
+        _alignTopEdge(
+          offset: _verticalViewport.pixels - unit
+        );
+      } else if (offset.dy == paintBounds.bottom - paddingBottom - floatingCursorHeight) {
         _alignBottomEdge(
           offset: _verticalViewport.pixels + unit
         );
