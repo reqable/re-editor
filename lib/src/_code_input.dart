@@ -282,7 +282,13 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
           _floatingCursorScrollTimer = null;
         }
         selection = _floatingCursorController.value.finalCursorSelection!;
+        render.makePositionCenterIfInvisible(
+            CodeLinePosition(
+              index: selection.baseIndex, 
+              offset: selection.baseOffset, 
+              affinity: selection.baseAffinity));
         _floatingCursorController.resetFloatingCursor();
+
     }
   }
 
