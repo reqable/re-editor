@@ -65,7 +65,7 @@ class _CodeFloatingCursorController
   }
 
   /// Performs the "snapping" animation and turns of the floating cursor.
-  void resetFloatingCursor() {
+  void animateDisableFloatingCursor() {
     _animationController.value = 0.0;
     _animationController.animateTo(1,
         duration: floatingCursorSnapDuration, curve: Curves.decelerate);

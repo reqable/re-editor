@@ -282,12 +282,27 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
           _floatingCursorScrollTimer = null;
         }
         selection = _floatingCursorController.value.finalCursorSelection!;
-        render.makePositionCenterIfInvisible(
+        final CodeLinePosition finalPosition = CodeLinePosition(
+          index: selection.baseIndex, 
+          offset: selection.baseOffset, 
+          affinity: selection.baseAffinity);
+        
+        final Offset? finalOffset = render.calculateTextPositionViewportOffset(finalPosition);
+        
+        // If the final selection is in not the viewport, make it visible without animating the floating cursor.
+        // Otherwise, play the floating cursor reset animation.
+        if (finalOffset != null && (finalOffset.dx < 0 || finalOffset.dy < 0)) {
+          render.makePositionCenterIfInvisible(
             CodeLinePosition(
               index: selection.baseIndex, 
               offset: selection.baseOffset, 
               affinity: selection.baseAffinity));
-        _floatingCursorController.resetFloatingCursor();
+            _floatingCursorController.disableFloatingCursor();
+        }
+        else {
+          _floatingCursorController.animateDisableFloatingCursor();
+        }
+
 
     }
   }
