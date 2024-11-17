@@ -696,7 +696,6 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   void autoScrollWhenDraggingFloatingCursor(Offset offset) {
     final double unit = _preferredLineHeight;
-    debugPrint((paintBounds.top + paddingTop).toString());
     if (_verticalViewportSize != null) {
       if (offset.dy == paintBounds.top + paddingTop) {
         _alignTopEdge(
