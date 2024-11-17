@@ -13,7 +13,7 @@ class _CodeField extends SingleChildRenderObjectWidget {
   final bool hasFocus;
   final _CodeHighlighter highlighter;
   final ValueNotifier<bool> showCursorNotifier;
-  final ValueNotifier<_FloatingCursorPosition> floatingCursorNotifier;
+  final ValueNotifier<_FloatingCursorState> floatingCursorNotifier;
   final ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged;
   final Color selectionColor;
   final Color highlightColor;
@@ -133,7 +133,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   bool _hasFocus;
   _CodeHighlighter _highlighter;
   ValueNotifier<bool> _showCursorNotifier;
-  ValueNotifier<_FloatingCursorPosition> _floatingCursorNotifier;
+  ValueNotifier<_FloatingCursorState> _floatingCursorNotifier;
   ValueChanged<List<CodeLineRenderParagraph>> _onRenderParagraphsChanged;
   EdgeInsetsGeometry _padding;
   bool _readOnly;
@@ -162,7 +162,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required bool hasFocus,
     required _CodeHighlighter highlighter,
     required ValueNotifier<bool> showCursorNotifier,
-    required ValueNotifier<_FloatingCursorPosition> floatingCursorNotifier,
+    required ValueNotifier<_FloatingCursorState> floatingCursorNotifier,
     required ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged,
     required Color selectionColor,
     required Color highlightColor,
@@ -350,7 +350,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
-  set floatingCursorNotifier(ValueNotifier<_FloatingCursorPosition> value) {
+  set floatingCursorNotifier(ValueNotifier<_FloatingCursorState> value) {
     if (_floatingCursorNotifier == value) {
       return;
     }
@@ -1609,13 +1609,13 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
 class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
 
   final Paint _paint;
-  _FloatingCursorPosition _position;
+  _FloatingCursorState _position;
   Color _color;
   double _width;
   double _height;
 
   _CodeFieldFloatingCursorPainter({
-    required _FloatingCursorPosition position,
+    required _FloatingCursorState position,
     required Color color,
     required double width,
     required double height,
@@ -1625,7 +1625,7 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
     _height = height,
     _paint = Paint();
 
-  set position(_FloatingCursorPosition value) {
+  set position(_FloatingCursorState value) {
     if (_position == value) {
       return;
     }
