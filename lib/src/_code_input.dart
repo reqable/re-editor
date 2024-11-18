@@ -296,7 +296,8 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
             CodeLinePosition(
               index: selection.baseIndex, 
               offset: selection.baseOffset, 
-              affinity: selection.baseAffinity));
+              affinity: selection.baseAffinity),
+            animated: true);
             _floatingCursorController.disableFloatingCursor();
         }
         else {

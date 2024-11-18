@@ -121,6 +121,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
 
 }
 
+const Duration positionCenteringDuration = Duration(milliseconds: 300);
+
 class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
   ViewportOffset _verticalViewport;
@@ -631,36 +633,61 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
-  void makePositionCenterIfInvisible(CodeLinePosition position, [int tryCount = 0]) {
+  void makePositionCenterIfInvisible(CodeLinePosition position, {int tryCount = 0, bool animated = false}) {
+    void scrollViewport(ViewportOffset viewport, num target) {
+      if (animated) {
+        viewport.animateTo(target.toDouble(), duration: positionCenteringDuration, curve: Curves.decelerate);
+      } else {
+        viewport.jumpTo(target.toDouble());
+      }
+    }
+
     final Offset? offset = calculateTextPositionViewportOffset(position);
     if (offset == null) {
       if (_displayParagraphs.isNotEmpty) {
         final CodeLineRenderParagraph first = _displayParagraphs.first;
         if (position.index < first.index) {
-          _verticalViewport.jumpTo(max(0, first.top - _preferredLineHeight * (first.index - position.index) - size.height / 2));
+          final target = max(0, first.top - _preferredLineHeight * (first.index - position.index) - size.height / 2);
+          scrollViewport(_verticalViewport, target);
         }
         final CodeLineRenderParagraph last = _displayParagraphs.last;
         if (position.index > last.index) {
-          _verticalViewport.jumpTo(min(_verticalViewportSize!, last.bottom + size.height / 2 + _preferredLineHeight * (position.index - first.index)));
+          final target = min(
+            _verticalViewportSize!,
+            last.bottom + size.height / 2 + _preferredLineHeight * (position.index - first.index),
+          );
+          scrollViewport(_verticalViewport, target);
         }
       }
       if (tryCount < 10) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-          makePositionCenterIfInvisible(position, tryCount);
+          makePositionCenterIfInvisible(position, tryCount: tryCount);
         });
       }
       return;
     }
+
     if (offset.dy < 0) {
-      _verticalViewport.jumpTo(max(0, _verticalViewport.pixels + offset.dy - size.height / 2));
+      final target = max(0, _verticalViewport.pixels + offset.dy - size.height / 2);
+      scrollViewport(_verticalViewport, target);
     } else if (offset.dy > size.height - _preferredLineHeight) {
-      _verticalViewport.jumpTo(min(_verticalViewportSize!, _verticalViewport.pixels + offset.dy + _preferredLineHeight - size.height / 2));
+      final target = min(
+        _verticalViewportSize!,
+        _verticalViewport.pixels + offset.dy + _preferredLineHeight - size.height / 2,
+      );
+      scrollViewport(_verticalViewport, target);
     }
+
     if (_horizontalViewport != null) {
       if (offset.dx < 0) {
-        _horizontalViewport!.jumpTo(max(0, _horizontalViewport!.pixels + offset.dx - size.width / 2));
+        final target = max(0, _horizontalViewport!.pixels + offset.dx - size.width / 2);
+        scrollViewport(_horizontalViewport!, target);
       } else if (offset.dx > size.width - _preferredLineHeight) {
-        _horizontalViewport!.jumpTo(min(_horizontalViewportSize!, _horizontalViewport!.pixels + offset.dx + _preferredLineHeight - size.width / 2));
+        final target = min(
+          _horizontalViewportSize!,
+          _horizontalViewport!.pixels + offset.dx + _preferredLineHeight - size.width / 2,
+        );
+        scrollViewport(_horizontalViewport!, target);
       }
     }
   }
