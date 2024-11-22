@@ -13,13 +13,16 @@ class _CodeField extends SingleChildRenderObjectWidget {
   final bool hasFocus;
   final _CodeHighlighter highlighter;
   final ValueNotifier<bool> showCursorNotifier;
+  final ValueNotifier<_FloatingCursorState> floatingCursorNotifier;
   final ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged;
   final Color selectionColor;
   final Color highlightColor;
   final Color cursorColor;
+  final Color floatingCursorColor;
   final Color? cursorLineColor;
   final Color? chunkIndicatorColor;
   final double cursorWidth;
+  final double floatingCursorWidth;
   final EdgeInsetsGeometry padding;
   final bool readOnly;
   final LayerLink startHandleLayerLink;
@@ -38,18 +41,24 @@ class _CodeField extends SingleChildRenderObjectWidget {
     required this.hasFocus,
     required this.highlighter,
     required this.showCursorNotifier,
+    required this.floatingCursorNotifier,
     required this.onRenderParagraphsChanged,
     required this.selectionColor,
     required this.highlightColor,
     required this.cursorColor,
+    floatingCursorColor,
     this.cursorLineColor,
     this.chunkIndicatorColor,
     required this.cursorWidth,
+    floatingCursorWidth,
     required this.padding,
     required this.readOnly,
     required this.startHandleLayerLink,
     required this.endHandleLayerLink,
-  }): assert(codes.isNotEmpty);
+  }): assert(codes.isNotEmpty),
+      floatingCursorColor = floatingCursorColor ?? cursorColor,
+      floatingCursorWidth = floatingCursorWidth ?? cursorWidth;
+      
 
   @override
   RenderObject createRenderObject(BuildContext context) => _CodeFieldRender(
@@ -64,13 +73,16 @@ class _CodeField extends SingleChildRenderObjectWidget {
     hasFocus: hasFocus,
     highlighter: highlighter,
     showCursorNotifier: showCursorNotifier,
+    floatingCursorNotifier: floatingCursorNotifier,
     onRenderParagraphsChanged: onRenderParagraphsChanged,
     selectionColor: selectionColor,
     highlightColor: highlightColor,
     cursorColor: cursorColor,
+    floatingCursorColor: floatingCursorColor,
     cursorLineColor: cursorLineColor,
     chunkIndicatorColor: chunkIndicatorColor,
     cursorWidth: cursorWidth,
+    floatingCursorWidth: floatingCursorWidth,
     padding: padding,
     readOnly: readOnly,
     startHandleLayerLink: startHandleLayerLink,
@@ -91,13 +103,16 @@ class _CodeField extends SingleChildRenderObjectWidget {
       ..hasFocus = hasFocus
       ..highlighter = highlighter
       ..showCursorNotifier = showCursorNotifier
+      ..floatingCursorNotifier = floatingCursorNotifier
       ..onRenderParagraphsChanged = onRenderParagraphsChanged
       ..selectionColor = selectionColor
       ..highlightColor = highlightColor
       ..cursorColor = cursorColor
+      ..floatingCursorColor = floatingCursorColor
       ..cursorLineColor = cursorLineColor
       ..chunkIndicatorColor = chunkIndicatorColor
       ..cursorWidth = cursorWidth
+      ..floatingCursorWidth = floatingCursorWidth
       ..padding = padding
       ..readOnly = readOnly
       ..startHandleLayerLink = startHandleLayerLink
@@ -105,6 +120,8 @@ class _CodeField extends SingleChildRenderObjectWidget {
   }
 
 }
+
+const Duration positionCenteringDuration = Duration(milliseconds: 300);
 
 class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
 
@@ -118,6 +135,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   bool _hasFocus;
   _CodeHighlighter _highlighter;
   ValueNotifier<bool> _showCursorNotifier;
+  ValueNotifier<_FloatingCursorState> _floatingCursorNotifier;
   ValueChanged<List<CodeLineRenderParagraph>> _onRenderParagraphsChanged;
   EdgeInsetsGeometry _padding;
   bool _readOnly;
@@ -146,13 +164,16 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     required bool hasFocus,
     required _CodeHighlighter highlighter,
     required ValueNotifier<bool> showCursorNotifier,
+    required ValueNotifier<_FloatingCursorState> floatingCursorNotifier,
     required ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged,
     required Color selectionColor,
     required Color highlightColor,
     required Color cursorColor,
+    required Color floatingCursorColor,
     Color? cursorLineColor,
     Color? chunkIndicatorColor,
     required double cursorWidth,
+    required double floatingCursorWidth,
     required EdgeInsetsGeometry padding,
     required bool readOnly,
     required LayerLink startHandleLayerLink,
@@ -167,6 +188,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _hasFocus = hasFocus,
     _highlighter = highlighter,
     _showCursorNotifier = showCursorNotifier,
+    _floatingCursorNotifier = floatingCursorNotifier,
     _onRenderParagraphsChanged = onRenderParagraphsChanged,
     _padding = padding,
     _readOnly = readOnly,
@@ -193,6 +215,12 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
           width: cursorWidth,
           height: 0.0,
           visible: _showCursorNotifier.value
+        ),
+        _CodeFieldFloatingCursorPainter(
+          position: _floatingCursorNotifier.value,
+          color: floatingCursorColor, 
+          width: floatingCursorWidth, 
+          height: 0.0, 
         )
       ]
     );
@@ -284,6 +312,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
+  TextStyle get textStyle => _textStyle;
+
   bool get hasFocus => _hasFocus;
 
   set hasFocus(bool value) {
@@ -322,6 +352,20 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
+  set floatingCursorNotifier(ValueNotifier<_FloatingCursorState> value) {
+    if (_floatingCursorNotifier == value) {
+      return;
+    }
+    if (attached) {
+      _floatingCursorNotifier.removeListener(_onFloatingCursorChanged);
+    }
+    _floatingCursorNotifier = value;
+    if (attached) {
+      _onFloatingCursorChanged();
+      _floatingCursorNotifier.addListener(_onFloatingCursorChanged);
+    }
+  }
+
   set onRenderParagraphsChanged(ValueChanged<List<CodeLineRenderParagraph>> value) {
     if (_onRenderParagraphsChanged == value) {
       return;
@@ -341,6 +385,10 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldCursorPainter>().color = value;
   }
 
+  set floatingCursorColor(Color value) {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().color = value;
+  }
+
   set cursorLineColor(Color? value) {
     _backgroundRender.find<_CodeCursorLinePainter>().color = value;
   }
@@ -357,9 +405,23 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _foregroundRender.find<_CodeFieldCursorPainter>().width = value;
   }
 
+  set floatingCursorWidth(double value) {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width = value;
+  }
+
   double get cursorWidth {
     return _foregroundRender.find<_CodeFieldCursorPainter>().width;
   }
+
+  double get floatingCursorWidth {
+    return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().width;
+  }
+
+  double get floatingCursorHeight {
+    return _foregroundRender.find<_CodeFieldFloatingCursorPainter>().height;
+  }
+
+  ValueNotifier<bool> get showCursorNotifier => _showCursorNotifier;
 
   /// The [LayerLink] of start selection handle.
   ///
@@ -571,36 +633,61 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     }
   }
 
-  void makePositionCenterIfInvisible(CodeLinePosition position, [int tryCount = 0]) {
+  void makePositionCenterIfInvisible(CodeLinePosition position, {int tryCount = 0, bool animated = false}) {
+    void scrollViewport(ViewportOffset viewport, num target) {
+      if (animated) {
+        viewport.animateTo(target.toDouble(), duration: positionCenteringDuration, curve: Curves.decelerate);
+      } else {
+        viewport.jumpTo(target.toDouble());
+      }
+    }
+
     final Offset? offset = calculateTextPositionViewportOffset(position);
     if (offset == null) {
       if (_displayParagraphs.isNotEmpty) {
         final CodeLineRenderParagraph first = _displayParagraphs.first;
         if (position.index < first.index) {
-          _verticalViewport.jumpTo(max(0, first.top - _preferredLineHeight * (first.index - position.index) - size.height / 2));
+          final target = max(0, first.top - _preferredLineHeight * (first.index - position.index) - size.height / 2);
+          scrollViewport(_verticalViewport, target);
         }
         final CodeLineRenderParagraph last = _displayParagraphs.last;
         if (position.index > last.index) {
-          _verticalViewport.jumpTo(min(_verticalViewportSize!, last.bottom + size.height / 2 + _preferredLineHeight * (position.index - first.index)));
+          final target = min(
+            _verticalViewportSize!,
+            last.bottom + size.height / 2 + _preferredLineHeight * (position.index - first.index),
+          );
+          scrollViewport(_verticalViewport, target);
         }
       }
       if (tryCount < 10) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-          makePositionCenterIfInvisible(position, tryCount);
+          makePositionCenterIfInvisible(position, tryCount: tryCount);
         });
       }
       return;
     }
+
     if (offset.dy < 0) {
-      _verticalViewport.jumpTo(max(0, _verticalViewport.pixels + offset.dy - size.height / 2));
+      final target = max(0, _verticalViewport.pixels + offset.dy - size.height / 2);
+      scrollViewport(_verticalViewport, target);
     } else if (offset.dy > size.height - _preferredLineHeight) {
-      _verticalViewport.jumpTo(min(_verticalViewportSize!, _verticalViewport.pixels + offset.dy + _preferredLineHeight - size.height / 2));
+      final target = min(
+        _verticalViewportSize!,
+        _verticalViewport.pixels + offset.dy + _preferredLineHeight - size.height / 2,
+      );
+      scrollViewport(_verticalViewport, target);
     }
+
     if (_horizontalViewport != null) {
       if (offset.dx < 0) {
-        _horizontalViewport!.jumpTo(max(0, _horizontalViewport!.pixels + offset.dx - size.width / 2));
+        final target = max(0, _horizontalViewport!.pixels + offset.dx - size.width / 2);
+        scrollViewport(_horizontalViewport!, target);
       } else if (offset.dx > size.width - _preferredLineHeight) {
-        _horizontalViewport!.jumpTo(min(_horizontalViewportSize!, _horizontalViewport!.pixels + offset.dx + _preferredLineHeight - size.width / 2));
+        final target = min(
+          _horizontalViewportSize!,
+          _horizontalViewport!.pixels + offset.dx + _preferredLineHeight - size.width / 2,
+        );
+        scrollViewport(_horizontalViewport!, target);
       }
     }
   }
@@ -620,6 +707,28 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
           offset: _verticalViewport.pixels - unit
         );
       } else if (offset.dy > size.height - unit) {
+        _alignBottomEdge(
+          offset: _verticalViewport.pixels + unit
+        );
+      }
+    }
+    if (_horizontalViewport != null && _horizontalViewportSize != null) {
+      if (offset.dx < unit) {
+        _horizontalViewport!.jumpTo(max(0, _horizontalViewport!.pixels - unit));
+      } else if (offset.dx > size.width - unit) {
+        _horizontalViewport!.jumpTo(min(_horizontalViewport!.pixels + unit, _horizontalViewportSize!));
+      }
+    }
+  }
+
+  void autoScrollWhenDraggingFloatingCursor(Offset offset) {
+    final double unit = _preferredLineHeight;
+    if (_verticalViewportSize != null) {
+      if (offset.dy == paintBounds.top + paddingTop) {
+        _alignTopEdge(
+          offset: _verticalViewport.pixels - unit
+        );
+      } else if (offset.dy == paintBounds.bottom - paddingBottom - floatingCursorHeight) {
         _alignBottomEdge(
           offset: _verticalViewport.pixels + unit
         );
@@ -752,6 +861,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _horizontalViewport?.addListener(markNeedsPaint);
     _highlighter.addListener(markNeedsLayout);
     _showCursorNotifier.addListener(_onCursorVisibleChanged);
+    _floatingCursorNotifier.addListener(_onFloatingCursorChanged);
   }
 
   @override
@@ -760,6 +870,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     _horizontalViewport?.removeListener(markNeedsPaint);
     _highlighter.removeListener(markNeedsLayout);
     _showCursorNotifier.removeListener(_onCursorVisibleChanged);
+    _floatingCursorNotifier.removeListener(_onFloatingCursorChanged);
     super.detach();
     _foregroundRender.detach();
     _backgroundRender.detach();
@@ -1056,10 +1167,15 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
     );
     _preferredLineHeight = painter.preferredLineHeight;
     _foregroundRender.find<_CodeFieldCursorPainter>().height = painter.preferredLineHeight;
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().height = painter.preferredLineHeight;
   }
 
   void _onCursorVisibleChanged() {
     _foregroundRender.find<_CodeFieldCursorPainter>().visible = _showCursorNotifier.value;
+  }
+
+  void _onFloatingCursorChanged() {
+    _foregroundRender.find<_CodeFieldFloatingCursorPainter>().position = _floatingCursorNotifier.value;
   }
 
   bool isValidPointer(Offset localPosition) {
@@ -1516,6 +1632,98 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
 
   void _drawCaret(Canvas canvas, Offset offset, Size size) {
     _paint.color = _color;
+    canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
+  }
+
+}
+
+class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
+
+  final Paint _paint;
+  _FloatingCursorState _position;
+  Color _color;
+  double _width;
+  double _height;
+
+  _CodeFieldFloatingCursorPainter({
+    required _FloatingCursorState position,
+    required Color color,
+    required double width,
+    required double height,
+  }) : _position = position,
+    _color = color,
+    _width = width,
+    _height = height,
+    _paint = Paint();
+
+  set position(_FloatingCursorState value) {
+    if (_position == value) {
+      return;
+    }
+    _position = value;
+    notifyListeners(); 
+  }
+
+  set color(Color value) {
+    if (_color == value) {
+      return;
+    }
+    _color = value;
+    notifyListeners();
+  }
+
+  double get width => _width;
+
+  set width(double value) {
+    if (_width == value) {
+      return;
+    }
+    _width = value;
+    notifyListeners();
+  }
+
+  double get height => _height;
+
+  set height(double value) {
+    if (_height == value) {
+      return;
+    }
+    _height = value;
+    notifyListeners();
+  }
+
+  @override
+  void paint(Canvas canvas, Size size, _CodeFieldRender render) {
+    if (!_position.isActive() || _color == Colors.transparent || _color.alpha == 0) {
+      return;
+    }
+    _drawFloatingCaret(canvas, _position.floatingCursorOffset!, size);
+    if (_position.previewCursorOffset != null) {
+      _drawPreviewCursor(canvas, _position.previewCursorOffset!, size);
+    }
+  }
+
+  void _drawFloatingCaret(Canvas canvas, Offset offset, Size size) {
+    final caretRect = RRect.fromRectXY(
+      Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height),
+      _width / 2,
+      _width / 2,
+    );
+    final path = Path()..addRRect(caretRect);
+
+    canvas.drawShadow(
+      path,
+      Colors.black,
+      4.0,            
+      true,           
+    );
+
+    _paint.color = _color;
+    canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
+  }
+
+  void _drawPreviewCursor(Canvas canvas, Offset offset, Size size) {
+    _paint.color = _color.withAlpha(150);
     canvas.drawRRect(RRect.fromRectXY(Rect.fromLTWH(offset.dx - _width / 2, offset.dy, _width, _height), _width / 2, _width / 2), _paint);
   }
 
