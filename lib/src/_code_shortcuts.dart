@@ -94,6 +94,17 @@ class _CodeShortcutActions extends StatelessWidget {
       if (intent is CodeShortcutEditableIntent && readOnly) {
         continue;
       }
+      if (intent is CodeShortcutEscIntent) {
+        // Do not enable ESC key when nothing the eidtor can do.
+        actions[intent.runtimeType] = _EscCallbackAction(
+          controller: editingController,
+          findController: findController,
+          onInvoke: (intent) {
+            return _onAction(context, intent);
+          },
+        );
+        continue;
+      }
       actions[intent.runtimeType] = _CompoDoNothingCallbackAction(
         controller: editingController,
         onInvoke: (intent) {
@@ -333,6 +344,24 @@ class _CompoDoNothingCallbackAction<T extends Intent> extends CallbackAction<T> 
   @override
   bool consumesKey(T intent) {
     return !controller.isComposing;
+  }
+
+}
+
+class _EscCallbackAction<T extends Intent> extends CallbackAction<T> {
+
+  final CodeLineEditingController controller;
+  final CodeFindController? findController;
+
+  _EscCallbackAction({
+    required this.controller,
+    required this.findController,
+    required super.onInvoke,
+  });
+
+  @override
+  bool isEnabled(T intent) {
+    return !controller.isComposing && (findController?.value != null || !controller.selection.isCollapsed);
   }
 
 }
