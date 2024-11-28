@@ -39,6 +39,7 @@ class _CodeEditable extends StatefulWidget {
   final bool readOnly;
   final bool autofocus;
   final bool wordWrap;
+  final int? maxLengthSingleLineRendering;
   final CodeFindController findController;
   final CodeScrollController scrollController;
   final CodeChunkController chunkController;
@@ -79,6 +80,7 @@ class _CodeEditable extends StatefulWidget {
     required this.readOnly,
     required this.autofocus,
     required this.wordWrap,
+    this.maxLengthSingleLineRendering,
     required this.findController,
     required this.scrollController,
     required this.chunkController,
@@ -306,6 +308,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       cursorWidth: widget.cursorWidth,
       padding: widget.padding,
       readOnly: widget.readOnly,
+      maxLengthSingleLineRendering: widget.maxLengthSingleLineRendering,
       startHandleLayerLink: widget.startHandleLayerLink,
       endHandleLayerLink: widget.endHandleLayerLink,
     );

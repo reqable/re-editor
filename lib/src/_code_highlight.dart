@@ -46,8 +46,10 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     required int index,
     required TextStyle style,
     required double maxWidth,
+    int? maxLengthSingleLineRendering,
   }) {
     _provider.updateBaseStyle(style);
+    _provider.updateMaxLengthSingleLineRendering(maxLengthSingleLineRendering);
     return _provider.build(_controller.buildTextSpan(
       context: _context,
       index: index,

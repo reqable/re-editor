@@ -184,6 +184,7 @@ class CodeEditor extends StatefulWidget {
     this.autocompleteSymbols,
     this.autofocus,
     this.focusNode,
+    this.maxLengthSingleLineRendering,
     this.chunkAnalyzer,
     this.commentFormatter,
   }) : assert(indicatorBuilder != null || (indicatorBuilder == null && sperator == null));
@@ -290,6 +291,14 @@ class CodeEditor extends StatefulWidget {
 
   /// Controls whether this widget has keyboard focus.
   final FocusNode? focusNode;
+
+  /// The maximum number of characters per line to render.
+  ///
+  /// Due to the performance limitations of the Skia text engine, 
+  /// setting a reasonable length can improve the performance of the editor.
+  ///
+  /// If null, there is no limit.
+  final int? maxLengthSingleLineRendering;
 
   /// Decide which parts of code can be folded.
   ///
@@ -502,6 +511,7 @@ class _CodeEditorState extends State<CodeEditor> {
       readOnly: readOnly,
       autofocus: autofocus,
       wordWrap: wordWrap,
+      maxLengthSingleLineRendering: widget.maxLengthSingleLineRendering,
       findController: _findController,
       scrollController: _scrollController,
       chunkController: _chunkController,

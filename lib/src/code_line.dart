@@ -1063,12 +1063,14 @@ class CodeLineRenderParagraph {
   final IParagraph paragraph;
   final Offset offset;
   final bool chunkParent;
+  final bool chunkLongText;
 
   const CodeLineRenderParagraph({
     required this.index,
     required this.paragraph,
     required this.offset,
     required this.chunkParent,
+    required this.chunkLongText,
   });
 
   double get preferredLineHeight => paragraph.preferredLineHeight;
@@ -1127,12 +1129,14 @@ class CodeLineRenderParagraph {
     IParagraph? paragraph,
     Offset? offset,
     bool? chunkParent,
+    bool? chunkLongText,
   }) {
     return CodeLineRenderParagraph(
       index: index ?? this.index,
       paragraph: paragraph ?? this.paragraph,
       offset: offset ?? this.offset,
-      chunkParent: chunkParent ?? this.chunkParent
+      chunkParent: chunkParent ?? this.chunkParent,
+      chunkLongText: chunkLongText ?? this.chunkLongText,
     );
   }
 

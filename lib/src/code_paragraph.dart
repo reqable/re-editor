@@ -5,6 +5,7 @@ abstract class IParagraph {
   double get width;
   double get height;
   double get preferredLineHeight;
+  bool get trucated;
   int get length;
   int get lineCount;
 

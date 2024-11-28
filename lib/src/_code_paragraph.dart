@@ -8,6 +8,7 @@ class _ParagraphImpl extends IParagraph {
   final String text;
   final TextSpan span;
   final ui.Paragraph paragraph;
+  final bool _trucated;
   final double _preferredLineHeight;
   final int _lineCount;
 
@@ -18,8 +19,10 @@ class _ParagraphImpl extends IParagraph {
     required this.text,
     required this.span,
     required this.paragraph,
+    required bool trucated,
     required double preferredLineHeight,
-  }) : _preferredLineHeight = preferredLineHeight,
+  }) : _trucated = trucated,
+    _preferredLineHeight = preferredLineHeight,
     _lineCount = (paragraph.height / preferredLineHeight).ceil();
 
   int get runeLength => text.runes.length;
@@ -45,6 +48,9 @@ class _ParagraphImpl extends IParagraph {
 
   @override
   int get lineCount => _lineCount;
+
+  @override
+  bool get trucated => _trucated;
 
   @override
   void draw(Canvas canvas, Offset offset) {
@@ -195,6 +201,7 @@ class _CodeParagraphProvider {
   ui.ParagraphConstraints? _constraints;
   ui.ParagraphStyle? _paragraphStyle;
   double? _preferredLineHeight;
+  int? _maxLengthSingleLineRendering;
 
   _CodeParagraphProvider() : _cachedParagraphs = {};
 
@@ -225,6 +232,14 @@ class _CodeParagraphProvider {
     _cachedParagraphs.clear();
   }
 
+  void updateMaxLengthSingleLineRendering(int? maxLengthSingleLineRendering) {
+    if (_maxLengthSingleLineRendering == maxLengthSingleLineRendering) {
+      return;
+    }
+    _maxLengthSingleLineRendering = maxLengthSingleLineRendering;
+    _cachedParagraphs.clear();
+  }
+
   IParagraph build(TextSpan span, double maxWidth) {
     if (maxWidth != _constraints?.width) {
       _constraints = ui.ParagraphConstraints(
@@ -236,12 +251,57 @@ class _CodeParagraphProvider {
     if (cache != null) {
       return cache;
     }
-    final _ParagraphImpl impl = _build(span);
+    final _ParagraphImpl impl;
+    // Trucate the span if it's too long.
+    final String plainText = span.toPlainText();
+    final int? renderingLength = _maxLengthSingleLineRendering;
+    if (renderingLength != null && plainText.length > renderingLength) {
+      impl = _build(trucate(span, renderingLength), plainText.substring(0, renderingLength), true);
+    } else {
+      impl = _build(span, plainText, false);
+    }
     _cachedParagraphs[span] = impl;
     return impl;
   }
 
-  _ParagraphImpl _build(TextSpan span) {
+  TextSpan trucate(TextSpan span, int maxLength) {
+    int currentLength = 0;
+    TextSpan truncateSpan(TextSpan span) {
+      if (currentLength >= maxLength) {
+        return const TextSpan(text: '');
+      }
+      String? text = span.text;
+      if (text != null) {
+        int remainingLength = maxLength - currentLength;
+        if (text.length > remainingLength) {
+          text = text.substring(0, remainingLength);
+        }
+        currentLength += text.length;
+        return TextSpan(
+          text: text,
+          style: span.style
+        );
+      }
+      final List<InlineSpan> children = [];
+      for (InlineSpan child in span.children ?? const []) {
+        if (currentLength >= maxLength) {
+          break;
+        }
+        if (child is TextSpan) {
+          children.add(truncateSpan(child));
+        } else {
+          children.add(child);
+        }
+      }
+      return TextSpan(
+        children: children,
+        style: span.style
+      );
+    }
+    return truncateSpan(span);
+  }
+
+  _ParagraphImpl _build(TextSpan span, String plainText, bool trucated) {
     final ui.ParagraphStyle? style = _paragraphStyle;
     if (style == null) {
       throw AssertionError('Must call updateBaseStyle before build Paragraph.');
@@ -251,10 +311,11 @@ class _CodeParagraphProvider {
     final ui.Paragraph paragraph = builder.build();
     paragraph.layout(_constraints!);
     return _ParagraphImpl(
-      text: span.toPlainText(),
+      text: plainText,
       span: span,
       paragraph: paragraph,
-      preferredLineHeight: _preferredLineHeight!
+      trucated: trucated,
+      preferredLineHeight: _preferredLineHeight!,
     );
   }
 
