@@ -676,7 +676,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       }
       if (tryCount < 10) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-          makePositionCenterIfInvisible(position, tryCount: tryCount);
+          makePositionCenterIfInvisible(position, tryCount: tryCount + 1);
         });
       }
       return;
