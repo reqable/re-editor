@@ -1021,12 +1021,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         double delta = 0;
         double offset = _displayParagraphs.first.top;
         for (int i = _displayParagraphs.first.index - 1; i >= 0; i--) {
-          final IParagraph paragraph = _highlighter.build(
-            index: i,
-            style: _textStyle,
-            maxWidth: effectiveWidth,
-            maxLengthSingleLineRendering: _maxLengthSingleLineRendering
-          );
+          final IParagraph paragraph = _buildParagraph(i, effectiveWidth);
           delta += paragraph.height - _preferredLineHeight;
           offset -= paragraph.height;
           if (target >= offset) {

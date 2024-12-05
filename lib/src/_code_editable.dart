@@ -308,7 +308,8 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       cursorWidth: widget.cursorWidth,
       padding: widget.padding,
       readOnly: widget.readOnly,
-      maxLengthSingleLineRendering: widget.maxLengthSingleLineRendering,
+      // Enable long text rendering when the find is on.
+      maxLengthSingleLineRendering: widget.findController.value != null ? null : widget.maxLengthSingleLineRendering,
       startHandleLayerLink: widget.startHandleLayerLink,
       endHandleLayerLink: widget.endHandleLayerLink,
     );
