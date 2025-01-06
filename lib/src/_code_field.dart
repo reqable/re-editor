@@ -624,7 +624,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
         }
         final CodeLineRenderParagraph last = _displayParagraphs.last;
         if (position.index > last.index) {
-          _verticalViewport.jumpTo(max(0, last.bottom - size.height + _preferredLineHeight * (position.index - first.index)));
+          _verticalViewport.jumpTo(max(0, last.bottom - size.height + _preferredLineHeight * (position.index - last.index)));
         }
       }
       if (tryCount < 10) {
