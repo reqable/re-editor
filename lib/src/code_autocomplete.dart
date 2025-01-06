@@ -6,8 +6,17 @@ part of re_editor;
 abstract class CodePrompt {
 
   const CodePrompt({
-    required this.word
+    required this.word,
+    this.caseSensitive = true,
   });
+  
+  /// Whether the prompt is case sensitive.
+  /// 
+  /// e.g. 
+  ///    - when false, user input is 'str', the prompt word 'String' will be displayed to user.
+  ///    - when true, user input is 'str', the prompt word 'String' will not be displayed to user.
+  /// default to true
+  final bool caseSensitive;
 
   /// Content associated with user input.
   ///
@@ -29,7 +38,8 @@ abstract class CodePrompt {
 class CodeKeywordPrompt extends CodePrompt {
 
   const CodeKeywordPrompt({
-    required super.word
+    required super.word,
+    super.caseSensitive = true,
   });
 
   @override
@@ -37,7 +47,10 @@ class CodeKeywordPrompt extends CodePrompt {
 
   @override
   bool match(String input) {
-    return word != input && word.startsWith(input);
+    return word != input &&
+            (caseSensitive
+                ? word.startsWith(input)
+                : word.toLowerCase().startsWith(input.toLowerCase()));
   }
 
   @override
@@ -201,7 +214,8 @@ class CodeAutocompleteEditingValue {
   }
 
   CodeAutocompleteResult get autocomplete {
-    final CodeAutocompleteResult result = prompts[index].autocomplete;
+    final selectedPrompt = prompts[index];
+    final CodeAutocompleteResult result = selectedPrompt.autocomplete;
     if (result.word.isEmpty) {
       return result;
     }
