@@ -30,7 +30,12 @@ abstract class CodePrompt {
   CodeAutocompleteResult get autocomplete;
 
   /// Check whether the input meets this prompt condition.
-  bool match(String input);
+  bool match(String input) {
+    return word != input &&
+        (caseSensitive
+            ? word.startsWith(input)
+            : word.toLowerCase().startsWith(input.toLowerCase()));
+  }
 
 }
 
@@ -44,14 +49,6 @@ class CodeKeywordPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => CodeAutocompleteResult.fromWord(word);
-
-  @override
-  bool match(String input) {
-    return word != input &&
-            (caseSensitive
-                ? word.startsWith(input)
-                : word.toLowerCase().startsWith(input.toLowerCase()));
-  }
 
   @override
   bool operator ==(Object other) {
@@ -75,6 +72,7 @@ class CodeFieldPrompt extends CodePrompt {
   const CodeFieldPrompt({
     required super.word,
     required this.type,
+    super.caseSensitive = true,
     this.customAutocomplete,
   });
 
@@ -86,11 +84,6 @@ class CodeFieldPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord(word);
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
@@ -111,6 +104,7 @@ class CodeFunctionPrompt extends CodePrompt {
 
   const CodeFunctionPrompt({
     required super.word,
+    super.caseSensitive = true,
     required this.type,
     this.parameters = const {},
     this.optionalParameters = const {},
@@ -131,11 +125,6 @@ class CodeFunctionPrompt extends CodePrompt {
 
   @override
   CodeAutocompleteResult get autocomplete => customAutocomplete ?? CodeAutocompleteResult.fromWord('$word(${parameters.keys.join(', ')})');
-
-  @override
-  bool match(String input) {
-    return word != input && word.startsWith(input);
-  }
 
   @override
   bool operator ==(Object other) {
