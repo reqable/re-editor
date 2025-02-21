@@ -99,6 +99,7 @@ class _CodeShortcutActions extends StatelessWidget {
         actions[intent.runtimeType] = _EscCallbackAction(
           controller: editingController,
           findController: findController,
+          context: context,
           onInvoke: (intent) {
             return _onAction(context, intent);
           },
@@ -352,16 +353,19 @@ class _EscCallbackAction<T extends Intent> extends CallbackAction<T> {
 
   final CodeLineEditingController controller;
   final CodeFindController? findController;
+  final BuildContext? context;
 
   _EscCallbackAction({
     required this.controller,
     required this.findController,
     required super.onInvoke,
+    this.context,
   });
 
   @override
   bool isEnabled(T intent) {
-    return !controller.isComposing && (findController?.value != null || !controller.selection.isCollapsed);
+    final _CodeAutocompleteState? autocompleteState = context?.findAncestorStateOfType<_CodeAutocompleteState>();
+    return !controller.isComposing && (findController?.value != null || !controller.selection.isCollapsed || autocompleteState != null);
   }
 
 }
