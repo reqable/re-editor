@@ -438,6 +438,13 @@ class CodeLine {
   }
 
   String substring(int start, [int? end]) {
+    if (end != null) {
+      if (end < start) {
+        end = start;
+      } else if (end > length) {
+        end = length;
+      }
+    }
     return start >= length ? '' : text.substring(start, end);
   }
 
