@@ -612,6 +612,8 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
 
   @override
   void dispose() {
+    _startHandleDragging = false;
+    _endHandleDragging = false;
     hideHandle();
     controller.removeListener(_updateTextSelectionHandle);
     _effectiveStartHandleVisibility.dispose();
