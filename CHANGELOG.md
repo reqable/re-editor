@@ -68,3 +68,13 @@
 ## 0.6.0
 * Check tap down pointer whether is in the valid region.
 * Break changes: Change autocomplete behavior to replace user input with complete match to support more pattern match method.
+
+## 0.7.0
+* Add callback parameter to CodeLineNumberRenderObject for customizable line number behavior.
+* Implement floating cursor feature for iOS.
+* Long press will select a word on mobile platform.
+* Disable ESC shortcuts when nothing the editor can do.
+* Added option for maximum rendering length of single line text.
+* Fix makePositionCenterIfInvisible was called infinitely.
+* Clamp code line substring.
+* Fixed a bug: type 'Null' is not a subtype of type '_CodeFieldRender'.

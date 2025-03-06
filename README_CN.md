@@ -29,7 +29,7 @@
 
 ```yaml
 dependencies:
-  re_editor: ^0.6.0
+  re_editor: ^0.7.0
 ```
 
 和`TextField`一样，`Re-Editor`使用`CodeLineEditingController`作为控制器，下面的示例代码创建了一个最简单的编辑器组件，在显示样式上和`TextField`并没有什么太大的区别。
