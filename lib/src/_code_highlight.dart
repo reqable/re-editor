@@ -191,6 +191,9 @@ class _CodeHighlightEngine {
     } else {
       final Highlight highlight = Highlight();
       highlight.registerLanguages(modes.map((key, value) => MapEntry(key, value.mode)));
+      for (final HLPlugin plugin in _theme!.plugins) {
+        highlight.addPlugin(plugin);
+      }
       _highlight = highlight;
     }
   }
