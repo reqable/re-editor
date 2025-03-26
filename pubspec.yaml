@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   re_highlight: ^0.0.3
-  isolate_manager: ^5.7.5
+  isolate_manager: ^4.1.5+1
 
 dev_dependencies:
   flutter_test:
