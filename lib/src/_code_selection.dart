@@ -308,7 +308,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     widget.controller.clearComposing();
-    widget.selectionOverlayController.showToolbar(context, details.localPosition,details.localPosition);
+    widget.selectionOverlayController.showToolbar(context, details.globalPosition,details.localPosition);
   }
 
   void _extendSelection(Offset offset, _SelectionChangedCause cause) {
