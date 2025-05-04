@@ -567,11 +567,14 @@ class _CodeEditorState extends State<CodeEditor> {
         onKey: (node, event) {
           if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
             _editingController.deleteBackward();
+
             return KeyEventResult.handled;
           } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
             _editingController.applyNewLine();
+
             return KeyEventResult.handled;
           }
+
           return KeyEventResult.ignored;
         },
         includeSemantics: false,
@@ -600,6 +603,7 @@ class _CodeEditorState extends State<CodeEditor> {
         ),
       );
     }
+
     return Stack(children: [child, if (find != null) find]);
   }
 
@@ -625,8 +629,8 @@ class CodeEditorTapRegion extends TapRegion {
   ///
   /// The [child] field is required.
   const CodeEditorTapRegion({
-    super.key,
     required super.child,
+    super.key,
     super.enabled = true,
     super.behavior = HitTestBehavior.deferToChild,
     super.onTapOutside,

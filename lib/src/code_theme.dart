@@ -29,6 +29,7 @@ class CodeHighlightTheme {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeHighlightTheme &&
         mapEquals(other.languages, languages) &&
         mapEquals(other.theme, theme) &&
@@ -73,6 +74,7 @@ class CodeHighlightThemeMode {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeHighlightThemeMode &&
         mode == other.mode &&
         maxSize == other.maxSize &&

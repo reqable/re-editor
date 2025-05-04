@@ -1,16 +1,6 @@
 part of 're_editor.dart';
 
 class CodeLineNumberRenderObject extends RenderBox {
-  CodeLineEditingController _controller;
-  CodeIndicatorValueNotifier _notifier;
-  TextStyle _textStyle;
-  TextStyle _focusedTextStyle;
-  int _minNumberCount;
-  int _allLineCount;
-
-  final String Function(int lineIndex)? _customLineIndex2Text;
-  final TextPainter _textPainter;
-
   CodeLineNumberRenderObject({
     required CodeLineEditingController controller,
     required CodeIndicatorValueNotifier notifier,
@@ -26,6 +16,15 @@ class CodeLineNumberRenderObject extends RenderBox {
        _allLineCount = controller.lineCount,
        _customLineIndex2Text = custonLineIndex2Text,
        _textPainter = TextPainter(textDirection: TextDirection.ltr);
+  CodeLineEditingController _controller;
+  CodeIndicatorValueNotifier _notifier;
+  TextStyle _textStyle;
+  TextStyle _focusedTextStyle;
+  int _minNumberCount;
+  int _allLineCount;
+
+  final String Function(int lineIndex)? _customLineIndex2Text;
+  final TextPainter _textPainter;
 
   set controller(CodeLineEditingController value) {
     if (_controller == value) {
@@ -185,20 +184,13 @@ class CodeLineNumberRenderObject extends RenderBox {
     if (index == null || index < 0) {
       return null;
     }
+
     return _notifier.value?.paragraphs[index];
   }
 }
 
 class CodeChunkIndicatorRenderObject extends RenderBox
     implements MouseTrackerAnnotation {
-  double _width;
-  CodeChunkController _controller;
-  CodeIndicatorValueNotifier _notifier;
-  CodeChunkIndicatorPainter _painter;
-  bool _collapseIndicatorVisible;
-  bool _expandIndicatorVisible;
-  MouseCursor _cursor;
-
   CodeChunkIndicatorRenderObject({
     required double width,
     required CodeChunkController controller,
@@ -213,6 +205,13 @@ class CodeChunkIndicatorRenderObject extends RenderBox
        _collapseIndicatorVisible = collapseIndicatorVisible,
        _expandIndicatorVisible = expandIndicatorVisible,
        _cursor = MouseCursor.defer;
+  double _width;
+  CodeChunkController _controller;
+  CodeIndicatorValueNotifier _notifier;
+  CodeChunkIndicatorPainter _painter;
+  bool _collapseIndicatorVisible;
+  bool _expandIndicatorVisible;
+  MouseCursor _cursor;
 
   set width(double value) {
     if (_width == value) {
@@ -298,6 +297,7 @@ class CodeChunkIndicatorRenderObject extends RenderBox
       }
       hitTarget = true;
     }
+
     return hitTarget;
   }
 
@@ -394,6 +394,7 @@ class CodeChunkIndicatorRenderObject extends RenderBox
         _controller.findByIndex(paragraph.index) != null) {
       return paragraph;
     }
+
     return null;
   }
 }

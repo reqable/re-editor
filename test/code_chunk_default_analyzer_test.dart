@@ -9,110 +9,74 @@ void main() {
   group('DefaultCodeChunkAnalyzer.parse()', () {
     test('A single code line with empty content', () {
       {
-        final CodeLines codeLines = CodeLines.of([
-          CodeLine.empty
-        ]);
+        final CodeLines codeLines = CodeLines.of([CodeLine.empty]);
         expect(analyzer.parse(codeLines), const []);
       }
     });
     test('A single code line without quota', () {
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('abc')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('abc')]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('(')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('(', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('(')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('(', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine(')')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol(')', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine(')')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol(')', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('[')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('[', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('[')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('[', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine(']')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol(']', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine(']')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol(']', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('{')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('{', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('{')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('{', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('}')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('}', 0)
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('}')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('}', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('()')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('()')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('(', 0),
-          CodeChunkSymbol(')', 0)
+          CodeChunkSymbol(')', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('[]')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('[]')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('[', 0),
-          CodeChunkSymbol(']', 0)
+          CodeChunkSymbol(']', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('{}')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('{}')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
-          CodeChunkSymbol('}', 0)
+          CodeChunkSymbol('}', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('()[]{}')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('()[]{}')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('(', 0),
           CodeChunkSymbol(')', 0),
           CodeChunkSymbol('[', 0),
           CodeChunkSymbol(']', 0),
           CodeChunkSymbol('{', 0),
-          CodeChunkSymbol('}', 0)
+          CodeChunkSymbol('}', 0),
         ]);
       }
       {
         final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('123{[foo]((abc))[[]]{{bar}}()}')
+          CodeLine('123{[foo]((abc))[[]]{{bar}}()}'),
         ]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
@@ -139,127 +103,89 @@ void main() {
 
     test('A single code line with quotas', () {
       {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine(r'\"\"')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\\\'\\\'')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"abc"')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'abc\'')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"\'abc\'"')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"("')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'(\'')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"()[]{}"')]);
+        expect(analyzer.parse(codeLines), const []);
+      }
+      {
         final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"')
+          CodeLine('\'()[]{}\''),
         ]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
         final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'')
+          CodeLine('"\'()[]{}\'"'),
         ]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
         final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\\"\\"')
+          CodeLine('\\"\'()[]{}\'\\"'),
         ]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\\\'\\\'')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('""(')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('(', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"abc"')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('""(""')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('(', 0)]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'abc\'')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"\'abc\'"')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"("')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'(\'')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"()[]{}"')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'()[]{}\'')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"\'()[]{}\'"')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\\"\'()[]{}\'\\"')
-        ]);
-        expect(analyzer.parse(codeLines), const []);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('""(')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('(', 0),
-        ]);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('""(""')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('(', 0),
-        ]);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('""("")')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('""("")')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('(', 0),
           CodeChunkSymbol(')', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'\'(')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('(', 0),
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'\'(')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('(', 0)]);
+      }
+      {
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'\'(\'\'')]);
+        expect(analyzer.parse(codeLines), const [CodeChunkSymbol('(', 0)]);
       }
       {
         final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'\'(\'\'')
-        ]);
-        expect(analyzer.parse(codeLines), const [
-          CodeChunkSymbol('(', 0),
-        ]);
-      }
-      {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'\'(\'\')')
+          CodeLine('\'\'(\'\')'),
         ]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('(', 0),
@@ -270,51 +196,37 @@ void main() {
 
     test('A single code line with unbalanced quotas', () {
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'(')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'(')]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"(')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"(')]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\'(\'\')')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('\'(\'\')')]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"\'()[]{}')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"\'()[]{}')]);
         expect(analyzer.parse(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"\'()"[]')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('"\'()"[]')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('[', 0),
           CodeChunkSymbol(']', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('"\\"()"[]')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine(r'"\"()"[]')]);
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('[', 0),
           CodeChunkSymbol(']', 0),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('\\"()"[]')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine(r'\"()"[]')]);
         expect(analyzer.parse(codeLines), const []);
       }
     });
@@ -393,7 +305,7 @@ void main() {
                 CodeLine('inner1'),
                 CodeLine('inner2'),
                 CodeLine('inner3'),
-              ])
+              ]),
             ]),
             CodeLine(']'),
             CodeLine('{', [
@@ -402,7 +314,7 @@ void main() {
                 CodeLine('inner5'),
                 CodeLine('inner6'),
                 CodeLine('inner7'),
-              ])
+              ]),
             ]),
             CodeLine('}'),
             CodeLine('}'),
@@ -418,7 +330,9 @@ void main() {
 
     test('Parse a json string', () {
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_pretty.json')).readAsStringSync());
+        final CodeLines codeLines = CodeLineUtils.toCodeLines(
+          File(join('test', 'data', 'json_pretty.json')).readAsStringSync(),
+        );
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
           CodeChunkSymbol('{', 1),
@@ -435,7 +349,9 @@ void main() {
         ]);
       }
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_flatted.json')).readAsStringSync());
+        final CodeLines codeLines = CodeLineUtils.toCodeLines(
+          File(join('test', 'data', 'json_flatted.json')).readAsStringSync(),
+        );
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
           CodeChunkSymbol('{', 0),
@@ -457,21 +373,15 @@ void main() {
   group('DefaultCodeChunkAnalyzer.run()', () {
     test('A single code line', () {
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine.empty
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine.empty]);
         expect(analyzer.run(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('abc')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('abc')]);
         expect(analyzer.run(codeLines), const []);
       }
       {
-        final CodeLines codeLines = CodeLines.of(const [
-          CodeLine('abc(){}[]')
-        ]);
+        final CodeLines codeLines = CodeLines.of(const [CodeLine('abc(){}[]')]);
         expect(analyzer.run(codeLines), const []);
       }
     });
@@ -514,9 +424,7 @@ void main() {
           CodeLine('abc'),
           CodeLine('abc)'),
         ]);
-        expect(analyzer.run(codeLines), const [
-          CodeChunk(0, 4)
-        ]);
+        expect(analyzer.run(codeLines), const [CodeChunk(0, 4)]);
       }
       {
         final CodeLines codeLines = CodeLines.of(const [
@@ -528,7 +436,7 @@ void main() {
         ]);
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 4),
-          CodeChunk(1, 3)
+          CodeChunk(1, 3),
         ]);
       }
       {
@@ -543,7 +451,7 @@ void main() {
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 1),
           CodeChunk(2, 3),
-          CodeChunk(4, 5)
+          CodeChunk(4, 5),
         ]);
       }
       {
@@ -556,7 +464,7 @@ void main() {
         ]);
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 4),
-          CodeChunk(1, 3)
+          CodeChunk(1, 3),
         ]);
       }
       {
@@ -572,7 +480,7 @@ void main() {
         ]);
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 7),
-          CodeChunk(1, 3)
+          CodeChunk(1, 3),
         ]);
       }
       {
@@ -583,25 +491,27 @@ void main() {
           CodeLine('abc['),
           CodeLine('abc)'),
         ]);
-        expect(analyzer.run(codeLines), const [
-          CodeChunk(0, 4),
-        ]);
+        expect(analyzer.run(codeLines), const [CodeChunk(0, 4)]);
       }
     });
     test('Parse a json string', () {
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_pretty.json')).readAsStringSync());
+        final CodeLines codeLines = CodeLineUtils.toCodeLines(
+          File(join('test', 'data', 'json_pretty.json')).readAsStringSync(),
+        );
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 17),
           CodeChunk(1, 5),
           CodeChunk(2, 4),
           CodeChunk(6, 15),
           CodeChunk(7, 10),
-          CodeChunk(11, 14)
+          CodeChunk(11, 14),
         ]);
       }
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_flatted.json')).readAsStringSync());
+        final CodeLines codeLines = CodeLineUtils.toCodeLines(
+          File(join('test', 'data', 'json_flatted.json')).readAsStringSync(),
+        );
         expect(analyzer.run(codeLines), const []);
       }
     });

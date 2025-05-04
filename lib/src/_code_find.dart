@@ -2,14 +2,6 @@ part of 're_editor.dart';
 
 class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
     implements CodeFindController {
-  late final CodeLineEditingController _controller;
-  late final _IsolateTasker<_CodeFindPayload, CodeFindResult?> _tasker;
-  late final TextEditingController _findInputController;
-  late final FocusNode _findInputFocusNode;
-  late final TextEditingController _replaceInputController;
-  late final FocusNode _replaceInputFocusNode;
-  late bool _shouldNotUpdateResults;
-
   _CodeFindControllerImpl(
     CodeLineEditingController controller, [
     CodeFindValue? value,
@@ -31,6 +23,13 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
     _shouldNotUpdateResults = false;
     _updateResult();
   }
+  late final CodeLineEditingController _controller;
+  late final _IsolateTasker<_CodeFindPayload, CodeFindResult?> _tasker;
+  late final TextEditingController _findInputController;
+  late final FocusNode _findInputFocusNode;
+  late final TextEditingController _replaceInputController;
+  late final FocusNode _replaceInputFocusNode;
+  late bool _shouldNotUpdateResults;
 
   @override
   void dispose() {
@@ -73,6 +72,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
       }
       selections.add(selection);
     }
+
     return selections;
   }
 
@@ -85,6 +85,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
     if (value!.result!.dirty) {
       return null;
     }
+
     return convertMatchToSelection(currentMatch);
   }
 
@@ -337,6 +338,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
     if (selection.isCollapsed || !selection.isSameLine) {
       return null;
     }
+
     return _controller.selectedText;
   }
 
@@ -420,6 +422,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
       element,
     ) {
       previousValue.addAll(element.flat());
+
       return previousValue;
     });
     final Iterable<Match> matches = regExp.allMatches(
@@ -457,6 +460,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
         break;
       }
     }
+
     return CodeFindResult(
       index: index,
       matches: selections,
@@ -477,18 +481,18 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
       }
       start += codeLines[line].length + 1;
     }
+
     return CodeLinePosition(index: line, offset: offset);
   }
 }
 
 class _CodeFindPayload {
-  final CodeLines codeLines;
-  final CodeLineSelection unforldLineSelection;
-  final CodeFindOption option;
-
   const _CodeFindPayload(
     this.codeLines,
     this.unforldLineSelection,
     this.option,
   );
+  final CodeLines codeLines;
+  final CodeLineSelection unforldLineSelection;
+  final CodeFindOption option;
 }

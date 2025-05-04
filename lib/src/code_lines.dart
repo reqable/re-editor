@@ -3,8 +3,6 @@ part of 're_editor.dart';
 const int _kCodeLineSegamentDefaultSize = 256;
 
 class CodeLines {
-  final List<CodeLineSegment> segments;
-
   const CodeLines(this.segments);
 
   factory CodeLines.empty() {
@@ -23,6 +21,7 @@ class CodeLines {
       }
       segments.add(segment.copyWith(dirty: true));
     }
+
     return CodeLines(segments);
   }
 
@@ -39,8 +38,10 @@ class CodeLines {
         count = 0;
       }
     }
+
     return CodeLines(segments);
   }
+  final List<CodeLineSegment> segments;
 
   CodeLine get first => segments.first.first;
 
@@ -84,6 +85,7 @@ class CodeLines {
           segments[i] = segment;
         }
         segment[index - offset] = value;
+
         return;
       }
     }
@@ -106,6 +108,7 @@ class CodeLines {
   void addAll(Iterable<CodeLine> iterable) {
     if (isEmpty) {
       segments.addAll(CodeLines.of(iterable).segments);
+
       return;
     }
     final CodeLineSegment segment = segments.last;
@@ -137,6 +140,7 @@ class CodeLines {
     }
     if (isEmpty) {
       segments.addAll(sub.segments);
+
       return;
     }
     final List<CodeLineSegment> appendSegments = sub.segments;
@@ -200,6 +204,7 @@ class CodeLines {
         return false;
       }
     }
+
     return true;
   }
 
@@ -243,6 +248,7 @@ class CodeLines {
         }
       }
     }
+
     return CodeLines(newSegments);
   }
 
@@ -267,6 +273,7 @@ class CodeLines {
         }
       }
     }
+
     return sb.toString();
   }
 
@@ -287,6 +294,7 @@ class CodeLines {
         break;
       }
     }
+
     return lineIndex;
   }
 
@@ -337,6 +345,7 @@ class CodeLines {
       }
       start = end;
     }
+
     return CodeLineIndex(index + lineCount, chunkIndex);
   }
 
@@ -345,6 +354,7 @@ class CodeLines {
     for (final CodeLineSegment segment in segments) {
       codeLines.addAll(segment.codeLines);
     }
+
     return codeLines;
   }
 
@@ -356,6 +366,7 @@ class CodeLines {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLines && listEquals(other.segments, segments);
   }
 
@@ -366,15 +377,14 @@ class CodeLines {
 }
 
 class CodeLineSegment with ListMixin<CodeLine> {
-  final List<CodeLine> codeLines;
-  final bool dirty;
-
   const CodeLineSegment({required this.codeLines, this.dirty = false});
 
   factory CodeLineSegment.of({
     required List<CodeLine> codeLines,
     bool dirty = false,
   }) => _CodeLineSegmentQuckLineCount(codeLines: codeLines, dirty: dirty);
+  final List<CodeLine> codeLines;
+  final bool dirty;
 
   @override
   int get length => codeLines.length;
@@ -437,6 +447,7 @@ class CodeLineSegment with ListMixin<CodeLine> {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineSegment &&
         listEquals(other.codeLines, codeLines) &&
         other.lineCount == lineCount &&

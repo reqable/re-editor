@@ -1,13 +1,6 @@
 part of 're_editor.dart';
 
 class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
-  final BuildContext _context;
-  final _CodeParagraphProvider _provider;
-  final _CodeHighlightEngine _engine;
-
-  CodeLineEditingController _controller;
-  CodeHighlightTheme? _theme;
-
   _CodeHighlighter({
     required BuildContext context,
     required CodeLineEditingController controller,
@@ -21,6 +14,12 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     _controller.addListener(_onCodesChanged);
     _processHighlight();
   }
+  final BuildContext _context;
+  final _CodeParagraphProvider _provider;
+  final _CodeHighlightEngine _engine;
+
+  CodeLineEditingController _controller;
+  CodeHighlightTheme? _theme;
 
   set controller(CodeLineEditingController value) {
     if (_controller == value) {
@@ -161,6 +160,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
         break;
       }
     }
+
     return null;
   }
 
@@ -177,11 +177,6 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
 }
 
 class _CodeHighlightEngine {
-  late final _IsolateTasker<_HighlightPayload, List<_HighlightResult>> _tasker;
-
-  Highlight? _highlight;
-  CodeHighlightTheme? _theme;
-
   _CodeHighlightEngine(final CodeHighlightTheme? theme) {
     this.theme = theme;
     _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>(
@@ -189,6 +184,10 @@ class _CodeHighlightEngine {
       _run,
     );
   }
+  late final _IsolateTasker<_HighlightPayload, List<_HighlightResult>> _tasker;
+
+  Highlight? _highlight;
+  CodeHighlightTheme? _theme;
 
   set theme(CodeHighlightTheme? value) {
     if (_theme == value) {
@@ -218,11 +217,13 @@ class _CodeHighlightEngine {
     final Highlight? highlight = _highlight;
     if (highlight == null) {
       callback(const []);
+
       return;
     }
     final Map<String, CodeHighlightThemeMode>? modes = _theme?.languages;
     if (modes == null) {
       callback(const []);
+
       return;
     }
     _tasker.run(
@@ -267,17 +268,12 @@ class _CodeHighlightEngine {
     }
     final _HighlightLineRenderer renderer = _HighlightLineRenderer();
     result.render(renderer);
+
     return renderer.lineResults;
   }
 }
 
 class _HighlightPayload {
-  final Highlight highlight;
-  final CodeLines codes;
-  final List<String> languages;
-  final List<int> maxSizes;
-  final List<int> maxLineLengths;
-
   const _HighlightPayload({
     required this.highlight,
     required this.codes,
@@ -285,29 +281,32 @@ class _HighlightPayload {
     required this.maxSizes,
     required this.maxLineLengths,
   });
+  final Highlight highlight;
+  final CodeLines codes;
+  final List<String> languages;
+  final List<int> maxSizes;
+  final List<int> maxLineLengths;
 }
 
 class _HighlightResult {
-  final List<_HighlightNode> nodes;
-
   _HighlightResult(this.nodes);
+  final List<_HighlightNode> nodes;
 
   String get source => nodes.map((e) => e.value).join();
 }
 
 class _HighlightNode {
+  const _HighlightNode(this.value, [this.className]);
   final String? className;
   final String value;
-
-  const _HighlightNode(this.value, [this.className]);
 }
 
 class _HighlightLineRenderer implements HighlightRenderer {
-  final List<_HighlightResult> lineResults;
-  final List<String?> classNames;
   _HighlightLineRenderer()
     : lineResults = [_HighlightResult([])],
       classNames = [];
+  final List<_HighlightResult> lineResults;
+  final List<String?> classNames;
 
   @override
   void addText(String text) {

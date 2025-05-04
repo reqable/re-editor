@@ -108,13 +108,13 @@ class ShortcutLineDeleteIntent extends CodeShortcutEditableIntent {
 }
 
 class ShortcutLineMoveIntent extends CodeShortcutEditableIntent {
-  final VerticalDirection direction;
   const ShortcutLineMoveIntent(this.direction);
+  final VerticalDirection direction;
 }
 
 class ShortcutLineDeleteDirectionIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const ShortcutLineDeleteDirectionIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutIndentIntent extends CodeShortcutEditableIntent {
@@ -126,63 +126,63 @@ class CodeShortcutOutdentIntent extends CodeShortcutEditableIntent {
 }
 
 class CodeShortcutCommentIntent extends CodeShortcutEditableIntent {
-  final bool single;
   const CodeShortcutCommentIntent(this.single);
+  final bool single;
 }
 
 class CodeShortcutCursorMoveIntent extends Intent {
-  final AxisDirection direction;
   const CodeShortcutCursorMoveIntent(this.direction);
+  final AxisDirection direction;
 }
 
 class CodeShortcutCursorMoveLineEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveLineEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMoveDocEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveDocEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMovePageIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMovePageIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMoveWordBoundaryIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveWordBoundaryIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendIntent extends Intent {
-  final AxisDirection direction;
   const CodeShortcutSelectionExtendIntent(this.direction);
+  final AxisDirection direction;
 }
 
 class CodeShortcutSelectionExtendLineEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendLineEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendPageEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendPageEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendWordBoundaryIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendWordBoundaryIntent(this.forward);
+  final bool forward;
 }
 
 class ShortcutWordDeleteDirectionIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const ShortcutWordDeleteDirectionIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutDeleteIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const CodeShortcutDeleteIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutNewLineIntent extends CodeShortcutEditableIntent {

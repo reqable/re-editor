@@ -8,11 +8,6 @@ typedef CodeFindBuilder =
     );
 
 class CodeFindValue {
-  final CodeFindOption option;
-  final bool replaceMode;
-  final CodeFindResult? result;
-  final bool searching;
-
   const CodeFindValue({
     required this.option,
     required this.replaceMode,
@@ -29,11 +24,15 @@ class CodeFindValue {
         ),
         replaceMode: false,
       );
+  final CodeFindOption option;
+  final bool replaceMode;
+  final CodeFindResult? result;
+  final bool searching;
 
   CodeFindValue copyWith({
+    required CodeFindResult? result,
     CodeFindOption? option,
     bool? replaceMode,
-    required CodeFindResult? result,
     bool? searching,
   }) {
     return CodeFindValue(
@@ -66,15 +65,14 @@ class CodeFindValue {
 }
 
 class CodeFindOption {
-  final String pattern;
-  final bool caseSensitive;
-  final bool regex;
-
   const CodeFindOption({
     required this.pattern,
     required this.caseSensitive,
     required this.regex,
   });
+  final String pattern;
+  final bool caseSensitive;
+  final bool regex;
 
   CodeFindOption copyWith({String? pattern, bool? caseSensitive, bool? regex}) {
     return CodeFindOption(
@@ -101,6 +99,7 @@ class CodeFindOption {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeFindOption &&
         other.pattern == pattern &&
         other.caseSensitive == caseSensitive &&
@@ -117,12 +116,6 @@ class CodeFindOption {
 }
 
 class CodeFindResult {
-  final int index;
-  final List<CodeLineSelection> matches;
-  final CodeFindOption option;
-  final CodeLines codeLines;
-  final bool dirty;
-
   const CodeFindResult({
     required this.index,
     required this.matches,
@@ -130,6 +123,11 @@ class CodeFindResult {
     required this.codeLines,
     required this.dirty,
   });
+  final int index;
+  final List<CodeLineSelection> matches;
+  final CodeFindOption option;
+  final CodeLines codeLines;
+  final bool dirty;
 
   CodeFindResult get previous =>
       copyWith(index: index == 0 ? matches.length - 1 : index - 1);
@@ -160,6 +158,7 @@ class CodeFindResult {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeFindResult &&
         other.index == index &&
         listEquals(other.matches, matches) &&

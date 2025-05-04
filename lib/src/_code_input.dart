@@ -2,21 +2,6 @@ part of 're_editor.dart';
 
 class _CodeInputController extends ChangeNotifier
     implements DeltaTextInputClient {
-  CodeLineEditingController _controller;
-  FocusNode _focusNode;
-  bool _readOnly;
-  bool _autocompleteSymbols;
-  bool _updateCausedByFloatingCursor;
-  late Offset _floatingCursorStartingOffset;
-
-  TextInputConnection? _textInputConnection;
-  TextEditingValue? _remoteEditingValue;
-
-  final _CodeFloatingCursorController _floatingCursorController;
-  Timer? _floatingCursorScrollTimer;
-
-  GlobalKey? _editorKey;
-
   _CodeInputController({
     required CodeLineEditingController controller,
     required _CodeFloatingCursorController floatingCursorController,
@@ -32,6 +17,20 @@ class _CodeInputController extends ChangeNotifier
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
   }
+  CodeLineEditingController _controller;
+  FocusNode _focusNode;
+  bool _readOnly;
+  bool _autocompleteSymbols;
+  bool _updateCausedByFloatingCursor;
+  late Offset _floatingCursorStartingOffset;
+
+  TextInputConnection? _textInputConnection;
+  TextEditingValue? _remoteEditingValue;
+
+  final _CodeFloatingCursorController _floatingCursorController;
+  Timer? _floatingCursorScrollTimer;
+
+  GlobalKey? _editorKey;
 
   void bindEditor(GlobalKey key) {
     _editorKey = key;
@@ -131,6 +130,7 @@ class _CodeInputController extends ChangeNotifier
       // This is necessary because otherwise the content of the line where the floating cursor was started
       // will be pasted over to the line where the floating cursor was stopped.
       _updateCausedByFloatingCursor = false;
+
       return;
     }
 
@@ -144,6 +144,7 @@ class _CodeInputController extends ChangeNotifier
       }
       _remoteEditingValue = newValue;
       _controller.applyNewLine();
+
       return;
     }
 
@@ -152,7 +153,7 @@ class _CodeInputController extends ChangeNotifier
     bool smartChange = false;
     for (final TextEditingDelta delta in textEditingDeltas) {
       if (_autocompleteSymbols) {
-        TextEditingDelta newDelta = _SmartTextEditingDelta(
+        final TextEditingDelta newDelta = _SmartTextEditingDelta(
           delta,
         ).apply(selection);
         if (newDelta != delta) {
@@ -219,14 +220,14 @@ class _CodeInputController extends ChangeNotifier
             render.paintBounds.right - render.paddingRight;
 
         // Clamp the offset coordinates to the paint bounds
-        Offset clampedUpdatedOffset = Offset(
+        final Offset clampedUpdatedOffset = Offset(
           updatedOffset.dx.clamp(leftBound, rightBound),
           updatedOffset.dy.clamp(topBound, bottomBound),
         );
 
         // An adjustment is made on the y-axis so that whenever it is in between lines, the line where the center
         // of the floating cursor is will be selected.
-        Offset adjustedClampedUpdatedOffset =
+        final Offset adjustedClampedUpdatedOffset =
             clampedUpdatedOffset + Offset(0, render.floatingCursorHeight / 2);
         final CodeLinePosition newPosition =
             render.calculateTextPosition(adjustedClampedUpdatedOffset)!;
@@ -235,7 +236,7 @@ class _CodeInputController extends ChangeNotifier
         final Offset? snappedNewOffset = render
             .calculateTextPositionViewportOffset(newPosition);
 
-        CodeLineSelection newSelection = CodeLineSelection.fromPosition(
+        final CodeLineSelection newSelection = CodeLineSelection.fromPosition(
           position: newPosition,
         );
 
@@ -511,6 +512,7 @@ class _CodeInputController extends ChangeNotifier
         );
       }
     }
+
     return TextEditingValue(
       text: codeLines[selection.baseIndex].text,
       selection: textSelection,
@@ -520,6 +522,7 @@ class _CodeInputController extends ChangeNotifier
 }
 
 class _SmartTextEditingDelta {
+  _SmartTextEditingDelta(this._delta);
   static const List<_ClosureSymbol> _closureSymbols = [
     _ClosureSymbol('{', '}'),
     _ClosureSymbol('[', ']'),
@@ -539,8 +542,6 @@ class _SmartTextEditingDelta {
 
   final TextEditingDelta _delta;
 
-  _SmartTextEditingDelta(this._delta);
-
   TextEditingDelta apply(CodeLineSelection selection) {
     TextEditingDelta delta = _delta;
     if (delta is TextEditingDeltaInsertion) {
@@ -548,6 +549,7 @@ class _SmartTextEditingDelta {
     } else if (delta is TextEditingDeltaReplacement) {
       delta = _smartReplacement(delta, selection);
     }
+
     return delta;
   }
 
@@ -557,6 +559,7 @@ class _SmartTextEditingDelta {
         if (!_shouldAutoClosed(delta.oldText, delta.insertionOffset, symbol)) {
           break;
         }
+
         return TextEditingDeltaInsertion(
           oldText: delta.oldText,
           textInserted: symbol.toString(),
@@ -568,6 +571,7 @@ class _SmartTextEditingDelta {
         if (!_shouldSkipClosed(delta.oldText, delta.insertionOffset, symbol)) {
           break;
         }
+
         return TextEditingDeltaNonTextUpdate(
           oldText: delta.oldText,
           selection: TextSelection.collapsed(offset: delta.insertionOffset + 1),
@@ -582,6 +586,7 @@ class _SmartTextEditingDelta {
       if (!_shouldAutoQuoted(delta.oldText, symbol, delta.insertionOffset)) {
         break;
       }
+
       return TextEditingDeltaInsertion(
         oldText: delta.oldText,
         textInserted: symbol * 2,
@@ -590,6 +595,7 @@ class _SmartTextEditingDelta {
         composing: delta.composing,
       );
     }
+
     return delta;
   }
 
@@ -610,6 +616,7 @@ class _SmartTextEditingDelta {
       return delta;
     }
     final _ClosureSymbol symbol = _wrapSymbols[index];
+
     return TextEditingDeltaReplacement(
       oldText: delta.oldText,
       replacementText: symbol.left + delta.textReplaced + symbol.right,
@@ -645,6 +652,7 @@ class _SmartTextEditingDelta {
         }
       }
     }
+
     return max(0, leftSymbolCount) >= rightSymbolCount;
   }
 
@@ -655,6 +663,7 @@ class _SmartTextEditingDelta {
     if (offset == text.length) {
       return false;
     }
+
     return text.substring(offset, offset + 1) == symbol.right;
   }
 
@@ -691,10 +700,9 @@ class _SmartTextEditingDelta {
 }
 
 class _ClosureSymbol {
+  const _ClosureSymbol(this.left, this.right);
   final String left;
   final String right;
-
-  const _ClosureSymbol(this.left, this.right);
 
   @override
   String toString() {
@@ -713,6 +721,7 @@ extension _TextEditingValueExtension on TextEditingValue {
     if (!usePrefix) {
       return this;
     }
+
     return copyWith(
       text: '$_kPrefix$text',
       selection: selection.copyWith(
@@ -733,6 +742,7 @@ extension _TextEditingValueExtension on TextEditingValue {
     if (!startWithPrefix) {
       return this;
     }
+
     return copyWith(
       text: text.substring(1),
       selection: selection.copyWith(

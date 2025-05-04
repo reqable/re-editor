@@ -1,6 +1,15 @@
 part of 're_editor.dart';
 
 class _ParagraphImpl extends IParagraph {
+  _ParagraphImpl({
+    required this.text,
+    required this.span,
+    required this.paragraph,
+    required bool trucated,
+    required double preferredLineHeight,
+  }) : _trucated = trucated,
+       _preferredLineHeight = preferredLineHeight,
+       _lineCount = (paragraph.height / preferredLineHeight).ceil();
   // Unicode value for a zero width joiner character.
   static const int _zwjUtf16 = 0x200d;
 
@@ -13,16 +22,6 @@ class _ParagraphImpl extends IParagraph {
 
   // For performance, do not init here
   Map<TextPosition, Offset?>? _offsets;
-
-  _ParagraphImpl({
-    required this.text,
-    required this.span,
-    required this.paragraph,
-    required bool trucated,
-    required double preferredLineHeight,
-  }) : _trucated = trucated,
-       _preferredLineHeight = preferredLineHeight,
-       _lineCount = (paragraph.height / preferredLineHeight).ceil();
 
   int get runeLength => text.runes.length;
 
@@ -59,6 +58,7 @@ class _ParagraphImpl extends IParagraph {
   @override
   TextPosition getPosition(Offset offset) {
     final TextPosition position = paragraph.getPositionForOffset(offset);
+
     return position;
   }
 
@@ -67,6 +67,7 @@ class _ParagraphImpl extends IParagraph {
     if (position.offset >= length - 1) {
       return null;
     }
+
     return span.getSpanForPosition(position);
   }
 
@@ -78,8 +79,10 @@ class _ParagraphImpl extends IParagraph {
         return false;
       }
       offset += child.length;
+
       return true;
     });
+
     return TextRange(start: offset, end: offset + span.length);
   }
 
@@ -126,6 +129,7 @@ class _ParagraphImpl extends IParagraph {
     if (range.isCollapsed) {
       return const [];
     }
+
     return paragraph
         .getBoxesForRange(
           range.start,
@@ -156,6 +160,7 @@ class _ParagraphImpl extends IParagraph {
     if (boxes.isEmpty) {
       return null;
     }
+
     return Offset(boxes.first.left, boxes.first.top);
   }
 
@@ -179,6 +184,7 @@ class _ParagraphImpl extends IParagraph {
     if (boxes.isEmpty) {
       return null;
     }
+
     return Offset(boxes.first.right, boxes.first.top);
   }
 
@@ -212,6 +218,7 @@ class _ParagraphImpl extends IParagraph {
 }
 
 class _CodeParagraphProvider {
+  _CodeParagraphProvider() : _cachedParagraphs = {};
   final Map<TextSpan, _ParagraphImpl> _cachedParagraphs;
 
   ui.TextStyle? _style;
@@ -219,8 +226,6 @@ class _CodeParagraphProvider {
   ui.ParagraphStyle? _paragraphStyle;
   double? _preferredLineHeight;
   int? _maxLengthSingleLineRendering;
-
-  _CodeParagraphProvider() : _cachedParagraphs = {};
 
   void updateBaseStyle(TextStyle style) {
     final ui.TextStyle uiStyle = style.getTextStyle();
@@ -275,6 +280,7 @@ class _CodeParagraphProvider {
       impl = _build(span, plainText, false);
     }
     _cachedParagraphs[span] = impl;
+
     return impl;
   }
 
@@ -286,7 +292,7 @@ class _CodeParagraphProvider {
       }
       String? text = span.text;
       if (text != null) {
-        int remainingLength = maxLength - currentLength;
+        final int remainingLength = maxLength - currentLength;
         if (text.length > remainingLength) {
           text = text.substring(0, remainingLength);
         }
@@ -294,7 +300,7 @@ class _CodeParagraphProvider {
         return TextSpan(text: text, style: span.style);
       }
       final List<InlineSpan> children = [];
-      for (InlineSpan child in span.children ?? const []) {
+      for (final InlineSpan child in span.children ?? const []) {
         if (currentLength >= maxLength) {
           break;
         }
@@ -304,6 +310,7 @@ class _CodeParagraphProvider {
           children.add(child);
         }
       }
+
       return TextSpan(children: children, style: span.style);
     }
 
@@ -319,6 +326,7 @@ class _CodeParagraphProvider {
     span.build(builder);
     final ui.Paragraph paragraph = builder.build();
     paragraph.layout(_constraints!);
+
     return _ParagraphImpl(
       text: plainText,
       span: span,

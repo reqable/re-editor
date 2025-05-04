@@ -1,14 +1,6 @@
 part of 're_editor.dart';
 
 class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
-  late final CodeLineEditingController _controller;
-  final CodeChunkAnalyzer _analyzer;
-
-  late final _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>
-  _tasker;
-
-  late bool _shouldNotUpdateChunks;
-
   CodeChunkController(CodeLineEditingController controller, this._analyzer)
     : super(const []) {
     _controller =
@@ -23,6 +15,13 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
     _shouldNotUpdateChunks = false;
     _runChunkAnalyzeTask();
   }
+  late final CodeLineEditingController _controller;
+  final CodeChunkAnalyzer _analyzer;
+
+  late final _IsolateTasker<_CodeChunkAnalyzePayload, _CodeChunkAnalyzeResult>
+  _tasker;
+
+  late bool _shouldNotUpdateChunks;
 
   void collapse(int index) {
     final CodeChunk? chunk = findByIndex(index);
@@ -99,6 +98,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
         break;
       }
     }
+
     return null;
   }
 
@@ -119,6 +119,7 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
     }
     if (_controller.codeLines.length < 3 && value.isEmpty) {
       value = [];
+
       return;
     }
     if (_controller.codeLines.equals(_controller.preValue?.codeLines)) {
@@ -157,15 +158,15 @@ class CodeChunkController extends ValueNotifier<List<CodeChunk>> {
         invalidCollapsedChunkIndexes.add(i);
       }
     }
+
     return _CodeChunkAnalyzeResult(chunks, invalidCollapsedChunkIndexes);
   }
 }
 
 class CodeChunk {
+  const CodeChunk(this.index, this.end);
   final int index;
   final int end;
-
-  const CodeChunk(this.index, this.end);
 
   bool get canCollapse => collapseSize > 0;
 
@@ -176,6 +177,7 @@ class CodeChunk {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeChunk && other.index == index && other.end == end;
   }
 
@@ -200,14 +202,13 @@ class NonCodeChunkAnalyzer implements CodeChunkAnalyzer {
 }
 
 class DefaultCodeChunkAnalyzer implements CodeChunkAnalyzer {
+  const DefaultCodeChunkAnalyzer();
   static const Map<String, String> _chunkSymbols = {
     '(': ')',
     '[': ']',
     '{': '}',
   };
   static final List<int> _tokens = '"\'()[]{}'.codeUnits;
-
-  const DefaultCodeChunkAnalyzer();
 
   @override
   List<CodeChunk> run(CodeLines codeLines) {
@@ -232,6 +233,7 @@ class DefaultCodeChunkAnalyzer implements CodeChunkAnalyzer {
     }
     // sort by index
     chunks.sort((a, b) => a.index - b.index);
+
     return chunks;
   }
 
@@ -245,6 +247,7 @@ class DefaultCodeChunkAnalyzer implements CodeChunkAnalyzer {
       }
       symbols.addAll(_parseLine(text, i));
     }
+
     return symbols;
   }
 
@@ -312,21 +315,21 @@ class DefaultCodeChunkAnalyzer implements CodeChunkAnalyzer {
   }
 
   bool isPreEscapeChar(List<int> codeUnits, int index) {
-    return index > 0 && codeUnits[index - 1] == '\\'.codeUnits.first;
+    return index > 0 && codeUnits[index - 1] == r'\'.codeUnits.first;
   }
 }
 
 class CodeChunkSymbol {
+  const CodeChunkSymbol(this.value, this.index);
   final String value;
   final int index;
-
-  const CodeChunkSymbol(this.value, this.index);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeChunkSymbol &&
         other.value == value &&
         other.index == index;
@@ -342,15 +345,13 @@ class CodeChunkSymbol {
 }
 
 class _CodeChunkAnalyzePayload {
+  const _CodeChunkAnalyzePayload(this.analyzer, this.codeLines);
   final CodeChunkAnalyzer analyzer;
   final CodeLines codeLines;
-
-  const _CodeChunkAnalyzePayload(this.analyzer, this.codeLines);
 }
 
 class _CodeChunkAnalyzeResult {
+  const _CodeChunkAnalyzeResult(this.chunks, this.invalidCollapsedChunkIndexes);
   final List<CodeChunk> chunks;
   final List<int> invalidCollapsedChunkIndexes;
-
-  const _CodeChunkAnalyzeResult(this.chunks, this.invalidCollapsedChunkIndexes);
 }

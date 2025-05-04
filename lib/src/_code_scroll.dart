@@ -1,19 +1,18 @@
 part of 're_editor.dart';
 
-const double _kScrollbarThickness = 8.0;
+const double _kScrollbarThickness = 8;
 
 class _CodeScrollable extends StatelessWidget {
+  const _CodeScrollable({
+    required this.axisDirection,
+    required this.viewportBuilder,
+    this.controller,
+    this.scrollbarBuilder,
+  });
   final AxisDirection axisDirection;
   final ScrollController? controller;
   final ViewportBuilder viewportBuilder;
   final CodeScrollbarBuilder? scrollbarBuilder;
-
-  const _CodeScrollable({
-    required this.axisDirection,
-    this.controller,
-    required this.viewportBuilder,
-    this.scrollbarBuilder,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +28,9 @@ class _CodeScrollable extends StatelessWidget {
 }
 
 class _ScrollBehavior extends MaterialScrollBehavior {
+  _ScrollBehavior(this.scrollbarBuilder) : physics = _ScrollPhysics();
   final _ScrollPhysics physics;
   final CodeScrollbarBuilder? scrollbarBuilder;
-
-  _ScrollBehavior(this.scrollbarBuilder) : physics = _ScrollPhysics();
 
   @override
   Widget buildScrollbar(
@@ -60,6 +58,7 @@ class _ScrollBehavior extends MaterialScrollBehavior {
         child: child,
       );
     }
+
     return _RawScrollbar(
       physics: physics,
       controller: details.controller ?? ScrollController(),
@@ -76,19 +75,18 @@ class _ScrollBehavior extends MaterialScrollBehavior {
 }
 
 class _RawScrollbar extends RawScrollbar {
-  final _ScrollPhysics physics;
-
   const _RawScrollbar({
     required this.physics,
     required super.child,
     required ScrollController super.controller,
-    super.scrollbarOrientation,
     required bool super.thumbVisibility,
+    super.scrollbarOrientation,
   }) : super(
          thickness: _kScrollbarThickness,
          radius: const Radius.circular(10),
          crossAxisMargin: 2,
        );
+  final _ScrollPhysics physics;
 
   @override
   RawScrollbarState<_RawScrollbar> createState() => _RawScrollbarState();
@@ -132,6 +130,7 @@ class _ScrollPhysics extends ScrollPhysics {
     if (_position == null) {
       return super.applyBoundaryConditions(position, value);
     }
+
     return value - _position!;
   }
 }

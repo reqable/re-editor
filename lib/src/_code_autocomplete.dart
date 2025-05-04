@@ -2,49 +2,48 @@ part of 're_editor.dart';
 
 class _DefaultCodeAutocompletePromptsBuilder
     implements DefaultCodeAutocompletePromptsBuilder {
-  final Mode? language;
-  final List<CodeKeywordPrompt> keywordPrompts;
-  final List<CodePrompt> directPrompts;
-  final Map<String, List<CodePrompt>> relatedPrompts;
-
-  final Set<CodePrompt> _allKeywordPrompts = {};
-
   _DefaultCodeAutocompletePromptsBuilder({
-    this.language,
     required this.keywordPrompts,
     required this.directPrompts,
     required this.relatedPrompts,
+    this.language,
   }) {
     _allKeywordPrompts.addAll(keywordPrompts);
     _allKeywordPrompts.addAll(directPrompts);
     final dynamic keywords = language?.keywords;
     if (keywords is Map) {
       final dynamic keywordList = keywords['keyword'];
-      if (keywordList is List) {
+      if (keywordList is List<String>) {
         _allKeywordPrompts.addAll(
           keywordList.map((keyword) => CodeKeywordPrompt(word: keyword)),
         );
       }
       final dynamic builtInList = keywords['built_in'];
-      if (builtInList is List) {
+      if (builtInList is List<String>) {
         _allKeywordPrompts.addAll(
           builtInList.map((keyword) => CodeKeywordPrompt(word: keyword)),
         );
       }
       final dynamic literalList = keywords['literal'];
-      if (literalList is List) {
+      if (literalList is List<String>) {
         _allKeywordPrompts.addAll(
           literalList.map((keyword) => CodeKeywordPrompt(word: keyword)),
         );
       }
       final dynamic typeList = keywords['type'];
-      if (typeList is List) {
+      if (typeList is List<String>) {
         _allKeywordPrompts.addAll(
           typeList.map((keyword) => CodeKeywordPrompt(word: keyword)),
         );
       }
     }
   }
+  final Mode? language;
+  final List<CodeKeywordPrompt> keywordPrompts;
+  final List<CodePrompt> directPrompts;
+  final Map<String, List<CodePrompt>> relatedPrompts;
+
+  final Set<CodePrompt> _allKeywordPrompts = {};
 
   @override
   CodeAutocompleteEditingValue? build(
@@ -65,7 +64,7 @@ class _DefaultCodeAutocompletePromptsBuilder
         charactersAfter.containsSymbols(const ['\'', '"'])) {
       return null;
     }
-    // TODO Should check operator `->` for some languages like c/c++
+    // TODOShould check operator `->` for some languages like c/c++
     final Iterable<CodePrompt> prompts;
     final String input;
     if (charactersBefore.takeLast(1).string == '.') {
@@ -111,6 +110,7 @@ class _DefaultCodeAutocompletePromptsBuilder
     if (prompts.isEmpty) {
       return null;
     }
+
     return CodeAutocompleteEditingValue(
       input: input,
       prompts: prompts.toList(),
@@ -163,6 +163,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
           newIndex = 0;
         }
         _notifier?.value = value.copyWith(index: newIndex);
+
         return intent;
       },
     );
@@ -173,6 +174,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
           return null;
         }
         _onAutocomplete?.call(value.autocomplete);
+
         return intent;
       },
     );
@@ -257,6 +259,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     } else {
       offsetY = 0;
     }
+
     return CompositedTransformFollower(
       link: layerLink,
       showWhenUnlinked: false,
@@ -278,9 +281,8 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
 }
 
 class _CodeAutocompleteAction<T extends Intent> extends CallbackAction<T> {
-  bool _isEnabled = false;
-
   _CodeAutocompleteAction({required super.onInvoke});
+  bool _isEnabled = false;
 
   void setEnabled(bool enabled) {
     _isEnabled = enabled;
@@ -304,6 +306,7 @@ class _CodeAutocompleteNavigateAction
 extension _CodeAutocompleteStringExtension on String {
   bool get isValidVariablePart {
     final int char = codeUnits.first;
+
     return (char >= 65 && char <= 90) ||
         (char >= 97 && char <= 122) ||
         char == 95;
@@ -317,6 +320,7 @@ extension _CodeAutocompleteCharactersExtension on Characters {
         return true;
       }
     }
+
     return false;
   }
 }

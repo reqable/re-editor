@@ -220,10 +220,10 @@ abstract class CodeLineEditingController
   /// Move the cursor to the end of document.
   void moveCursorToPageEnd();
 
-  /// TODO
+  // TODO(XXX): Need to implement this.
   void moveCursorToPageUp();
 
-  /// TODO
+  // TODO(XXX): Need to implement this.
   void moveCursorToPageDown();
 
   /// Move the cursor to the start of the word.
@@ -391,18 +391,18 @@ class CodeLineEditingControllerDelegate
 }
 
 class CodeLine {
+  const CodeLine(this.text, [this.chunks = const []]);
   static const CodeLine empty = CodeLine('');
 
   final String text;
   final List<CodeLine> chunks;
-
-  const CodeLine(this.text, [this.chunks = const []]);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLine &&
         other.text == text &&
         listEquals(other.chunks, chunks);
@@ -422,6 +422,7 @@ class CodeLine {
     for (final CodeLine codeLine in chunks) {
       count += codeLine.lineCount;
     }
+
     return count;
   }
 
@@ -430,6 +431,7 @@ class CodeLine {
     for (final CodeLine codeLine in chunks) {
       count += codeLine.charCount;
     }
+
     return count;
   }
 
@@ -446,6 +448,7 @@ class CodeLine {
         end = length;
       }
     }
+
     return start >= length ? '' : text.substring(start, end);
   }
 
@@ -491,6 +494,7 @@ class CodeLine {
     for (final CodeLine child in chunks) {
       codeLines.addAll(child.flat());
     }
+
     return codeLines;
   }
 }
@@ -564,6 +568,7 @@ class CodeLineEditingValue {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineEditingValue &&
         other.codeLines.equals(codeLines) &&
         other.selection == selection &&
@@ -581,36 +586,6 @@ class CodeLineEditingValue {
 
 /// A range of code lines that represents a selection.
 class CodeLineSelection {
-  /// The line index at which the selection originates.
-  final int baseIndex;
-
-  /// The line index at which the selection terminates.
-  final int extentIndex;
-
-  /// The offset at which the selection originates.
-  ///
-  /// Might be larger than, smaller than, or equal to extent.
-  final int baseOffset;
-
-  /// The offset at which the selection terminates.
-  ///
-  /// When the user uses the arrow keys to adjust the selection, this is the
-  /// value that changes. Similarly, if the current theme paints a caret on one
-  /// side of the selection, this is the location at which to paint the caret.
-  ///
-  /// Might be larger than, smaller than, or equal to base.
-  final int extentOffset;
-
-  /// If the code range is collapsed and has more than one visual location
-  /// (e.g., occurs at a line break), which of the two locations to use when
-  /// painting the caret.
-  final TextAffinity baseAffinity;
-
-  /// If the code range is collapsed and has more than one visual location
-  /// (e.g., occurs at a line break), which of the two locations to use when
-  /// painting the caret.
-  final TextAffinity extentAffinity;
-
   /// Creates a code selection.
   const CodeLineSelection({
     required this.baseIndex,
@@ -676,6 +651,36 @@ class CodeLineSelection {
   /// Creates a collapsed selection at the beginning.
   const CodeLineSelection.zero()
     : this(baseIndex: 0, baseOffset: 0, extentIndex: 0, extentOffset: 0);
+
+  /// The line index at which the selection originates.
+  final int baseIndex;
+
+  /// The line index at which the selection terminates.
+  final int extentIndex;
+
+  /// The offset at which the selection originates.
+  ///
+  /// Might be larger than, smaller than, or equal to extent.
+  final int baseOffset;
+
+  /// The offset at which the selection terminates.
+  ///
+  /// When the user uses the arrow keys to adjust the selection, this is the
+  /// value that changes. Similarly, if the current theme paints a caret on one
+  /// side of the selection, this is the location at which to paint the caret.
+  ///
+  /// Might be larger than, smaller than, or equal to base.
+  final int extentOffset;
+
+  /// If the code range is collapsed and has more than one visual location
+  /// (e.g., occurs at a line break), which of the two locations to use when
+  /// painting the caret.
+  final TextAffinity baseAffinity;
+
+  /// If the code range is collapsed and has more than one visual location
+  /// (e.g., occurs at a line break), which of the two locations to use when
+  /// painting the caret.
+  final TextAffinity extentAffinity;
 
   /// The position at which the selection originates.
   CodeLinePosition get base {
@@ -763,6 +768,7 @@ class CodeLineSelection {
     } else {
       endInside = true;
     }
+
     return startInside && endInside;
   }
 
@@ -792,6 +798,7 @@ class CodeLineSelection {
     if (other is! CodeLineSelection) {
       return false;
     }
+
     return other.baseIndex == baseIndex &&
         other.extentIndex == extentIndex &&
         other.baseOffset == baseOffset &&
@@ -834,12 +841,12 @@ class CodeLinePosition extends TextPosition {
     super.affinity = TextAffinity.downstream,
   });
 
-  /// Line index in the codes.
-  final int index;
-
   /// Creates the CodeLinePosition with the line index and text position.
   CodeLinePosition.from({required int index, required TextPosition position})
     : this(index: index, offset: position.offset, affinity: position.affinity);
+
+  /// Line index in the codes.
+  final int index;
 
   CodeLinePosition copyWith({int? index, int? offset, TextAffinity? affinity}) {
     return CodeLinePosition(
@@ -861,6 +868,7 @@ class CodeLinePosition extends TextPosition {
     if (index > position.index) {
       return false;
     }
+
     return offset < position.offset;
   }
 
@@ -872,6 +880,7 @@ class CodeLinePosition extends TextPosition {
     if (index < position.index) {
       return false;
     }
+
     return offset > position.offset;
   }
 
@@ -880,6 +889,7 @@ class CodeLinePosition extends TextPosition {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLinePosition &&
         other.index == index &&
         other.offset == offset &&
@@ -904,9 +914,6 @@ class CodeLineRange extends TextRange {
     required super.end,
   });
 
-  /// Line index in the codes.
-  final int index;
-
   /// Creates a code range at the given line index and text range.
   factory CodeLineRange.from({required int index, required TextRange range}) {
     return CodeLineRange(index: index, start: range.start, end: range.end);
@@ -922,6 +929,9 @@ class CodeLineRange extends TextRange {
 
   /// Creates a collapsed range with negative offset.
   const CodeLineRange.empty() : this(index: 0, start: -1, end: -1);
+
+  /// Line index in the codes.
+  final int index;
 
   /// Creates a new [CodeLineRange] based on the current selection, with the
   /// provided parameters overridden.
@@ -941,6 +951,7 @@ class CodeLineRange extends TextRange {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineRange &&
         other.index == index &&
         other.start == start &&
@@ -953,12 +964,11 @@ class CodeLineRange extends TextRange {
 
 /// Some options of the code lines.
 class CodeLineOptions {
-  static const int _defaultIndentSize = 2;
-
   const CodeLineOptions({
     this.lineBreak = TextLineBreak.lf,
     this.indentSize = _defaultIndentSize,
   });
+  static const int _defaultIndentSize = 2;
 
   /// Line break symbols, like LF, CRLF.
   ///
@@ -983,6 +993,7 @@ class CodeLineOptions {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineOptions &&
         other.lineBreak == lineBreak &&
         other.indentSize == indentSize;
@@ -992,10 +1003,9 @@ class CodeLineOptions {
 }
 
 class CodeLineIndex {
+  const CodeLineIndex(this.index, this.chunkIndex);
   final int index;
   final int chunkIndex;
-
-  const CodeLineIndex(this.index, this.chunkIndex);
 
   @override
   int get hashCode => Object.hash(index, chunkIndex);
@@ -1005,6 +1015,7 @@ class CodeLineIndex {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineIndex &&
         other.index == index &&
         other.chunkIndex == chunkIndex;
@@ -1015,14 +1026,6 @@ class CodeLineIndex {
 }
 
 class CodeLineRenderParagraph {
-  static const double _chunkIndicatorWidth = 15;
-
-  final int index;
-  final IParagraph paragraph;
-  final Offset offset;
-  final bool chunkParent;
-  final bool chunkLongText;
-
   const CodeLineRenderParagraph({
     required this.index,
     required this.paragraph,
@@ -1030,6 +1033,13 @@ class CodeLineRenderParagraph {
     required this.chunkParent,
     required this.chunkLongText,
   });
+  static const double _chunkIndicatorWidth = 15;
+
+  final int index;
+  final IParagraph paragraph;
+  final Offset offset;
+  final bool chunkParent;
+  final bool chunkLongText;
 
   double get preferredLineHeight => paragraph.preferredLineHeight;
 
@@ -1076,6 +1086,7 @@ class CodeLineRenderParagraph {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeLineRenderParagraph &&
         other.index == index &&
         other.paragraph == paragraph &&
@@ -1119,6 +1130,7 @@ class CodeLineUtils {
     if (text.isEmpty) {
       return _kInitialCodeLines;
     }
+
     return compute<String, CodeLines>((message) => toCodeLines(message), text);
   }
 }

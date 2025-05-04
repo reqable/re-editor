@@ -6,10 +6,9 @@ const Duration floatingCursorSnapDuration = Duration(milliseconds: 300);
 // Class containing the floating cursor control logic.
 class _CodeFloatingCursorController
     extends ValueNotifier<_FloatingCursorState> {
+  _CodeFloatingCursorController() : super(const _FloatingCursorState());
   late final _CodeCursorBlinkController _blinkController;
   late final AnimationController _animationController;
-
-  _CodeFloatingCursorController() : super(const _FloatingCursorState());
 
   /// Sets the [Offset] and [CodeLineSelection] of the cursors. Setting either one of these offsets
   /// to null is equivalent to turning off the corresponding cursor.
@@ -108,6 +107,13 @@ class _CodeFloatingCursorController
 }
 
 class _FloatingCursorState {
+  const _FloatingCursorState({
+    this.floatingCursorOffset,
+    this.previewCursorOffset,
+    this.finalCursorOffset,
+    this.finalCursorSelection,
+  });
+
   /// The offset of the floating cursor.
   final Offset? floatingCursorOffset;
 
@@ -120,13 +126,6 @@ class _FloatingCursorState {
   final Offset? finalCursorOffset;
 
   final CodeLineSelection? finalCursorSelection;
-
-  const _FloatingCursorState({
-    this.floatingCursorOffset,
-    this.previewCursorOffset,
-    this.finalCursorOffset,
-    this.finalCursorSelection,
-  });
 
   /// Creates a copy of this instance with the specified values overridden.
   _FloatingCursorState copyWith({

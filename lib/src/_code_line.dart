@@ -10,14 +10,6 @@ const List<String> _kClosureAndQuates = ['{}', '[]', '()', '\'\'', '""', '``'];
 
 class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     implements CodeLineEditingController {
-  @override
-  final CodeLineOptions options;
-  final CodeLineSpanBuilder? spanBuilder;
-  late final _CodeLineEditingCache _cache;
-  late int _preEditLineIndex;
-  CodeLineEditingValue? _preValue;
-  GlobalKey? _editorKey;
-
   _CodeLineEditingControllerImpl({
     required CodeLines codeLines,
     required this.options,
@@ -49,8 +41,16 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     CodeLineUtils.toCodeLinesAsync(
       text ?? '',
     ).then((value) => controller.codeLines = value);
+
     return controller;
   }
+  @override
+  final CodeLineOptions options;
+  final CodeLineSpanBuilder? spanBuilder;
+  late final _CodeLineEditingCache _cache;
+  late int _preEditLineIndex;
+  CodeLineEditingValue? _preValue;
+  GlobalKey? _editorKey;
 
   @override
   set value(CodeLineEditingValue value) {
@@ -149,6 +149,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       baseRawIndex = index2lineIndex(selection.baseIndex);
       extentRawIndex = index2lineIndex(selection.extentIndex);
     }
+
     return selection.copyWith(
       baseIndex: baseRawIndex,
       extentIndex: extentRawIndex,
@@ -346,7 +347,6 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
             selection = CodeLineSelection.collapsed(
               index: index,
               offset: offset,
-              affinity: TextAffinity.downstream,
             );
           }
         }
@@ -521,7 +521,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     int i = offset - 1;
 
     while (i > 0) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
 
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
@@ -578,7 +578,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     int i = offset + 1;
 
     while (i < current.length) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
 
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
@@ -764,7 +764,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     int i = offset - 1;
 
     while (i > 0) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
 
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
@@ -821,7 +821,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     int i = offset + 1;
 
     while (i < current.length) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
 
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
@@ -935,7 +935,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   void cut() {
     copy();
     if (selection.isCollapsed) {
-      deleteSelectionLines(true);
+      deleteSelectionLines();
     } else {
       deleteSelection();
     }
@@ -1167,10 +1167,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   void _deleteLineForward() {
     if (!selection.isCollapsed) {
       _deleteForward();
+
       return;
     }
     if (selection.extentOffset >= extentLine.length) {
       _deleteForward();
+
       return;
     }
     final CodeLines newCodeLines = CodeLines.from(codeLines);
@@ -1184,10 +1186,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   void _deleteLineBackward() {
     if (!selection.isCollapsed) {
       _deleteBackward();
+
       return;
     }
     if (selection.extentOffset == 0) {
       _deleteBackward();
+
       return;
     }
     final CodeLines newCodeLines = CodeLines.from(codeLines);
@@ -1433,10 +1437,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   void _deleteWordBackward() {
     if (!selection.isCollapsed) {
       _deleteBackward();
+
       return;
     }
     if (selection.extentOffset == 0) {
       _deleteBackward();
+
       return;
     }
     final String current = extentLine.text;
@@ -1452,7 +1458,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
     int i = offset - 1;
     while (i > 0) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
       }
@@ -1483,10 +1489,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   void _deleteWordForward() {
     if (!selection.isCollapsed) {
       _deleteForward();
+
       return;
     }
     if (selection.extentOffset >= extentLine.length) {
       _deleteForward();
+
       return;
     }
     final String current = extentLine.text;
@@ -1505,7 +1513,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     bool isBeforeAlphanumeric = _isAlphanumeric(codeUnit);
     int i = offset + 1;
     while (i < current.length) {
-      bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
+      final bool isCurrentAlphanumeric = _isAlphanumeric(current.codeUnitAt(i));
       if (isBeforeAlphanumeric != isCurrentAlphanumeric) {
         break;
       }
@@ -1875,6 +1883,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       if (match.end <= extentOffset) {
         delta += replacement.length - (match.end - match.start);
       }
+
       return replacement;
     });
     if (preText == newText) {
@@ -1919,6 +1928,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
         ),
       );
     }
+
     return newChildren;
   }
 
@@ -1935,12 +1945,14 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
         ),
       );
     }
+
     return newChildren;
   }
 
   String _applyTextIndent(String text) {
     // Indent the mod count of whitespace
     final int mod = _prefixWhitespaceCount(text) % indent.length;
+
     return ' ' * (mod == 0 ? indent.length : mod) + text;
   }
 
@@ -1951,6 +1963,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     }
     // Outdent the mod count of whitespace
     final int mod = index % indent.length;
+
     return text.substring(mod == 0 ? indent.length : mod);
   }
 
@@ -1977,6 +1990,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
         break;
       }
     }
+
     return index;
   }
 
@@ -1988,6 +2002,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       }
       count++;
     }
+
     return count;
   }
 
@@ -1998,6 +2013,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     if (offset == 0 || offset == text.length) {
       return false;
     }
+
     return _kClosureAndQuates.contains(text.substring(offset - 1, offset + 1));
   }
 
@@ -2055,15 +2071,14 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
 }
 
 class _CodeLineEditingCache {
-  final CodeLineEditingController controller;
-  late _CodeLineEditingCacheNode _node;
-  late bool _markNewRecord;
-
   _CodeLineEditingCache(this.controller) {
     controller.addListener(_onValueChanged);
     _node = _CodeLineEditingCacheNode(controller.value);
     _markNewRecord = false;
   }
+  final CodeLineEditingController controller;
+  late _CodeLineEditingCacheNode _node;
+  late bool _markNewRecord;
 
   bool get canUndo => _node.pre != null;
 
@@ -2106,11 +2121,13 @@ class _CodeLineEditingCache {
     }
     if (!_node.isTail) {
       _appendNewNode();
+
       return;
     }
     if (_markNewRecord) {
       _markNewRecord = false;
       _appendNewNode();
+
       return;
     }
     _node.value = controller.value;
@@ -2130,11 +2147,10 @@ class _CodeLineEditingCache {
 }
 
 class _CodeLineEditingCacheNode {
+  _CodeLineEditingCacheNode(this.value);
   _CodeLineEditingCacheNode? pre;
   _CodeLineEditingCacheNode? next;
   CodeLineEditingValue value;
-
-  _CodeLineEditingCacheNode(this.value);
 
   bool get isRoot => pre == null;
 
@@ -2151,6 +2167,7 @@ extension _StringExtension on String {
         break;
       }
     }
+
     return index;
   }
 
@@ -2159,6 +2176,7 @@ extension _StringExtension on String {
     while (startsWith(indent, index)) {
       index += indent.length;
     }
+
     return index;
   }
 

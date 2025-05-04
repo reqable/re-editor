@@ -1,12 +1,53 @@
 part of 're_editor.dart';
 
-const double _kDefaultTextSize = 13.0;
+const double _kDefaultTextSize = 13;
 const double _kDefaultFontHeight = 1.4;
 const double _kDefaultCaretWidth = 2;
 const EdgeInsetsGeometry _kDefaultPadding = EdgeInsets.all(5);
 const Duration _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 
 class _CodeEditable extends StatefulWidget {
+  const _CodeEditable({
+    required this.editorKey,
+    required this.textStyle,
+    required this.selectionColor,
+    required this.highlightColor,
+    required this.cursorColor,
+    required this.cursorWidth,
+    required this.showCursorWhenReadOnly,
+    required this.padding,
+    required this.margin,
+    required this.sperator,
+    required this.focusNode,
+    required this.controller,
+    required this.inputController,
+    required this.floatingCursorController,
+    required this.codeTheme,
+    required this.readOnly,
+    required this.autofocus,
+    required this.wordWrap,
+    required this.findController,
+    required this.scrollController,
+    required this.chunkController,
+    required this.startHandleLayerLink,
+    required this.endHandleLayerLink,
+    required this.toolbarLayerLink,
+    required this.selectionOverlayController,
+    this.hint,
+    this.indicatorBuilder,
+    this.scrollbarBuilder,
+    this.verticalScrollbarWidth,
+    this.horizontalScrollbarHeight,
+    this.hintTextColor,
+    this.backgroundColor,
+    this.cursorLineColor,
+    this.chunkIndicatorColor,
+    this.border,
+    this.borderRadius,
+    this.clipBehavior = Clip.none,
+    this.onChanged,
+    this.maxLengthSingleLineRendering,
+  });
   final GlobalKey editorKey;
   final String? hint;
   final CodeIndicatorBuilder? indicatorBuilder;
@@ -46,48 +87,6 @@ class _CodeEditable extends StatefulWidget {
   final LayerLink endHandleLayerLink;
   final LayerLink toolbarLayerLink;
   final _SelectionOverlayController selectionOverlayController;
-
-  const _CodeEditable({
-    required this.editorKey,
-    this.hint,
-    this.indicatorBuilder,
-    this.scrollbarBuilder,
-    this.verticalScrollbarWidth,
-    this.horizontalScrollbarHeight,
-    required this.textStyle,
-    this.hintTextColor,
-    this.backgroundColor,
-    required this.selectionColor,
-    required this.highlightColor,
-    required this.cursorColor,
-    this.cursorLineColor,
-    this.chunkIndicatorColor,
-    required this.cursorWidth,
-    required this.showCursorWhenReadOnly,
-    required this.padding,
-    required this.margin,
-    required this.sperator,
-    this.border,
-    this.borderRadius,
-    this.clipBehavior = Clip.none,
-    this.onChanged,
-    required this.focusNode,
-    required this.controller,
-    required this.inputController,
-    required this.floatingCursorController,
-    required this.codeTheme,
-    required this.readOnly,
-    required this.autofocus,
-    required this.wordWrap,
-    this.maxLengthSingleLineRendering,
-    required this.findController,
-    required this.scrollController,
-    required this.chunkController,
-    required this.startHandleLayerLink,
-    required this.endHandleLayerLink,
-    required this.toolbarLayerLink,
-    required this.selectionOverlayController,
-  });
 
   @override
   State<StatefulWidget> createState() => _CodeEditableState();
@@ -213,7 +212,6 @@ class _CodeEditableState extends State<_CodeEditable>
               children: [
                 codeField,
                 IgnorePointer(
-                  ignoring: true,
                   child: Padding(
                     padding: widget.padding,
                     child: Text(
@@ -234,6 +232,7 @@ class _CodeEditableState extends State<_CodeEditable>
           widget.chunkController,
           _codeIndicatorValueNotifier,
         );
+
         return Container(
           decoration: BoxDecoration(
             border: widget.border,
@@ -261,6 +260,7 @@ class _CodeEditableState extends State<_CodeEditable>
       },
       scrollbarBuilder: widget.scrollbarBuilder,
     );
+
     return CodeEditorTapRegion(
       onTapOutside: (_) {
         widget.focusNode.unfocus();
@@ -270,6 +270,7 @@ class _CodeEditableState extends State<_CodeEditable>
           if (notification is ScrollStartNotification) {
             widget.selectionOverlayController.hideToolbar();
           }
+
           return false;
         },
         child: child,
@@ -367,6 +368,7 @@ class _CodeEditableState extends State<_CodeEditable>
     final CodeFindValue? value = widget.findController.value;
     if (value == null) {
       widget.focusNode.requestFocus();
+      
       return;
     }
     if (widget.focusNode.hasFocus) {
@@ -376,6 +378,7 @@ class _CodeEditableState extends State<_CodeEditable>
         widget.findController.currentMatchSelection;
     if (currentMatch == null) {
       widget.controller.selection = const CodeLineSelection.zero();
+
       return;
     }
     widget.controller.selection = currentMatch;
@@ -411,11 +414,13 @@ class _CodeEditableState extends State<_CodeEditable>
     }
     if (!isCodeLineChanged) {
       autocompleteState.dismiss();
+
       return;
     }
     if (widget.controller.isComposing ||
         !widget.controller.selection.isCollapsed) {
       autocompleteState.dismiss();
+
       return;
     }
     final _CodeFieldRender? render =
@@ -423,6 +428,7 @@ class _CodeEditableState extends State<_CodeEditable>
             as _CodeFieldRender?;
     if (render == null) {
       autocompleteState.dismiss();
+
       return;
     }
     final Offset? position = render.calculateTextPositionScreenOffset(
@@ -431,6 +437,7 @@ class _CodeEditableState extends State<_CodeEditable>
     );
     if (position == null) {
       autocompleteState.dismiss();
+
       return;
     }
     autocompleteState.show(
@@ -457,9 +464,8 @@ class _CodeEditableState extends State<_CodeEditable>
 }
 
 class _CodeCursorBlinkController extends ValueNotifier<bool> {
-  Timer? _timer;
-
   _CodeCursorBlinkController() : super(false);
+  Timer? _timer;
 
   void startBlink() {
     if (_timer != null) {

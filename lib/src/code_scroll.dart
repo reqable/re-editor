@@ -8,16 +8,15 @@ typedef CodeScrollbarBuilder =
     );
 
 class CodeScrollController {
-  final ScrollController verticalScroller;
-  final ScrollController horizontalScroller;
-
-  GlobalKey? _editorKey;
-
   CodeScrollController({
     ScrollController? verticalScroller,
     ScrollController? horizontalScroller,
   }) : verticalScroller = verticalScroller ?? ScrollController(),
        horizontalScroller = horizontalScroller ?? ScrollController();
+  final ScrollController verticalScroller;
+  final ScrollController horizontalScroller;
+
+  GlobalKey? _editorKey;
 
   void makeCenterIfInvisible(CodeLinePosition position) {
     _render?.makePositionCenterIfInvisible(position);

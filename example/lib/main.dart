@@ -18,17 +18,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Re-Editor',
       theme: ThemeData(
-        colorScheme: const ColorScheme.light(
-          primary: Color.fromARGB(255, 255, 140, 0),
-        )
-      ),
+          colorScheme: const ColorScheme.light(
+        primary: Color.fromARGB(255, 255, 140, 0),
+      )),
       home: const MyHomePage(title: 'Re-Editor Demo Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({required this.title, super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -46,7 +45,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   static const Map<String, Widget> _editors = {
     'Basic Field': BasicField(),
     'Json Editor': JsonEditor(),
@@ -64,42 +62,36 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-        margin: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _editors.entries.mapIndexed((index, entry) {
-                  return TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _index = index;
-                      });
-                    },
-                    child: Text(
-                      entry.key,
-                      style: TextStyle(
-                        color: _index == index ? null : Colors.black
+          margin: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _editors.entries.mapIndexed((index, entry) {
+                    return TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _index = index;
+                        });
+                      },
+                      child: Text(
+                        entry.key,
+                        style: TextStyle(
+                            color: _index == index ? null : Colors.black),
                       ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey
-                  )
+                    );
+                  }).toList(),
                 ),
+              ),
+              Expanded(
+                  child: DecoratedBox(
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.grey)),
                 child: child,
-              )
-            )
-          ],
-        )
-      ),
+              ))
+            ],
+          )),
     );
   }
 }

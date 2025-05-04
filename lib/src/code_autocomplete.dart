@@ -282,10 +282,10 @@ abstract class DefaultCodeAutocompletePromptsBuilder
 /// ```
 class CodeAutocomplete extends StatelessWidget {
   const CodeAutocomplete({
-    super.key,
     required this.viewBuilder,
     required this.promptsBuilder,
     required this.child,
+    super.key,
   });
 
   final CodeAutocompleteWidgetBuilder viewBuilder;

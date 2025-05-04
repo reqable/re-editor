@@ -1,6 +1,15 @@
 part of 're_editor.dart';
 
 class _CodeSelectionGestureDetector extends StatefulWidget {
+  const _CodeSelectionGestureDetector({
+    required this.controller,
+    required this.inputController,
+    required this.chunkController,
+    required this.editorKey,
+    required this.selectionOverlayController,
+    required this.child,
+    this.behavior,
+  });
   final CodeLineEditingController controller;
   final _CodeInputController inputController;
   final CodeChunkController chunkController;
@@ -8,16 +17,6 @@ class _CodeSelectionGestureDetector extends StatefulWidget {
   final GlobalKey editorKey;
   final _SelectionOverlayController selectionOverlayController;
   final Widget child;
-
-  const _CodeSelectionGestureDetector({
-    required this.controller,
-    required this.inputController,
-    required this.chunkController,
-    this.behavior,
-    required this.editorKey,
-    required this.selectionOverlayController,
-    required this.child,
-  });
 
   @override
   State<StatefulWidget> createState() => _CodeSelectionGestureDetectorState();
@@ -34,7 +33,7 @@ class _CodeSelectionGestureDetectorState
   CodeLineSelection? _anchorSelection;
 
   _CodeFieldRender get render =>
-      widget.editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+      widget.editorKey.currentContext!.findRenderObject()! as _CodeFieldRender;
 
   bool _tapping = false;
 
@@ -239,6 +238,7 @@ class _CodeSelectionGestureDetectorState
       if (widget.controller.selection.baseOffset != -1) {
         if (_isShiftPressed) {
           _extendSelection(position, _SelectionChangedCause.tapDown);
+
           return;
         }
       }
@@ -369,6 +369,7 @@ class _CodeSelectionGestureDetectorState
       if (!widget.controller.selection.isCollapsed &&
           widget.controller.selection.contains(selection)) {
         _handleByNextEvent = true;
+
         return;
       }
     }
@@ -389,12 +390,13 @@ class _CodeSelectionGestureDetectorState
     if (widget.controller.selection == selection) {
       return false;
     }
+
     return widget.controller.selection.contains(selection);
   }
 
   void _autoScrollWhenDragging() {
     final Offset? position = _dragPosition;
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (_dragPosition == null || position == null) {
         return;
       }
@@ -403,7 +405,7 @@ class _CodeSelectionGestureDetectorState
         _extendSelection(_dragPosition!, _SelectionChangedCause.drag);
       }
       _autoScrollWhenDragging();
-    }));
+    });
   }
 
   bool expandChunkIfNeeded(int index) {
@@ -411,6 +413,7 @@ class _CodeSelectionGestureDetectorState
       return false;
     }
     widget.chunkController.expand(index);
+
     return true;
   }
 }
@@ -450,13 +453,12 @@ typedef OnToolbarShow =
 
 class _DesktopSelectionOverlayController
     implements _SelectionOverlayController {
-  final OnToolbarShow onShowToolbar;
-  final VoidCallback onHideToolbar;
-
   const _DesktopSelectionOverlayController({
     required this.onShowToolbar,
     required this.onHideToolbar,
   });
+  final OnToolbarShow onShowToolbar;
+  final VoidCallback onHideToolbar;
 
   @override
   void hideHandle() {}
@@ -486,6 +488,20 @@ class _DesktopSelectionOverlayController
 }
 
 class _MobileSelectionOverlayController implements _SelectionOverlayController {
+  _MobileSelectionOverlayController({
+    required BuildContext context,
+    required this.controller,
+    required this.editorKey,
+    required this.startHandleLayerLink,
+    required this.endHandleLayerLink,
+    required this.toolbarVisibility,
+    required this.focusNode,
+    required this.onShowToolbar,
+    required this.onHideToolbar,
+  }) {
+    _context = context;
+    controller.addListener(_updateTextSelectionHandle);
+  }
   final CodeLineEditingController controller;
   final GlobalKey editorKey;
   final LayerLink startHandleLayerLink;
@@ -527,21 +543,6 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
 
   List<OverlayEntry>? _handles;
   bool? _handleCollapsed;
-
-  _MobileSelectionOverlayController({
-    required BuildContext context,
-    required this.controller,
-    required this.editorKey,
-    required this.startHandleLayerLink,
-    required this.endHandleLayerLink,
-    required this.toolbarVisibility,
-    required this.focusNode,
-    required this.onShowToolbar,
-    required this.onHideToolbar,
-  }) {
-    _context = context;
-    controller.addListener(_updateTextSelectionHandle);
-  }
 
   TextSelectionControls get selectionControls {
     if (kIsAndroid) {
@@ -673,17 +674,19 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     if (render == null) {
       return 0;
     }
+
     return render.lineHeight;
   }
 
   bool get attached {
     final _CodeFieldRender? render =
         editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+
     return render != null && render.attached;
   }
 
   _CodeFieldRender get ensureRender =>
-      editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+      editorKey.currentContext!.findRenderObject()! as _CodeFieldRender;
 
   void _updateTextSelectionHandle() {
     if (!_handlesVisible) {
@@ -747,6 +750,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     if (kIsIOS && type == TextSelectionHandleType.collapsed) {
       type = TextSelectionHandleType.right;
     }
+
     return CodeEditorTapRegion(
       child: ExcludeSemantics(
         child: _SelectionHandleOverlay(
@@ -812,6 +816,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         preferredLineHeight: lineHeight,
       );
     }
+
     return CodeEditorTapRegion(child: ExcludeSemantics(child: handle));
   }
 
@@ -859,6 +864,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         HapticFeedback.selectionClick();
       }
       controller.selection = newSelection;
+
       return;
     }
     if (kIsAndroid) {
@@ -945,6 +951,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         HapticFeedback.selectionClick();
       }
       controller.selection = newSelection;
+
       return;
     }
 
@@ -990,25 +997,25 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   void _autoScrollWhenStartHandleDragging() {
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (!_startHandleDragging) {
         return;
       }
       ensureRender.autoScrollWhenDragging(_startHandleDragLastPosition);
       _handleStartHandleDragUpdate(_startHandleDragLastPosition);
       _autoScrollWhenStartHandleDragging();
-    }));
+    });
   }
 
   void _autoScrollWhenEndHandleDragging() {
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (!_endHandleDragging) {
         return;
       }
       ensureRender.autoScrollWhenDragging(_endHandleDragLastPosition);
       _handleEndHandleDragUpdate(_endHandleDragLastPosition);
       _autoScrollWhenEndHandleDragging();
-    }));
+    });
   }
 
   /// Given a handle position and drag position, returns the position of handle
@@ -1024,12 +1031,14 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     final int linesDragged =
         dragDirection *
         (distanceDragged.abs() / ensureRender.lineHeight).floor();
+
     return handleDy + linesDragged * ensureRender.lineHeight;
   }
 
   Offset _clampPosition(Offset position) {
-    final RenderBox box = _context.findRenderObject() as RenderBox;
+    final RenderBox box = _context.findRenderObject()! as RenderBox;
     final Offset offset = box.globalToLocal(position);
+
     return box.localToGlobal(
       Offset(
         min(max(0, offset.dx), box.size.width),
@@ -1044,14 +1053,14 @@ class _SelectionHandleOverlay extends StatefulWidget {
   const _SelectionHandleOverlay({
     required this.type,
     required this.handleLayerLink,
+    required this.selectionControls,
+    required this.preferredLineHeight,
     this.onSelectionHandleTapped,
     this.onSelectionHandleDragStart,
     this.onSelectionHandleDragUpdate,
     this.onSelectionHandleDragEnd,
     this.onSelectionHandleDragCancel,
-    required this.selectionControls,
     this.visibility,
-    required this.preferredLineHeight,
   });
 
   final LayerLink handleLayerLink;
@@ -1199,10 +1208,9 @@ class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay>
 
 class _MobileSelectionToolbarController
     implements MobileSelectionToolbarController {
+  _MobileSelectionToolbarController({required this.builder});
   final ToolbarMenuBuilder builder;
   OverlayEntry? _entry;
-
-  _MobileSelectionToolbarController({required this.builder});
 
   @override
   void hide(BuildContext context) {
@@ -1215,9 +1223,9 @@ class _MobileSelectionToolbarController
     required BuildContext context,
     required CodeLineEditingController controller,
     required TextSelectionToolbarAnchors anchors,
-    Rect? renderRect,
     required LayerLink layerLink,
     required ValueNotifier<bool> visibility,
+    Rect? renderRect,
   }) {
     hide(context);
     final OverlayState? overlay = Overlay.maybeOf(context, rootOverlay: true);
@@ -1263,10 +1271,10 @@ class _MobileSelectionToolbarController
 // TextSelectionControls.buildToolbar.
 class _SelectionToolbarWrapper extends StatefulWidget {
   const _SelectionToolbarWrapper({
-    this.visibility,
     required this.layerLink,
     required this.offset,
     required this.child,
+    this.visibility,
   });
 
   final Widget child;

@@ -10,6 +10,7 @@ extension _InlineSpanExtension on InlineSpan {
     } else {
       len += toPlainText(includePlaceholders: false).length;
     }
+
     return len;
   }
 }
@@ -27,6 +28,7 @@ extension _TextSpanExtension on TextSpan {
         len += span.length;
       }
     }
+    
     return len;
   }
 }

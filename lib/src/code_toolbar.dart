@@ -14,9 +14,9 @@ abstract class SelectionToolbarController {
     required BuildContext context,
     required CodeLineEditingController controller,
     required TextSelectionToolbarAnchors anchors,
-    Rect? renderRect,
     required LayerLink layerLink,
     required ValueNotifier<bool> visibility,
+    Rect? renderRect,
   });
 
   void hide(BuildContext context);

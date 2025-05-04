@@ -1,10 +1,9 @@
 part of 're_editor.dart';
 
 class _CodeShortcuts extends StatefulWidget {
+  const _CodeShortcuts({required this.builder, required this.child});
   final CodeShortcutsActivatorsBuilder builder;
   final Widget child;
-
-  const _CodeShortcuts({required this.builder, required this.child});
 
   @override
   State<StatefulWidget> createState() => _CodeShortcutsState();
@@ -58,6 +57,15 @@ class _CodeShortcutsState extends State<_CodeShortcuts> {
 }
 
 class _CodeShortcutActions extends StatelessWidget {
+  const _CodeShortcutActions({
+    required this.editingController,
+    required this.inputController,
+    required this.overrideActions,
+    required this.readOnly,
+    required this.child,
+    this.findController,
+    this.commentFormatter,
+  });
   final CodeLineEditingController editingController;
   final _CodeInputController inputController;
   final CodeFindController? findController;
@@ -65,16 +73,6 @@ class _CodeShortcutActions extends StatelessWidget {
   final Map<Type, Action<Intent>>? overrideActions;
   final bool readOnly;
   final Widget child;
-
-  const _CodeShortcutActions({
-    required this.editingController,
-    required this.inputController,
-    this.findController,
-    this.commentFormatter,
-    required this.overrideActions,
-    required this.readOnly,
-    required this.child,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +144,7 @@ class _CodeShortcutActions extends StatelessWidget {
       actions.editingController.redo();
     },
     ShortcutLineDeleteIntent: (intent, actions) {
-      actions.editingController.deleteSelectionLines(true);
+      actions.editingController.deleteSelectionLines();
     },
     ShortcutLineDeleteDirectionIntent: (intent, actions) {
       if ((intent as ShortcutLineDeleteDirectionIntent).forward) {
@@ -290,6 +288,7 @@ class _CodeShortcutActions extends StatelessWidget {
       if (action is CallbackAction) {
         action.invoke(intent);
       }
+
       return null;
     }
     if (intent is CodeShortcutEditableIntent && readOnly) {
@@ -298,7 +297,7 @@ class _CodeShortcutActions extends StatelessWidget {
     if (editingController.isComposing) {
       return null;
     }
-    bool keepAutoCompleteState = intent is CodeShortcutDeleteIntent;
+    final bool keepAutoCompleteState = intent is CodeShortcutDeleteIntent;
     final handler = actions[intent.runtimeType];
     if (handler != null) {
       handler(intent, this);
@@ -308,18 +307,18 @@ class _CodeShortcutActions extends StatelessWidget {
           context.findAncestorStateOfType<_CodeAutocompleteState>();
       autocompleteState?.dismiss();
     }
+
     return intent;
   }
 }
 
 class _CompoDoNothingCallbackAction<T extends Intent>
     extends CallbackAction<T> {
-  final CodeLineEditingController controller;
-
   _CompoDoNothingCallbackAction({
     required this.controller,
     required super.onInvoke,
   });
+  final CodeLineEditingController controller;
 
   @override
   bool consumesKey(T intent) {
@@ -328,14 +327,13 @@ class _CompoDoNothingCallbackAction<T extends Intent>
 }
 
 class _EscCallbackAction<T extends Intent> extends CallbackAction<T> {
-  final CodeLineEditingController controller;
-  final CodeFindController? findController;
-
   _EscCallbackAction({
     required this.controller,
     required this.findController,
     required super.onInvoke,
   });
+  final CodeLineEditingController controller;
+  final CodeFindController? findController;
 
   @override
   bool isEnabled(T intent) {
