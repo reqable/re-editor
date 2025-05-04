@@ -1,7 +1,6 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeLineSegmentQuckLineCount extends CodeLineSegment {
-
   late int _lineCount;
 
   _CodeLineSegmentQuckLineCount({
@@ -31,6 +30,4 @@ class _CodeLineSegmentQuckLineCount extends CodeLineSegment {
     super[index] = value;
     _lineCount = super.lineCount;
   }
-  
 }
-

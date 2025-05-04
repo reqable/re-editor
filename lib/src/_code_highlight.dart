@@ -1,7 +1,6 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
-
   final BuildContext _context;
   final _CodeParagraphProvider _provider;
   final _CodeHighlightEngine _engine;
@@ -14,11 +13,11 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     required CodeLineEditingController controller,
     CodeHighlightTheme? theme,
   }) : _context = context,
-    _provider = _CodeParagraphProvider(),
-    _controller = controller,
-    _theme = theme,
-    _engine = _CodeHighlightEngine(theme),
-    super(const []) {
+       _provider = _CodeParagraphProvider(),
+       _controller = controller,
+       _theme = theme,
+       _engine = _CodeHighlightEngine(theme),
+       super(const []) {
     _controller.addListener(_onCodesChanged);
     _processHighlight();
   }
@@ -50,12 +49,15 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   }) {
     _provider.updateBaseStyle(style);
     _provider.updateMaxLengthSingleLineRendering(maxLengthSingleLineRendering);
-    return _provider.build(_controller.buildTextSpan(
-      context: _context,
-      index: index,
-      textSpan: _buildSpan(index, style),
-      style: style
-    ), maxWidth);
+    return _provider.build(
+      _controller.buildTextSpan(
+        context: _context,
+        index: index,
+        textSpan: _buildSpan(index, style),
+        style: style,
+      ),
+      maxWidth,
+    );
   }
 
   @override
@@ -68,17 +70,11 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   TextSpan _buildSpan(int index, TextStyle style) {
     final String text = _controller.codeLines[index].text;
     if (index >= value.length) {
-      return TextSpan(
-        text: text,
-        style: style
-      );
+      return TextSpan(text: text, style: style);
     }
     final _HighlightResult result = value[index];
     if (result.nodes.isEmpty) {
-      return TextSpan(
-        text: text,
-        style: style
-      );
+      return TextSpan(text: text, style: style);
     }
     if (result.source == text) {
       return _buildSpanFromNodes(result.nodes, style);
@@ -108,29 +104,42 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     }
     final _HighlightNode? midNode;
     if (startNodes.isEmpty) {
-      midNode = _HighlightNode(text.substring(start, end), result.nodes[0].className);
+      midNode = _HighlightNode(
+        text.substring(start, end),
+        result.nodes[0].className,
+      );
     } else if (startNodes.length < result.nodes.length) {
-      midNode = _HighlightNode(text.substring(start, end), result.nodes[startNodes.length].className);
-    } else if (end > start){
-      midNode = _HighlightNode(text.substring(start, end), result.nodes.last.className);
+      midNode = _HighlightNode(
+        text.substring(start, end),
+        result.nodes[startNodes.length].className,
+      );
+    } else if (end > start) {
+      midNode = _HighlightNode(
+        text.substring(start, end),
+        result.nodes.last.className,
+      );
     } else {
       midNode = null;
     }
     return _buildSpanFromNodes([
       ...startNodes,
-      if (midNode != null)
-        midNode,
-      ...endNodes
+      if (midNode != null) midNode,
+      ...endNodes,
     ], style);
   }
 
-  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle baseStyle) {
+  TextSpan _buildSpanFromNodes(
+    List<_HighlightNode> nodes,
+    TextStyle baseStyle,
+  ) {
     return TextSpan(
-      children: nodes.map((e) => TextSpan(
-          text: e.value,
-          style: _findStyle(e.className)
-        )).toList(),
-      style: baseStyle
+      children:
+          nodes
+              .map(
+                (e) => TextSpan(text: e.value, style: _findStyle(e.className)),
+              )
+              .toList(),
+      style: baseStyle,
     );
   }
 
@@ -138,7 +147,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     if (className == null) {
       return null;
     }
-    while(true) {
+    while (true) {
       final TextStyle? style = _theme?.theme[className];
       if (style != null) {
         return style;
@@ -165,11 +174,9 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   void _processHighlight() {
     _engine.run(_controller.codeLines, (result) => value = result);
   }
-
 }
 
 class _CodeHighlightEngine {
-
   late final _IsolateTasker<_HighlightPayload, List<_HighlightResult>> _tasker;
 
   Highlight? _highlight;
@@ -177,7 +184,10 @@ class _CodeHighlightEngine {
 
   _CodeHighlightEngine(final CodeHighlightTheme? theme) {
     this.theme = theme;
-    _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>('CodeHighlightEngine', _run);
+    _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>(
+      'CodeHighlightEngine',
+      _run,
+    );
   }
 
   set theme(CodeHighlightTheme? value) {
@@ -190,7 +200,9 @@ class _CodeHighlightEngine {
       _highlight = null;
     } else {
       final Highlight highlight = Highlight();
-      highlight.registerLanguages(modes.map((key, value) => MapEntry(key, value.mode)));
+      highlight.registerLanguages(
+        modes.map((key, value) => MapEntry(key, value.mode)),
+      );
       for (final HLPlugin plugin in _theme!.plugins) {
         highlight.addPlugin(plugin);
       }
@@ -213,13 +225,16 @@ class _CodeHighlightEngine {
       callback(const []);
       return;
     }
-    _tasker.run(_HighlightPayload(
-      highlight: highlight,
-      codes: codes,
-      languages: modes.keys.toList(),
-      maxSizes: modes.values.map((e) => e.maxSize).toList(),
-      maxLineLengths: modes.values.map((e) => e.maxLineLength).toList(),
-    ), callback);
+    _tasker.run(
+      _HighlightPayload(
+        highlight: highlight,
+        codes: codes,
+        languages: modes.keys.toList(),
+        maxSizes: modes.values.map((e) => e.maxSize).toList(),
+        maxLineLengths: modes.values.map((e) => e.maxLineLength).toList(),
+      ),
+      callback,
+    );
   }
 
   @pragma('vm:entry-point')
@@ -243,7 +258,10 @@ class _CodeHighlightEngine {
     if (!canHighlight) {
       result = payload.highlight.justTextHighlightResult(code);
     } else if (payload.languages.length == 1) {
-      result = payload.highlight.highlight(code: code, language: payload.languages.first);
+      result = payload.highlight.highlight(
+        code: code,
+        language: payload.languages.first,
+      );
     } else {
       result = payload.highlight.highlightAuto(code, payload.languages);
     }
@@ -251,11 +269,9 @@ class _CodeHighlightEngine {
     result.render(renderer);
     return renderer.lineResults;
   }
-
 }
 
 class _HighlightPayload {
-
   final Highlight highlight;
   final CodeLines codes;
   final List<String> languages;
@@ -269,7 +285,6 @@ class _HighlightPayload {
     required this.maxSizes,
     required this.maxLineLengths,
   });
-
 }
 
 class _HighlightResult {
@@ -281,7 +296,6 @@ class _HighlightResult {
 }
 
 class _HighlightNode {
-
   final String? className;
   final String value;
 
@@ -289,12 +303,11 @@ class _HighlightNode {
 }
 
 class _HighlightLineRenderer implements HighlightRenderer {
-
   final List<_HighlightResult> lineResults;
   final List<String?> classNames;
-  _HighlightLineRenderer(): lineResults = [
-    _HighlightResult([])
-  ], classNames = [];
+  _HighlightLineRenderer()
+    : lineResults = [_HighlightResult([])],
+      classNames = [];
 
   @override
   void addText(String text) {
@@ -303,7 +316,9 @@ class _HighlightLineRenderer implements HighlightRenderer {
     lineResults.last.nodes.add(_HighlightNode(lines.first, className));
     if (lines.length > 1) {
       for (int i = 1; i < lines.length; i++) {
-        lineResults.add(_HighlightResult([_HighlightNode(lines[i], className)]));
+        lineResults.add(
+          _HighlightResult([_HighlightNode(lines[i], className)]),
+        );
       }
     }
   }
@@ -321,13 +336,10 @@ class _HighlightLineRenderer implements HighlightRenderer {
     classNames.add(newClassName);
   }
 
-
   @override
   void closeNode(DataNode node) {
     if (classNames.isNotEmpty) {
       classNames.removeLast();
     }
   }
-
 }
-

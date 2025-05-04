@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeShortcuts extends StatefulWidget {
   final CodeShortcutsActivatorsBuilder builder;
@@ -102,25 +102,33 @@ class _CodeShortcutActions extends StatelessWidget {
         },
       );
     }
-    return Actions(actions: {
-      ...actions,
-      ...{
-        DoNothingAndStopPropagationTextIntent:
-            DoNothingAction(consumesKey: false),
+    return Actions(
+      actions: {
+        ...actions,
+        ...{
+          DoNothingAndStopPropagationTextIntent: DoNothingAction(
+            consumesKey: false,
+          ),
+        },
+        if (overrideActions != null) ...overrideActions!,
       },
-      if (overrideActions != null) ...overrideActions!
-    }, child: child);
+      child: child,
+    );
   }
 
-  static final Map<Type,
-      void Function(Intent intent, _CodeShortcutActions actions)> actions = {
+  static final Map<
+    Type,
+    void Function(Intent intent, _CodeShortcutActions actions)
+  >
+  actions = {
     CodeShortcutSelectAllIntent: (intent, actions) {
       actions.editingController.selectAll();
     },
     CodeShortcutLineSelectIntent: (intent, actions) {
       actions.editingController.selectLines(
-          actions.editingController.selection.baseIndex,
-          actions.editingController.selection.extentIndex);
+        actions.editingController.selection.baseIndex,
+        actions.editingController.selection.extentIndex,
+      );
     },
     CodeShortcutCutIntent: (intent, actions) {
       actions.editingController.cut();
@@ -163,9 +171,10 @@ class _CodeShortcutActions extends StatelessWidget {
     },
     CodeShortcutCommentIntent: (intent, actions) {
       final CodeLineEditingValue? value = actions.commentFormatter?.format(
-          actions.editingController.value,
-          actions.editingController.options.indent,
-          (intent as CodeShortcutCommentIntent).single);
+        actions.editingController.value,
+        actions.editingController.options.indent,
+        (intent as CodeShortcutCommentIntent).single,
+      );
       if (value != null) {
         actions.editingController.runRevocableOp(() {
           actions.editingController.value = value;
@@ -173,8 +182,9 @@ class _CodeShortcutActions extends StatelessWidget {
       }
     },
     CodeShortcutCursorMoveIntent: (intent, actions) {
-      actions.editingController
-          .moveCursor((intent as CodeShortcutCursorMoveIntent).direction);
+      actions.editingController.moveCursor(
+        (intent as CodeShortcutCursorMoveIntent).direction,
+      );
     },
     CodeShortcutCursorMoveLineEdgeIntent: (intent, actions) {
       if ((intent as CodeShortcutCursorMoveLineEdgeIntent).forward) {
@@ -206,7 +216,8 @@ class _CodeShortcutActions extends StatelessWidget {
     },
     CodeShortcutSelectionExtendIntent: (intent, actions) {
       actions.editingController.extendSelection(
-          (intent as CodeShortcutSelectionExtendIntent).direction);
+        (intent as CodeShortcutSelectionExtendIntent).direction,
+      );
     },
     CodeShortcutSelectionExtendLineEdgeIntent: (intent, actions) {
       if ((intent as CodeShortcutSelectionExtendLineEdgeIntent).forward) {
@@ -268,7 +279,7 @@ class _CodeShortcutActions extends StatelessWidget {
       } else {
         actions.editingController.cancelSelection();
       }
-    }
+    },
   };
 
   Object? _onAction(BuildContext context, Intent intent) {

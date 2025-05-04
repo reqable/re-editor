@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 typedef IsolateRunnable<Req, Res> = Res Function(Req req);
 typedef IsolateCallback<Res> = void Function(Res res);
@@ -21,13 +21,16 @@ class _IsolateTasker<Req, Res> {
     if (_closed) {
       return;
     }
-    _isolateManager?.compute(req, callback: (message) async {
-      if (_closed) {
-        return false;
-      }
-      callback(message);
-      return true;
-    });
+    _isolateManager?.compute(
+      req,
+      callback: (message) async {
+        if (_closed) {
+          return false;
+        }
+        callback(message);
+        return true;
+      },
+    );
   }
 
   void close() {
