@@ -32,7 +32,7 @@ class _CodeInputController extends ChangeNotifier
 
   GlobalKey? _editorKey;
 
-  void bindEditor(GlobalKey key) {
+  set bindEditor(GlobalKey key) {
     _editorKey = key;
   }
 
@@ -690,11 +690,12 @@ class _SmartTextEditingDelta {
       return true;
     }
     if (rightSymbolCount == 0) {
-      return leftSymbolCount % 2 == 0;
+      return leftSymbolCount.isEven;
     }
     if (leftSymbolCount == 0) {
-      return rightSymbolCount % 2 == 0;
+      return rightSymbolCount.isEven;
     }
+
     return leftSymbolCount % 2 == rightSymbolCount % 2;
   }
 }

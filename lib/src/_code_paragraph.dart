@@ -29,6 +29,7 @@ class _ParagraphImpl extends IParagraph {
     if (index < 0 || index >= length) {
       return null;
     }
+
     return text.codeUnitAt(index);
   }
 
@@ -57,9 +58,7 @@ class _ParagraphImpl extends IParagraph {
 
   @override
   TextPosition getPosition(Offset offset) {
-    final TextPosition position = paragraph.getPositionForOffset(offset);
-
-    return position;
+    return paragraph.getPositionForOffset(offset);
   }
 
   @override
@@ -118,6 +117,7 @@ class _ParagraphImpl extends IParagraph {
           _getOffsetDownstream(position.offset);
     }
     (_offsets ??= {})[position] = offset;
+
     return offset;
   }
 
@@ -297,6 +297,7 @@ class _CodeParagraphProvider {
           text = text.substring(0, remainingLength);
         }
         currentLength += text.length;
+
         return TextSpan(text: text, style: span.style);
       }
       final List<InlineSpan> children = [];

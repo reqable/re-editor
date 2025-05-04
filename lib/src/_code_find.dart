@@ -311,6 +311,7 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
       // This match is in a collapsed chunk, invisble
       return null;
     }
+
     return match.copyWith(
       baseIndex: baseIndex.index,
       extentIndex: extentIndex.index,
@@ -349,12 +350,14 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?>
     final CodeFindOption? option = value?.option;
     if (option == null || option.pattern.isEmpty) {
       value = value?.copyWith(result: null, searching: false);
+
       return;
     }
     final bool optionChanged = value?.result?.option != option;
     if (!optionChanged &&
         _controller.codeLines.equals(value?.result?.codeLines)) {
       value = value?.copyWith(result: value?.result, searching: false);
+
       return;
     }
     _tasker.run(

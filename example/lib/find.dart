@@ -66,7 +66,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     if (controller.value == null) {
-      return const SizedBox(width: 0, height: 0);
+      return const SizedBox.shrink();
     }
     return Container(
         margin: margin,

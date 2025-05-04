@@ -42,7 +42,7 @@ class _CodeSelectionGestureDetectorState
     if (_isMobile) {
       return GestureDetector(
         onLongPressMoveUpdate: (details) {
-          if (_longPressOnSelection == true) {
+          if (_longPressOnSelection) {
             return;
           }
           if (details.localOffsetFromOrigin.distance < 1) {

@@ -48,6 +48,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   }) {
     _provider.updateBaseStyle(style);
     _provider.updateMaxLengthSingleLineRendering(maxLengthSingleLineRendering);
+
     return _provider.build(
       _controller.buildTextSpan(
         context: _context,
@@ -105,7 +106,8 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     if (startNodes.isEmpty) {
       midNode = _HighlightNode(
         text.substring(start, end),
-        result.nodes[0].className,
+
+        result.nodes.first.className,
       );
     } else if (startNodes.length < result.nodes.length) {
       midNode = _HighlightNode(
@@ -120,6 +122,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     } else {
       midNode = null;
     }
+
     return _buildSpanFromNodes([
       ...startNodes,
       if (midNode != null) midNode,
@@ -331,7 +334,7 @@ class _HighlightLineRenderer implements HighlightRenderer {
     } else {
       newClassName = '$className-${node.scope!}';
     }
-    newClassName = newClassName?.split('.')[0];
+    newClassName = newClassName?.split('.').first;
     classNames.add(newClassName);
   }
 

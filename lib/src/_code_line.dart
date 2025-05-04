@@ -133,6 +133,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
         }
       }
     }
+
     return sb.toString();
   }
 
@@ -631,7 +632,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
             final Characters characters =
                 extentLine.substring(selection.extentOffset).characters;
             index = selection.extentIndex;
-            offset = selection.extentOffset + characters.elementAt(0).length;
+            offset = selection.extentOffset + characters.first.length;
           }
           selection = selection.copyWith(
             extentIndex: index,
@@ -2047,6 +2048,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     if (backwardUnitCode == null) {
       return false;
     }
+
     return _kClosures.contains(
       String.fromCharCodes([forwardUnitCode, backwardUnitCode]),
     );
@@ -2117,6 +2119,7 @@ class _CodeLineEditingCache {
     }
     if (_node.isInitial) {
       _appendNewNode();
+
       return;
     }
     if (!_node.isTail) {
