@@ -11,10 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   re_highlight: ^0.0.3
-  isolate_manager: ^4.1.5+1
+  isolate_manager: ^6.0.0+2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.1
-  path: ^1.8.2
+  flutter_lints: ^5.0.0
+  path: ^1.9.1
