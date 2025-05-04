@@ -4,12 +4,10 @@ import 'package:re_editor/re_editor.dart';
 class ContextMenuItemWidget extends PopupMenuItem<void> implements PreferredSizeWidget {
 
   ContextMenuItemWidget({
-    Key? key,
+    super.key,
     required String text,
-    required VoidCallback onTap,
+    required VoidCallback super.onTap,
   }) : super(
-    key: key,
-    onTap: onTap,
     child: Text(text)
   );
 

@@ -81,18 +81,14 @@ class _RawScrollbar extends RawScrollbar {
 
   const _RawScrollbar({
     required this.physics,
-    required Widget child,
-    required ScrollController controller,
-    ScrollbarOrientation? scrollbarOrientation,
-    required bool thumbVisibility,
+    required super.child,
+    required ScrollController super.controller,
+    super.scrollbarOrientation,
+    required bool super.thumbVisibility,
   }) : super(
-    controller: controller,
-    scrollbarOrientation: scrollbarOrientation,
-    thumbVisibility: thumbVisibility,
     thickness: _kScrollbarThickness,
     radius: const Radius.circular(10),
     crossAxisMargin: 2,
-    child: child,
   );
 
   @override
