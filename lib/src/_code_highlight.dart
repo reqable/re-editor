@@ -149,17 +149,20 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     if (className == null) {
       return null;
     }
+
+    var name = className;
+
     while (true) {
-      final TextStyle? style = _theme?.theme[className];
+      final TextStyle? style = _theme?.theme[name];
       if (style != null) {
         return style;
       }
-      final int pieceIndex = className!.indexOf('-');
+      final int pieceIndex = name.indexOf('-');
       if (pieceIndex < 0) {
         break;
       }
-      className = className.substring(pieceIndex + 1);
-      if (className.isEmpty) {
+      name = name.substring(pieceIndex + 1);
+      if (name.isEmpty) {
         break;
       }
     }
@@ -205,9 +208,8 @@ class _CodeHighlightEngine {
       highlight.registerLanguages(
         modes.map((key, value) => MapEntry(key, value.mode)),
       );
-      for (final HLPlugin plugin in _theme!.plugins) {
-        highlight.addPlugin(plugin);
-      }
+      _theme!.plugins.forEach(highlight.addPlugin);
+
       _highlight = highlight;
     }
   }

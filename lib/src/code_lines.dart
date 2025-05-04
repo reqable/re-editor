@@ -302,14 +302,17 @@ class CodeLines {
     if (lineIndex < 0) {
       return const CodeLineIndex(-1, -1);
     }
+
+    int lIndex = lineIndex;
+
     // Find the segment first
     int segmentIndex = -1;
     int lineCount = 0;
     for (int i = 0, start = 0; i < segments.length; i++) {
       final int end = start + segments[i].lineCount;
-      if (lineIndex >= start && lineIndex < end) {
+      if (lIndex >= start && lIndex < end) {
         segmentIndex = i;
-        lineIndex -= start;
+        lIndex -= start;
         break;
       }
       start = end;
@@ -324,7 +327,7 @@ class CodeLines {
     int start = 0;
     for (int i = 0; i < codeLines.length; i++) {
       final int end = start + codeLines[i].lineCount;
-      if (lineIndex >= start && lineIndex < end) {
+      if (lIndex >= start && lIndex < end) {
         index = i;
         start++;
         break;
@@ -339,7 +342,7 @@ class CodeLines {
     final List<CodeLine> chunks = codeLines[index].chunks;
     for (int i = 0; i < chunks.length; i++) {
       final int end = start + chunks[i].lineCount;
-      if (lineIndex >= start && lineIndex < end) {
+      if (lIndex >= start && lIndex < end) {
         chunkIndex = i;
         break;
       }

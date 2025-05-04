@@ -26,7 +26,7 @@ class CodeScrollController {
     _render?.makePositionVisible(position);
   }
 
-  void bindEditor(GlobalKey key) {
+  set bindEditor(GlobalKey key) {
     _editorKey = key;
   }
 

@@ -640,7 +640,7 @@ void main() {
           controller.selection,
           const CodeLineSelection.collapsed(index: 1, offset: 4),
         );
-        expect(controller.composing, const TextRange(start: -1, end: -1));
+        expect(controller.composing, TextRange.empty);
         // Edit line index 2
         controller.selection = const CodeLineSelection.collapsed(
           index: 2,

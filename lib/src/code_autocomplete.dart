@@ -39,6 +39,7 @@ class CodeKeywordPrompt extends CodePrompt {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeKeywordPrompt && other.word == word;
   }
 
@@ -77,6 +78,7 @@ class CodeFieldPrompt extends CodePrompt {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeFieldPrompt &&
         other.word == word &&
         other.type == type &&
@@ -124,6 +126,7 @@ class CodeFunctionPrompt extends CodePrompt {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeFunctionPrompt &&
         other.word == word &&
         other.type == type &&
@@ -207,6 +210,7 @@ class CodeAutocompleteEditingValue {
       baseOffset: result.selection.baseOffset - input.length,
       extentOffset: result.selection.extentOffset - input.length,
     );
+
     return CodeAutocompleteResult(
       input: input,
       word: result.word,

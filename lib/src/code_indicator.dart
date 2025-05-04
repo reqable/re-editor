@@ -144,7 +144,7 @@ class DefaultCodeChunkIndicator extends LeafRenderObjectWidget {
   Color? _useCodeTextColor(BuildContext context) {
     final _CodeEditable? editor =
         context.findAncestorWidgetOfExactType<_CodeEditable>();
-    assert(editor != null);
+    assert(editor != null, 'editor is null');
 
     return editor!.textStyle.color?.withAlpha(128);
   }

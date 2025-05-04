@@ -29,6 +29,7 @@ class _MouseTrackerAnnotationTextSpan extends TextSpan {
     if (identical(this, other)) {
       return true;
     }
+
     return other is _MouseTrackerAnnotationTextSpan &&
         span == other.span &&
         id == other.id;

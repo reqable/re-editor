@@ -10,15 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  re_highlight: ^0.0.3
   isolate_manager: ^6.0.0+2
+  re_highlight: ^0.0.3
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
   dart_code_metrics:
     git: https://github.com/JonasWanke/dart-code-metrics
   dfc_lints:
     git: https://github.com/sgehrman/dfc_lints
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
   path: ^1.9.1

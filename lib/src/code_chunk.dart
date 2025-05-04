@@ -311,6 +311,7 @@ class DefaultCodeChunkAnalyzer implements CodeChunkAnalyzer {
         }
       }
     }
+
     return symbols;
   }
 

@@ -360,6 +360,12 @@ _kDefaultMacCodeShortcutsActivators = {
     SingleActivator(LogicalKeyboardKey.arrowUp, meta: true),
     SingleActivator(LogicalKeyboardKey.home, control: true),
   ],
+  CodeShortcutType.cursorMovePageUp: [
+    SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
+  ],
+  CodeShortcutType.cursorMovePageDown: [
+    SingleActivator(LogicalKeyboardKey.arrowDown, control: true),
+  ],
   CodeShortcutType.cursorMovePageEnd: [
     SingleActivator(LogicalKeyboardKey.arrowDown, meta: true),
     SingleActivator(LogicalKeyboardKey.end, control: true),
@@ -514,6 +520,12 @@ _kDefaultCommonCodeShortcutsActivators = {
   CodeShortcutType.cursorMovePageStart: [
     SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
     SingleActivator(LogicalKeyboardKey.home, control: true),
+  ],
+  CodeShortcutType.cursorMovePageUp: [
+    SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
+  ],
+  CodeShortcutType.cursorMovePageDown: [
+    SingleActivator(LogicalKeyboardKey.arrowDown, control: true),
   ],
   CodeShortcutType.cursorMovePageEnd: [
     SingleActivator(LogicalKeyboardKey.arrowDown, control: true),

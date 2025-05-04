@@ -17,9 +17,18 @@ class CodeEditorStyle {
     this.cursorLineColor,
     this.chunkIndicatorColor,
     this.codeTheme,
-  }) : assert(fontSize == null || fontSize > 0),
-       assert(fontHeight == null || fontHeight >= 1.0),
-       assert(cursorWidth == null || cursorWidth > 0);
+  }) : assert(
+         fontSize == null || fontSize > 0,
+         'fontSize must be greater than 0',
+       ),
+       assert(
+         fontHeight == null || fontHeight >= 1.0,
+         'fontHeight must be greater than or equal to 1.0',
+       ),
+       assert(
+         cursorWidth == null || cursorWidth > 0,
+         'cursorWidth must be greater than 0',
+       );
 
   /// The size of fonts (in logical pixels) to use when painting the text.
   ///
@@ -187,6 +196,7 @@ class CodeEditor extends StatefulWidget {
   }) : assert(
          indicatorBuilder != null ||
              (indicatorBuilder == null && sperator == null),
+         'indicatorBuilder and sperator cannot be both null',
        );
 
   /// Similar to [TextField], editor uses [CodeLineEditingController] as the content controller.
@@ -351,13 +361,13 @@ class _CodeEditorState extends State<CodeEditor> {
       readOnly: widget.readOnly ?? false,
       autocompleteSymbols: widget.autocompleteSymbols ?? true,
     );
-    _inputController.bindEditor(_editorKey);
+    _inputController.bindEditor = _editorKey;
 
     _findController =
         widget.findController ?? CodeFindController(_editingController);
     _findController.addListener(_updateWidget);
     _scrollController = widget.scrollController ?? CodeScrollController();
-    _scrollController.bindEditor(_editorKey);
+    _scrollController.bindEditor = _editorKey;
     _chunkController = CodeChunkController(
       _editingController,
       widget.chunkAnalyzer ?? const DefaultCodeChunkAnalyzer(),
@@ -458,7 +468,7 @@ class _CodeEditorState extends State<CodeEditor> {
         _scrollController.dispose();
       }
       _scrollController = widget.scrollController ?? CodeScrollController();
-      _scrollController.bindEditor(_editorKey);
+      _scrollController.bindEditor = _editorKey;
     }
     if (oldWidget.chunkAnalyzer != widget.chunkAnalyzer ||
         oldWidget.controller != widget.controller) {
@@ -564,12 +574,12 @@ class _CodeEditorState extends State<CodeEditor> {
       child = Focus(
         autofocus: autofocus,
         focusNode: _focusNode,
-        onKey: (node, event) {
-          if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
+        onKeyEvent: (node, KeyEvent event) {
+          if (event.logicalKey == LogicalKeyboardKey.backspace) {
             _editingController.deleteBackward();
 
             return KeyEventResult.handled;
-          } else if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+          } else if (event.logicalKey == LogicalKeyboardKey.enter) {
             _editingController.applyNewLine();
 
             return KeyEventResult.handled;

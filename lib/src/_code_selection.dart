@@ -57,7 +57,7 @@ class _CodeSelectionGestureDetectorState
           _longPressOnSelection = _isPositionOnSelection(
             details.globalPosition,
           );
-          if (_longPressOnSelection != true) {
+          if (!_longPressOnSelection) {
             _onMobileLongPressedStart(details.globalPosition);
             _autoScrollWhenDragging();
           } else {
@@ -69,7 +69,7 @@ class _CodeSelectionGestureDetectorState
           widget.selectionOverlayController.showHandle(context);
         },
         onLongPressEnd: (details) {
-          if (_longPressOnSelection != true) {
+          if (!_longPressOnSelection) {
             widget.selectionOverlayController.showToolbar(
               context,
               details.globalPosition,
@@ -568,7 +568,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     _handlesVisible = false;
     _handleCollapsed = null;
     if (_handles != null) {
-      _handles![0].remove();
+      _handles!.first.remove();
       _handles![1].remove();
       _handles = null;
     }
@@ -717,7 +717,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     }
     _handleCollapsed = isCollapsed;
     if (_handles != null) {
-      _handles![0].remove();
+      _handles!.first.remove();
       _handles![1].remove();
       _handles = null;
     }

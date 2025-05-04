@@ -222,8 +222,8 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
       },
     );
     Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
-    _navigateAction.setEnabled(true);
-    _selectAction.setEnabled(true);
+    _navigateAction.setEnabled = true;
+    _selectAction.setEnabled = true;
   }
 
   void dismiss() {
@@ -231,8 +231,8 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
     _onAutocomplete = null;
     _overlayEntry?.remove();
     _overlayEntry = null;
-    _navigateAction.setEnabled(false);
-    _selectAction.setEnabled(false);
+    _navigateAction.setEnabled = false;
+    _selectAction.setEnabled = false;
   }
 
   Widget _buildWidget(
@@ -284,7 +284,7 @@ class _CodeAutocompleteAction<T extends Intent> extends CallbackAction<T> {
   _CodeAutocompleteAction({required super.onInvoke});
   bool _isEnabled = false;
 
-  void setEnabled(bool enabled) {
+  set setEnabled(bool enabled) {
     _isEnabled = enabled;
   }
 

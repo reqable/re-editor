@@ -100,6 +100,7 @@ class _CodeShortcutActions extends StatelessWidget {
         },
       );
     }
+
     return Actions(
       actions: {
         ...actions,
@@ -280,7 +281,7 @@ class _CodeShortcutActions extends StatelessWidget {
     },
   };
 
-  Object? _onAction(BuildContext context, Intent intent) {
+  Intent? _onAction(BuildContext context, Intent intent) {
     final Action<Intent>? action = Actions.maybeFind(context, intent: intent);
     if (action != null &&
         action.isActionEnabled &&

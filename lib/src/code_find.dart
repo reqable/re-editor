@@ -48,6 +48,7 @@ class CodeFindValue {
     if (identical(this, other)) {
       return true;
     }
+
     return other is CodeFindValue &&
         other.option == option &&
         other.replaceMode == replaceMode &&

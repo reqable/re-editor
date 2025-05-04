@@ -17,13 +17,14 @@ class _IsolateTasker<Req, Res> {
     if (_closed) {
       return;
     }
-    _isolateManager?.compute(
+    await _isolateManager?.compute(
       req,
-      callback: (message) async {
+      callback: (message) {
         if (_closed) {
           return false;
         }
         callback(message);
+
         return true;
       },
     );

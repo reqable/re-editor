@@ -253,7 +253,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     }
     if (_preEditLineIndex != selection.extentIndex) {
       _preEditLineIndex = selection.extentIndex;
-      _cache.markNewRecord(true);
+      _cache.markNewRecord = true;
     }
     value = value.copyWith(
       codeLines: newCodeLines,
@@ -263,7 +263,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       ),
       composing: newComposing,
     );
-    _cache.markNewRecord(false);
+    _cache.markNewRecord = false;
     makeCursorCenterIfInvisible();
   }
 
@@ -477,12 +477,12 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
 
   @override
   void moveCursorToPageUp() {
-    // TODO
+    // TODO(XXX): Implement this
   }
 
   @override
   void moveCursorToPageDown() {
-    // TODO
+    // TODO(XXX): Implement this
   }
 
   @override
@@ -943,14 +943,15 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   }
 
   @override
-  void paste() {
-    Clipboard.getData(Clipboard.kTextPlain).then((data) {
-      final String? text = data?.text;
-      if (text == null || text.isEmpty) {
-        return;
-      }
-      replaceSelection(text);
-    });
+  Future<void> paste() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+
+    final String? text = data?.text;
+    if (text == null || text.isEmpty) {
+      return;
+    }
+
+    replaceSelection(text);
   }
 
   @override
@@ -1104,9 +1105,9 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
 
   @override
   void runRevocableOp(VoidCallback op) {
-    _cache.markNewRecord(true);
+    _cache.markNewRecord = true;
     op();
-    _cache.markNewRecord(false);
+    _cache.markNewRecord = false;
   }
 
   @override
@@ -2109,7 +2110,7 @@ class _CodeLineEditingCache {
     controller.removeListener(_onValueChanged);
   }
 
-  void markNewRecord(bool flag) {
+  set markNewRecord(bool flag) {
     _markNewRecord = flag;
   }
 
@@ -2195,9 +2196,8 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   CodeLineEditingController get delegate => _delegate;
 
   set delegate(CodeLineEditingController value) {
-    for (final listener in _listeners) {
-      value.addListener(listener);
-    }
+    _listeners.forEach(value.addListener);
+
     _delegate = value;
     notifyListeners();
   }
