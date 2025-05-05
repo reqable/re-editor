@@ -368,7 +368,7 @@ class _CodeEditableState extends State<_CodeEditable>
     final CodeFindValue? value = widget.findController.value;
     if (value == null) {
       widget.focusNode.requestFocus();
-      
+
       return;
     }
     if (widget.focusNode.hasFocus) {
@@ -468,18 +468,18 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
   Timer? _timer;
 
   void startBlink() {
-    if (_timer != null) {
-      _timer!.cancel();
-    }
-    _timer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-    if (kIsAndroid || kIsIOS) {
-      // Wait selection position to update
-      Future.delayed(const Duration(milliseconds: 100), () {
-        value = true;
-      });
-    } else {
-      value = true;
-    }
+    // if (_timer != null) {
+    //   _timer!.cancel();
+    // }
+    // _timer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
+    // if (kIsAndroid || kIsIOS) {
+    //   // Wait selection position to update
+    //   Future.delayed(const Duration(milliseconds: 100), () {
+    //     value = true;
+    //   });
+    // } else {
+    //   value = true;
+    // }
   }
 
   void stopBlink() {
