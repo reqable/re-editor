@@ -581,7 +581,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
 
   @override
   void showToolbar(BuildContext context, Offset globalPosition) {
-    globalPosition = _clampPosition(globalPosition);
+    final Offset gPosition = _clampPosition(globalPosition);
     final Rect editingRegion = Rect.fromPoints(
       ensureRender.localToGlobal(Offset.zero),
       ensureRender.localToGlobal(ensureRender.size.bottomRight(Offset.zero)),
@@ -595,7 +595,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
               selection.start,
               false,
             ) ??
-            globalPosition,
+            gPosition,
       );
     } else {
       Offset startPosition =
@@ -615,11 +615,10 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
       }
       if (startPosition.dy <= editingRegion.top + lineHeight &&
           endPosition.dy >= editingRegion.bottom - lineHeight) {
-        anchors = TextSelectionToolbarAnchors(primaryAnchor: globalPosition);
+        anchors = TextSelectionToolbarAnchors(primaryAnchor: gPosition);
       } else {
-        final double distanceToStart =
-            (globalPosition - startPosition).distance;
-        final double distanceToEnd = (globalPosition - endPosition).distance;
+        final double distanceToStart = (gPosition - startPosition).distance;
+        final double distanceToEnd = (gPosition - endPosition).distance;
         if (distanceToStart < distanceToEnd) {
           anchors = TextSelectionToolbarAnchors(
             primaryAnchor: startPosition,
