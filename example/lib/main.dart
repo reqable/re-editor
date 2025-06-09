@@ -4,6 +4,7 @@ import 'package:re_editor_exmaple/editor_autocomplete.dart';
 import 'package:re_editor_exmaple/editor_basic_field.dart';
 import 'package:re_editor_exmaple/editor_json.dart';
 import 'package:re_editor_exmaple/editor_large_text.dart';
+import 'package:re_editor/re_editor.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'Json Editor': JsonEditor(),
     'Auto Complete': AutoCompleteEditor(),
     'Large Text': LargeTextEditor(),
+    'Native Context Menu': NativeContextMenuExamplePage(),
   };
 
   int _index = 0;
@@ -100,6 +102,29 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         )
       ),
+    );
+  }
+}
+
+class NativeContextMenuExamplePage extends StatelessWidget {
+  const NativeContextMenuExamplePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CodeEditor(
+      controller: CodeLineEditingController.fromText(
+        '''
+Press and hold (or right-click) to see the native context menu.
+This example demonstrates the useNativeContextMenu: true feature.
+
+Try selecting some text:
+- Cut
+- Copy
+- Paste
+        '''
+      ),
+      useNativeContextMenu: true,
+      wordWrap: true, // Enable word wrap for better readability of sample text
     );
   }
 }

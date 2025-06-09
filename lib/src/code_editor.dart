@@ -187,6 +187,7 @@ class CodeEditor extends StatefulWidget {
     this.maxLengthSingleLineRendering,
     this.chunkAnalyzer,
     this.commentFormatter,
+    this.useNativeContextMenu = false,
   }) : assert(indicatorBuilder != null || (indicatorBuilder == null && sperator == null));
 
   /// Similar to [TextField], editor uses [CodeLineEditingController] as the content controller.
@@ -310,6 +311,11 @@ class CodeEditor extends StatefulWidget {
   /// Control how one or more lines of code are commented.
   final CodeCommentFormatter? commentFormatter;
 
+  /// Whether to use the native context menu.
+  ///
+  /// Defaults to false.
+  final bool useNativeContextMenu;
+
   @override
   State<StatefulWidget> createState() => _CodeEditorState();
 
@@ -368,17 +374,21 @@ class _CodeEditorState extends State<CodeEditor> {
       toolbarVisibility: _effectiveToolbarVisibility,
       focusNode: _focusNode,
       onShowToolbar: (context, anchors, renderRect) {
-        widget.toolbarController?.show(
-          context: _editorKey.currentContext ?? context,
-          controller: _editingController,
-          anchors: anchors,
-          renderRect: renderRect,
-          layerLink: _toolbarLayerLink,
-          visibility: _effectiveToolbarVisibility,
-        );
+        if (!widget.useNativeContextMenu) {
+          widget.toolbarController?.show(
+            context: _editorKey.currentContext ?? context,
+            controller: _editingController,
+            anchors: anchors,
+            renderRect: renderRect,
+            layerLink: _toolbarLayerLink,
+            visibility: _effectiveToolbarVisibility,
+          );
+        }
       },
       onHideToolbar: () {
-        widget.toolbarController?.hide(context);
+        if (!widget.useNativeContextMenu) {
+          widget.toolbarController?.hide(context);
+        }
       },
     ) : _DesktopSelectionOverlayController(
       onShowToolbar: (context, anchors, renderRect) {
