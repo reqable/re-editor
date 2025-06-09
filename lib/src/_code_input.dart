@@ -139,7 +139,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
       _updateCausedByFloatingCursor = false;
       return;
     }
-    
+
     if (textEditingDeltas.any((delta) => delta is TextEditingDeltaInsertion && delta.textInserted == '\n')) {
       TextEditingValue newValue = _remoteEditingValue!;
       for (final TextEditingDelta delta in textEditingDeltas) {
@@ -219,7 +219,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
           updatedOffset.dy.clamp(topBound, bottomBound),
         );
 
-        // An adjustment is made on the y-axis so that whenever it is in between lines, the line where the center 
+        // An adjustment is made on the y-axis so that whenever it is in between lines, the line where the center
         // of the floating cursor is will be selected.
         Offset adjustedClampedUpdatedOffset = clampedUpdatedOffset + Offset(0, render.floatingCursorHeight / 2);
         final CodeLinePosition newPosition = render.calculateTextPosition(adjustedClampedUpdatedOffset)!;
@@ -257,24 +257,24 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
             _floatingCursorScrollTimer = null;
           }
         }
-        
+
         // Only turn on the preview cursor if we are away from the end of the line (relatively to the font size)
         if (adjustedClampedUpdatedOffset.dx > snappedNewOffset!.dx + render.textStyle.fontSize!) {
           _floatingCursorController.setFloatingCursorPositions(
-            floatingCursorOffset: clampedUpdatedOffset, 
-            previewCursorOffset: snappedNewOffset, 
-            finalCursorOffset: snappedNewOffset, 
+            floatingCursorOffset: clampedUpdatedOffset,
+            previewCursorOffset: snappedNewOffset,
+            finalCursorOffset: snappedNewOffset,
             finalCursorSelection:newSelection
           );
         }
         else {
           _floatingCursorController.setFloatingCursorPositions(
-            floatingCursorOffset: clampedUpdatedOffset, 
-            finalCursorOffset: snappedNewOffset, 
+            floatingCursorOffset: clampedUpdatedOffset,
+            finalCursorOffset: snappedNewOffset,
             finalCursorSelection: newSelection
           );
         }
-        
+
         break;
       case FloatingCursorDragState.End:
         if (_floatingCursorScrollTimer != null) {
@@ -283,19 +283,19 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
         }
         selection = _floatingCursorController.value.finalCursorSelection!;
         final CodeLinePosition finalPosition = CodeLinePosition(
-          index: selection.baseIndex, 
-          offset: selection.baseOffset, 
+          index: selection.baseIndex,
+          offset: selection.baseOffset,
           affinity: selection.baseAffinity);
-        
+
         final Offset? finalOffset = render.calculateTextPositionViewportOffset(finalPosition);
-        
+
         // If the final selection is in not the viewport, make it visible without animating the floating cursor.
         // Otherwise, play the floating cursor reset animation.
         if (finalOffset != null && (finalOffset.dx < 0 || finalOffset.dy < 0)) {
           render.makePositionCenterIfInvisible(
             CodeLinePosition(
-              index: selection.baseIndex, 
-              offset: selection.baseOffset, 
+              index: selection.baseIndex,
+              offset: selection.baseOffset,
               affinity: selection.baseAffinity),
             animated: true);
             _floatingCursorController.disableFloatingCursor();
@@ -431,10 +431,16 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
 
   void _openInputConnection() {
     if (!_hasInputConnection) {
+      final int? viewId = ui.PlatformDispatcher.instance.implicitView?.viewId ??
+          View.maybeOf(_editorKey!.currentContext!)?.viewId;
+      if (viewId == null) {
+        throw Exception('Cannot open input connection without a valid viewId.');
+      }
       final TextInputConnection connection = TextInput.attach(this,
-        const TextInputConfiguration(
+         TextInputConfiguration(
+          viewId: viewId,
           enableDeltaModel: true,
-          inputAction: TextInputAction.newline
+          inputAction: TextInputAction.newline,
         ),
       );
       _remoteEditingValue = _buildTextEditingValue();
