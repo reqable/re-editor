@@ -13,13 +13,13 @@ dependencies:
     sdk: flutter
   isolate_manager: ^6.0.0+2
   re_highlight:
-    git: https://github.com/sgehrman/re-highlight
+    git: https://github.com/sgehrman/re-highlight.git
 
 dev_dependencies:
   dart_code_metrics:
-    git: https://github.com/JonasWanke/dart-code-metrics
+    git: https://github.com/JonasWanke/dart-code-metrics.git
   dfc_lints:
-    git: https://github.com/sgehrman/dfc_lints
+    git: https://github.com/sgehrman/dfc_lints.git
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
