@@ -470,6 +470,7 @@ class _CodeEditorState extends State<CodeEditor> {
     final TextStyle baseStyle = TextStyle(
       fontSize: widget.style?.fontSize ?? _kDefaultTextSize,
       fontFamily: widget.style?.fontFamily,
+      fontFamilyFallback: theme.textTheme.bodyMedium?.fontFamilyFallback,
       height: widget.style?.fontHeight ?? _kDefaultFontHeight,
     );
     final bool readOnly = widget.readOnly ?? false;
