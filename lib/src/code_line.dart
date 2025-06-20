@@ -1,12 +1,13 @@
-part of re_editor;
+part of 're_editor.dart';
 
-typedef CodeLineSpanBuilder = TextSpan Function({
-  required BuildContext context,
-  required int index,
-  required CodeLine codeLine,
-  required TextSpan textSpan,
-  required TextStyle style,
-});
+typedef CodeLineSpanBuilder =
+    TextSpan Function({
+      required BuildContext context,
+      required int index,
+      required CodeLine codeLine,
+      required TextSpan textSpan,
+      required TextStyle style,
+    });
 
 /// A controller for an editor field.
 ///
@@ -38,8 +39,8 @@ typedef CodeLineSpanBuilder = TextSpan Function({
 /// Remember to [dispose] of the [CodeLineEditingController] when it is no longer
 /// needed. This will ensure we discard any resources used by the object.
 ///
-abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingValue> {
-
+abstract class CodeLineEditingController
+    extends ValueNotifier<CodeLineEditingValue> {
   /// Creates a controller for an editor field.
   ///
   /// This constructor treats an empty [codeLines] argument as if it were the empty
@@ -60,13 +61,15 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   );
 
   /// Creates a controller for a given text.
-  factory CodeLineEditingController.fromText(String? text, [
-    CodeLineOptions options = const CodeLineOptions()
+  factory CodeLineEditingController.fromText(
+    String? text, [
+    CodeLineOptions options = const CodeLineOptions(),
   ]) => _CodeLineEditingControllerImpl.fromText(text, options);
 
   /// Creates a controller for a given file path. The file content will read async.
-  factory CodeLineEditingController.fromTextAsync(String? text, [
-    CodeLineOptions options = const CodeLineOptions()
+  factory CodeLineEditingController.fromTextAsync(
+    String? text, [
+    CodeLineOptions options = const CodeLineOptions(),
   ]) => _CodeLineEditingControllerImpl.fromTextAsync(text, options);
 
   /// Set the current editor codes.
@@ -217,10 +220,10 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
   /// Move the cursor to the end of document.
   void moveCursorToPageEnd();
 
-  /// TODO
+  // TODO(XXX): Need to implement this.
   void moveCursorToPageUp();
 
-  /// TODO
+  // TODO(XXX): Need to implement this.
   void moveCursorToPageDown();
 
   /// Move the cursor to the start of the word.
@@ -378,33 +381,31 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
 /// A delegate controller for an editor field.
 ///
 /// We can override some default behaviors of the controller.
-class CodeLineEditingControllerDelegate extends _CodeLineEditingControllerDelegate {
-
+class CodeLineEditingControllerDelegate
+    extends _CodeLineEditingControllerDelegate {
   CodeLineEditingControllerDelegate({
     required CodeLineEditingController delegate,
   }) {
     super.delegate = delegate;
   }
-
 }
 
 class CodeLine {
-
+  const CodeLine(this.text, [this.chunks = const []]);
   static const CodeLine empty = CodeLine('');
 
   final String text;
   final List<CodeLine> chunks;
-
-  const CodeLine(this.text, [this.chunks = const[]]);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLine
-        && other.text == text
-        && listEquals(other.chunks, chunks);
+
+    return other is CodeLine &&
+        other.text == text &&
+        listEquals(other.chunks, chunks);
   }
 
   @override
@@ -421,6 +422,7 @@ class CodeLine {
     for (final CodeLine codeLine in chunks) {
       count += codeLine.lineCount;
     }
+
     return count;
   }
 
@@ -429,6 +431,7 @@ class CodeLine {
     for (final CodeLine codeLine in chunks) {
       count += codeLine.charCount;
     }
+
     return count;
   }
 
@@ -445,6 +448,7 @@ class CodeLine {
         end = length;
       }
     }
+
     return start >= length ? '' : text.substring(start, end);
   }
 
@@ -474,18 +478,15 @@ class CodeLine {
 
   int codeUnitAt(int index) => text.codeUnitAt(index);
 
-  CodeLine copyWith({
-    String? text,
-    List<CodeLine>? chunks
-  }) {
-    return CodeLine(
-      text ?? this.text,
-      chunks ?? this.chunks
-    );
+  CodeLine copyWith({String? text, List<CodeLine>? chunks}) {
+    return CodeLine(text ?? this.text, chunks ?? this.chunks);
   }
 
   String asString(int start, TextLineBreak lineBreak) {
-    return [substring(start), ...chunks.map((e) => e.asString(0, lineBreak))].join(lineBreak.value);
+    return [
+      substring(start),
+      ...chunks.map((e) => e.asString(0, lineBreak)),
+    ].join(lineBreak.value);
   }
 
   List<String> flat() {
@@ -493,14 +494,13 @@ class CodeLine {
     for (final CodeLine child in chunks) {
       codeLines.addAll(child.flat());
     }
+
     return codeLines;
   }
-
 }
 
 /// The current codes, selection, and composing state for editing a run of text.
 class CodeLineEditingValue {
-
   /// Creates information for editing a run of codes.
   ///
   /// The selection and composing range must be within the codes. This is not
@@ -514,9 +514,7 @@ class CodeLineEditingValue {
     this.composing = TextRange.empty,
   });
 
-  const CodeLineEditingValue.empty() : this(
-    codeLines: _kInitialCodeLines
-  );
+  const CodeLineEditingValue.empty() : this(codeLines: _kInitialCodeLines);
 
   /// The current codes being edited.
   final CodeLines codeLines;
@@ -559,7 +557,7 @@ class CodeLineEditingValue {
     return CodeLineEditingValue(
       codeLines: codeLines ?? this.codeLines,
       selection: selection ?? this.selection,
-      composing: composing ?? this.composing
+      composing: composing ?? this.composing,
     );
   }
 
@@ -570,10 +568,11 @@ class CodeLineEditingValue {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLineEditingValue
-        && other.codeLines.equals(codeLines)
-        && other.selection == selection
-        && other.composing == composing;
+
+    return other is CodeLineEditingValue &&
+        other.codeLines.equals(codeLines) &&
+        other.selection == selection &&
+        other.composing == composing;
   }
 
   @override
@@ -583,11 +582,75 @@ class CodeLineEditingValue {
   String toString() {
     return 'codeLines: $codeLines, selection: $selection, composing: $composing';
   }
-
 }
 
 /// A range of code lines that represents a selection.
 class CodeLineSelection {
+  /// Creates a code selection.
+  const CodeLineSelection({
+    required this.baseIndex,
+    required this.baseOffset,
+    required this.extentIndex,
+    required this.extentOffset,
+    this.baseAffinity = TextAffinity.downstream,
+    this.extentAffinity = TextAffinity.downstream,
+  });
+
+  /// Creates a collapsed selection at the given line index and offset.
+  ///
+  /// A collapsed selection starts and ends at the same offset, which means it
+  /// contains zero characters but instead serves as an insertion point in the
+  /// text.
+  const CodeLineSelection.collapsed({
+    required int index,
+    required int offset,
+    TextAffinity affinity = TextAffinity.downstream,
+  }) : this(
+         baseIndex: index,
+         baseOffset: offset,
+         extentIndex: index,
+         extentOffset: offset,
+         baseAffinity: affinity,
+         extentAffinity: affinity,
+       );
+
+  /// Creates a collapsed selection at the given code position.
+  ///
+  /// A collapsed selection starts and ends at the same offset, which means it
+  /// contains zero characters but instead serves as an insertion point in the
+  /// text.
+  CodeLineSelection.fromPosition({required CodeLinePosition position})
+    : this.collapsed(
+        index: position.index,
+        offset: position.offset,
+        affinity: position.affinity,
+      );
+
+  /// Creates a selection at the given line index and range.
+  CodeLineSelection.fromRange({required CodeLineRange range})
+    : this(
+        baseIndex: range.index,
+        baseOffset: range.start,
+        extentIndex: range.index,
+        extentOffset: range.end,
+      );
+
+  /// Creates a selection at the given line index and selection.
+  CodeLineSelection.fromTextSelection({
+    required int index,
+    required TextSelection selection,
+  }) : this(
+         baseIndex: index,
+         baseOffset: selection.baseOffset,
+         baseAffinity: selection.affinity,
+         extentIndex: index,
+         extentOffset: selection.extentOffset,
+         extentAffinity: selection.affinity,
+       );
+
+  /// Creates a collapsed selection at the beginning.
+  const CodeLineSelection.zero()
+    : this(baseIndex: 0, baseOffset: 0, extentIndex: 0, extentOffset: 0);
 
   /// The line index at which the selection originates.
   final int baseIndex;
@@ -619,84 +682,12 @@ class CodeLineSelection {
   /// painting the caret.
   final TextAffinity extentAffinity;
 
-  /// Creates a code selection.
-  const CodeLineSelection({
-    required this.baseIndex,
-    required this.baseOffset,
-    required this.extentIndex,
-    required this.extentOffset,
-    this.baseAffinity = TextAffinity.downstream,
-    this.extentAffinity = TextAffinity.downstream,
-  });
-
-  /// Creates a collapsed selection at the given line index and offset.
-  ///
-  /// A collapsed selection starts and ends at the same offset, which means it
-  /// contains zero characters but instead serves as an insertion point in the
-  /// text.
-  const CodeLineSelection.collapsed({
-    required int index,
-    required int offset,
-    TextAffinity affinity = TextAffinity.downstream,
-  }) : this(
-      baseIndex: index,
-      baseOffset: offset,
-      extentIndex: index,
-      extentOffset: offset,
-      baseAffinity: affinity,
-      extentAffinity: affinity
-  );
-
-  /// Creates a collapsed selection at the given code position.
-  ///
-  /// A collapsed selection starts and ends at the same offset, which means it
-  /// contains zero characters but instead serves as an insertion point in the
-  /// text.
-  CodeLineSelection.fromPosition({
-    required CodeLinePosition position
-  }) : this.collapsed(
-      index: position.index,
-      offset: position.offset,
-      affinity: position.affinity,
-  );
-
-  /// Creates a selection at the given line index and range.
-  CodeLineSelection.fromRange({
-    required CodeLineRange range
-  }) : this(
-    baseIndex: range.index,
-    baseOffset: range.start,
-    extentIndex: range.index,
-    extentOffset: range.end,
-  );
-
-  /// Creates a selection at the given line index and selection.
-  CodeLineSelection.fromTextSelection({
-    required int index,
-    required TextSelection selection
-  }) : this(
-    baseIndex: index,
-    baseOffset: selection.baseOffset,
-    baseAffinity: selection.affinity,
-    extentIndex: index,
-    extentOffset: selection.extentOffset,
-    extentAffinity: selection.affinity,
-  );
-
-  /// Creates a collapsed selection at the beginning.
-  const CodeLineSelection.zero() : this(
-    baseIndex: 0,
-    baseOffset: 0,
-    extentIndex: 0,
-    extentOffset: 0,
-  );
-
   /// The position at which the selection originates.
   CodeLinePosition get base {
     return CodeLinePosition(
       index: baseIndex,
       offset: baseOffset,
-      affinity: baseAffinity
+      affinity: baseAffinity,
     );
   }
 
@@ -705,7 +696,7 @@ class CodeLineSelection {
     return CodeLinePosition(
       index: extentIndex,
       offset: extentOffset,
-      affinity: extentAffinity
+      affinity: extentAffinity,
     );
   }
 
@@ -777,6 +768,7 @@ class CodeLineSelection {
     } else {
       endInside = true;
     }
+
     return startInside && endInside;
   }
 
@@ -806,17 +798,25 @@ class CodeLineSelection {
     if (other is! CodeLineSelection) {
       return false;
     }
-    return other.baseIndex == baseIndex
-        && other.extentIndex == extentIndex
-        && other.baseOffset == baseOffset
-        && other.extentOffset == extentOffset
-        && other.baseAffinity == baseAffinity
-        && other.extentAffinity == extentAffinity;
+
+    return other.baseIndex == baseIndex &&
+        other.extentIndex == extentIndex &&
+        other.baseOffset == baseOffset &&
+        other.extentOffset == extentOffset &&
+        other.baseAffinity == baseAffinity &&
+        other.extentAffinity == extentAffinity;
   }
 
   @override
   int get hashCode {
-    return Object.hash(baseIndex, extentIndex, baseOffset, extentOffset, baseAffinity, extentAffinity);
+    return Object.hash(
+      baseIndex,
+      extentIndex,
+      baseOffset,
+      extentOffset,
+      baseAffinity,
+      extentAffinity,
+    );
   }
 
   @override
@@ -824,7 +824,6 @@ class CodeLineSelection {
     return 'CodeLineSelection(baseIndex: $baseIndex, baseOffset: $baseOffset, baseAffinity: $baseAffinity, '
         'extentIndex: $extentIndex, extentOffset: $extentOffset, extentAffinity: $extentAffinity)';
   }
-
 }
 
 /// A position in a string of code.
@@ -835,7 +834,6 @@ class CodeLineSelection {
 /// and the [affinity] is used to describe which character this position affiliates
 /// with.
 class CodeLinePosition extends TextPosition {
-
   /// Creates an object representing a particular position in a code.
   const CodeLinePosition({
     required this.index,
@@ -843,24 +841,14 @@ class CodeLinePosition extends TextPosition {
     super.affinity = TextAffinity.downstream,
   });
 
+  /// Creates the CodeLinePosition with the line index and text position.
+  CodeLinePosition.from({required int index, required TextPosition position})
+    : this(index: index, offset: position.offset, affinity: position.affinity);
+
   /// Line index in the codes.
   final int index;
 
-  /// Creates the CodeLinePosition with the line index and text position.
-  CodeLinePosition.from({
-    required int index,
-    required TextPosition position
-  }) : this(
-    index: index,
-    offset: position.offset,
-    affinity: position.affinity
-  );
-
-  CodeLinePosition copyWith({
-    int? index,
-    int? offset,
-    TextAffinity? affinity
-  }) {
+  CodeLinePosition copyWith({int? index, int? offset, TextAffinity? affinity}) {
     return CodeLinePosition(
       index: index ?? this.index,
       offset: offset ?? this.offset,
@@ -869,7 +857,8 @@ class CodeLinePosition extends TextPosition {
   }
 
   /// Get the text position withou line index.
-  TextPosition get textPosition => TextPosition(offset: offset, affinity: affinity);
+  TextPosition get textPosition =>
+      TextPosition(offset: offset, affinity: affinity);
 
   /// Whether the current code position is before the given position.
   bool isBefore(CodeLinePosition position) {
@@ -879,6 +868,7 @@ class CodeLinePosition extends TextPosition {
     if (index > position.index) {
       return false;
     }
+
     return offset < position.offset;
   }
 
@@ -890,6 +880,7 @@ class CodeLinePosition extends TextPosition {
     if (index < position.index) {
       return false;
     }
+
     return offset > position.offset;
   }
 
@@ -898,10 +889,11 @@ class CodeLinePosition extends TextPosition {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLinePosition
-        && other.index == index
-        && other.offset == offset
-        && other.affinity == affinity;
+
+    return other is CodeLinePosition &&
+        other.index == index &&
+        other.offset == offset &&
+        other.affinity == affinity;
   }
 
   @override
@@ -911,12 +903,10 @@ class CodeLinePosition extends TextPosition {
   String toString() {
     return 'CodeLinePosition(index: $index, offset: $offset, affinity: $affinity)';
   }
-
 }
 
 /// A range of code that represents a selection.
 class CodeLineRange extends TextRange {
-
   /// Creates a code range.
   const CodeLineRange({
     required this.index,
@@ -924,19 +914,9 @@ class CodeLineRange extends TextRange {
     required super.end,
   });
 
-  /// Line index in the codes.
-  final int index;
-
   /// Creates a code range at the given line index and text range.
-  factory CodeLineRange.from({
-    required int index,
-    required TextRange range
-  }) {
-    return CodeLineRange(
-      index: index,
-      start: range.start,
-      end: range.end
-    );
+  factory CodeLineRange.from({required int index, required TextRange range}) {
+    return CodeLineRange(index: index, start: range.start, end: range.end);
   }
 
   /// Creates a collapsed range at the given offset.
@@ -944,29 +924,18 @@ class CodeLineRange extends TextRange {
   /// A collapsed range starts and ends at the same offset, which means it
   /// contains zero characters but instead serves as an insertion point in the
   /// text.
-  const CodeLineRange.collapsed({
-    required int index,
-    required int offset
-  }) : this(
-    index: index,
-    start: offset,
-    end: offset
-  );
+  const CodeLineRange.collapsed({required int index, required int offset})
+    : this(index: index, start: offset, end: offset);
 
   /// Creates a collapsed range with negative offset.
-  const CodeLineRange.empty() : this(
-    index: 0,
-    start: -1,
-    end: -1
-  );
+  const CodeLineRange.empty() : this(index: 0, start: -1, end: -1);
+
+  /// Line index in the codes.
+  final int index;
 
   /// Creates a new [CodeLineRange] based on the current selection, with the
   /// provided parameters overridden.
-  CodeLineRange copyWith({
-    int? index,
-    int? start,
-    int? end
-  }) {
+  CodeLineRange copyWith({int? index, int? start, int? end}) {
     return CodeLineRange(
       index: index ?? this.index,
       start: start ?? this.start,
@@ -982,26 +951,24 @@ class CodeLineRange extends TextRange {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLineRange
-        && other.index == index
-        && other.start == start
-        && other.end == end;
+
+    return other is CodeLineRange &&
+        other.index == index &&
+        other.start == start &&
+        other.end == end;
   }
 
   @override
   String toString() => 'CodeLineRange(index: $index start: $start, end: $end)';
-
 }
 
 /// Some options of the code lines.
 class CodeLineOptions {
-
-  static const int _defaultIndentSize = 2;
-
   const CodeLineOptions({
     this.lineBreak = TextLineBreak.lf,
-    this.indentSize = _defaultIndentSize
+    this.indentSize = _defaultIndentSize,
   });
+  static const int _defaultIndentSize = 2;
 
   /// Line break symbols, like LF, CRLF.
   ///
@@ -1011,10 +978,7 @@ class CodeLineOptions {
   /// Indent length, default value is 2.
   final int indentSize;
 
-  CodeLineOptions copyWith({
-    TextLineBreak? lineBreak,
-    int? indentSize,
-  }) {
+  CodeLineOptions copyWith({TextLineBreak? lineBreak, int? indentSize}) {
     return CodeLineOptions(
       lineBreak: lineBreak ?? this.lineBreak,
       indentSize: indentSize ?? this.indentSize,
@@ -1029,21 +993,19 @@ class CodeLineOptions {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLineOptions
-        && other.lineBreak == lineBreak
-        && other.indentSize == indentSize;
+
+    return other is CodeLineOptions &&
+        other.lineBreak == lineBreak &&
+        other.indentSize == indentSize;
   }
 
   String get indent => ' ' * indentSize;
-
 }
 
 class CodeLineIndex {
-
+  const CodeLineIndex(this.index, this.chunkIndex);
   final int index;
   final int chunkIndex;
-
-  const CodeLineIndex(this.index, this.chunkIndex);
 
   @override
   int get hashCode => Object.hash(index, chunkIndex);
@@ -1053,9 +1015,10 @@ class CodeLineIndex {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLineIndex
-        && other.index == index
-        && other.chunkIndex == chunkIndex;
+
+    return other is CodeLineIndex &&
+        other.index == index &&
+        other.chunkIndex == chunkIndex;
   }
 
   @override
@@ -1063,7 +1026,13 @@ class CodeLineIndex {
 }
 
 class CodeLineRenderParagraph {
-
+  const CodeLineRenderParagraph({
+    required this.index,
+    required this.paragraph,
+    required this.offset,
+    required this.chunkParent,
+    required this.chunkLongText,
+  });
   static const double _chunkIndicatorWidth = 15;
 
   final int index;
@@ -1072,39 +1041,32 @@ class CodeLineRenderParagraph {
   final bool chunkParent;
   final bool chunkLongText;
 
-  const CodeLineRenderParagraph({
-    required this.index,
-    required this.paragraph,
-    required this.offset,
-    required this.chunkParent,
-    required this.chunkLongText,
-  });
-
   double get preferredLineHeight => paragraph.preferredLineHeight;
 
   double get top => offset.dy;
 
   double get bottom => offset.dy + height;
 
-  double get width => paragraph.width + (chunkParent ? _chunkIndicatorWidth : 0);
+  double get width =>
+      paragraph.width + (chunkParent ? _chunkIndicatorWidth : 0);
 
   double get height => paragraph.height;
 
   int get length => paragraph.length;
 
-  bool inVerticalRange(Offset coordinate) => coordinate.dy >= top && coordinate.dy < bottom;
+  bool inVerticalRange(Offset coordinate) =>
+      coordinate.dy >= top && coordinate.dy < bottom;
 
   CodeLinePosition getPosition(Offset offset) => CodeLinePosition.from(
     index: index,
-    position: paragraph.getPosition(offset)
+    position: paragraph.getPosition(offset),
   );
 
-  CodeLineRange getWord(Offset offset) => CodeLineRange.from(
-    index: index,
-    range: paragraph.getWord(offset)
-  );
+  CodeLineRange getWord(Offset offset) =>
+      CodeLineRange.from(index: index, range: paragraph.getWord(offset));
 
-  InlineSpan? getSpanForPosition(Offset offset) => paragraph.getSpanForPosition(getPosition(offset));
+  InlineSpan? getSpanForPosition(Offset offset) =>
+      paragraph.getSpanForPosition(getPosition(offset));
 
   TextRange getRangeForSpan(InlineSpan span) => paragraph.getRangeForSpan(span);
 
@@ -1124,11 +1086,12 @@ class CodeLineRenderParagraph {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeLineRenderParagraph
-        && other.index == index
-        && other.paragraph == paragraph
-        && other.offset == offset
-        && other.chunkParent == chunkParent;
+
+    return other is CodeLineRenderParagraph &&
+        other.index == index &&
+        other.paragraph == paragraph &&
+        other.offset == offset &&
+        other.chunkParent == chunkParent;
   }
 
   CodeLineRenderParagraph copyWith({
@@ -1146,27 +1109,15 @@ class CodeLineRenderParagraph {
       chunkLongText: chunkLongText ?? this.chunkLongText,
     );
   }
-
 }
 
-enum TextLineBreak {
-
-  crlf,
-
-  cr,
-
-  lf,
-
-}
+enum TextLineBreak { crlf, cr, lf }
 
 extension TextLineBreakExtension on TextLineBreak {
-
   String get value => const ['\r\n', '\r', '\n'][index];
-
 }
 
 class CodeLineUtils {
-
   static List<String> toTextLines(String text) {
     return text.replaceAll('\r\n', '\n').replaceAll('\r', '\n').split('\n');
   }
@@ -1179,7 +1130,7 @@ class CodeLineUtils {
     if (text.isEmpty) {
       return _kInitialCodeLines;
     }
+
     return compute<String, CodeLines>((message) => toCodeLines(message), text);
   }
-
 }

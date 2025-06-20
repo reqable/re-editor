@@ -1,14 +1,13 @@
-part of re_editor;
+part of 're_editor.dart';
 
-typedef CodeFindBuilder = PreferredSizeWidget Function(BuildContext context, CodeFindController controller, bool readonly);
+typedef CodeFindBuilder =
+    PreferredSizeWidget Function(
+      BuildContext context,
+      CodeFindController controller,
+      bool readonly,
+    );
 
 class CodeFindValue {
-
-  final CodeFindOption option;
-  final bool replaceMode;
-  final CodeFindResult? result;
-  final bool searching;
-
   const CodeFindValue({
     required this.option,
     required this.replaceMode,
@@ -16,19 +15,24 @@ class CodeFindValue {
     this.searching = false,
   });
 
-  const CodeFindValue.empty() : this(
-    option: const CodeFindOption(
-      pattern: '',
-      caseSensitive: false,
-      regex: false,
-    ),
-    replaceMode: false,
-  );
+  const CodeFindValue.empty()
+    : this(
+        option: const CodeFindOption(
+          pattern: '',
+          caseSensitive: false,
+          regex: false,
+        ),
+        replaceMode: false,
+      );
+  final CodeFindOption option;
+  final bool replaceMode;
+  final CodeFindResult? result;
+  final bool searching;
 
   CodeFindValue copyWith({
+    required CodeFindResult? result,
     CodeFindOption? option,
     bool? replaceMode,
-    required CodeFindResult? result,
     bool? searching,
   }) {
     return CodeFindValue(
@@ -44,11 +48,12 @@ class CodeFindValue {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeFindValue
-        && other.option == option
-        && other.replaceMode == replaceMode
-        && other.result == result
-        && other.searching == searching;
+
+    return other is CodeFindValue &&
+        other.option == option &&
+        other.replaceMode == replaceMode &&
+        other.result == result &&
+        other.searching == searching;
   }
 
   @override
@@ -58,26 +63,19 @@ class CodeFindValue {
   String toString() {
     return '{option: $option replaceMode: $replaceMode result: $result searching:$searching}';
   }
-
 }
 
 class CodeFindOption {
-
-  final String pattern;
-  final bool caseSensitive;
-  final bool regex;
-
   const CodeFindOption({
     required this.pattern,
     required this.caseSensitive,
     required this.regex,
   });
+  final String pattern;
+  final bool caseSensitive;
+  final bool regex;
 
-  CodeFindOption copyWith({
-    String? pattern,
-    bool? caseSensitive,
-    bool? regex,
-  }) {
+  CodeFindOption copyWith({String? pattern, bool? caseSensitive, bool? regex}) {
     return CodeFindOption(
       pattern: pattern ?? this.pattern,
       caseSensitive: caseSensitive ?? this.caseSensitive,
@@ -102,10 +100,11 @@ class CodeFindOption {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeFindOption
-        && other.pattern == pattern
-        && other.caseSensitive == caseSensitive
-        && other.regex == regex;
+
+    return other is CodeFindOption &&
+        other.pattern == pattern &&
+        other.caseSensitive == caseSensitive &&
+        other.regex == regex;
   }
 
   @override
@@ -115,17 +114,9 @@ class CodeFindOption {
   String toString() {
     return '{pattern: $pattern caseSensitive: $caseSensitive regex: $regex}';
   }
-
 }
 
 class CodeFindResult {
-
-  final int index;
-  final List<CodeLineSelection> matches;
-  final CodeFindOption option;
-  final CodeLines codeLines;
-  final bool dirty;
-
   const CodeFindResult({
     required this.index,
     required this.matches,
@@ -133,14 +124,17 @@ class CodeFindResult {
     required this.codeLines,
     required this.dirty,
   });
+  final int index;
+  final List<CodeLineSelection> matches;
+  final CodeFindOption option;
+  final CodeLines codeLines;
+  final bool dirty;
 
-  CodeFindResult get previous => copyWith(
-    index: index == 0 ? matches.length - 1 : index - 1
-  );
+  CodeFindResult get previous =>
+      copyWith(index: index == 0 ? matches.length - 1 : index - 1);
 
-  CodeFindResult get next => copyWith(
-    index: index == matches.length - 1 ? 0 : index + 1
-  );
+  CodeFindResult get next =>
+      copyWith(index: index == matches.length - 1 ? 0 : index + 1);
 
   CodeLineSelection? get currentMatch => index == -1 ? null : matches[index];
 
@@ -165,23 +159,24 @@ class CodeFindResult {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeFindResult
-        && other.index == index
-        && listEquals(other.matches, matches)
-        && other.option == option
-        && other.codeLines.equals(codeLines)
-        && other.dirty == dirty;
+
+    return other is CodeFindResult &&
+        other.index == index &&
+        listEquals(other.matches, matches) &&
+        other.option == option &&
+        other.codeLines.equals(codeLines) &&
+        other.dirty == dirty;
   }
 
   @override
   int get hashCode => Object.hash(index, matches, option, codeLines, dirty);
-
 }
 
 abstract class CodeFindController extends ValueNotifier<CodeFindValue?> {
-
-  factory CodeFindController(CodeLineEditingController controller, [CodeFindValue? value])
-    => _CodeFindControllerImpl(controller, value);
+  factory CodeFindController(
+    CodeLineEditingController controller, [
+    CodeFindValue? value,
+  ]) => _CodeFindControllerImpl(controller, value);
 
   TextEditingController get findInputController;
 
@@ -220,5 +215,4 @@ abstract class CodeFindController extends ValueNotifier<CodeFindValue?> {
   void replaceAllMatches();
 
   CodeLineSelection? convertMatchToSelection(CodeLineSelection match);
-
 }

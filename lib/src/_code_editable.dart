@@ -1,13 +1,53 @@
-part of re_editor;
+part of 're_editor.dart';
 
-const double _kDefaultTextSize = 13.0;
+const double _kDefaultTextSize = 13;
 const double _kDefaultFontHeight = 1.4;
 const double _kDefaultCaretWidth = 2;
 const EdgeInsetsGeometry _kDefaultPadding = EdgeInsets.all(5);
 const Duration _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 
 class _CodeEditable extends StatefulWidget {
-
+  const _CodeEditable({
+    required this.editorKey,
+    required this.textStyle,
+    required this.selectionColor,
+    required this.highlightColor,
+    required this.cursorColor,
+    required this.cursorWidth,
+    required this.showCursorWhenReadOnly,
+    required this.padding,
+    required this.margin,
+    required this.sperator,
+    required this.focusNode,
+    required this.controller,
+    required this.inputController,
+    required this.floatingCursorController,
+    required this.codeTheme,
+    required this.readOnly,
+    required this.autofocus,
+    required this.wordWrap,
+    required this.findController,
+    required this.scrollController,
+    required this.chunkController,
+    required this.startHandleLayerLink,
+    required this.endHandleLayerLink,
+    required this.toolbarLayerLink,
+    required this.selectionOverlayController,
+    this.hint,
+    this.indicatorBuilder,
+    this.scrollbarBuilder,
+    this.verticalScrollbarWidth,
+    this.horizontalScrollbarHeight,
+    this.hintTextColor,
+    this.backgroundColor,
+    this.cursorLineColor,
+    this.chunkIndicatorColor,
+    this.border,
+    this.borderRadius,
+    this.clipBehavior = Clip.none,
+    this.onChanged,
+    this.maxLengthSingleLineRendering,
+  });
   final GlobalKey editorKey;
   final String? hint;
   final CodeIndicatorBuilder? indicatorBuilder;
@@ -48,55 +88,14 @@ class _CodeEditable extends StatefulWidget {
   final LayerLink toolbarLayerLink;
   final _SelectionOverlayController selectionOverlayController;
 
-  const _CodeEditable({
-    required this.editorKey,
-    this.hint,
-    this.indicatorBuilder,
-    this.scrollbarBuilder,
-    this.verticalScrollbarWidth,
-    this.horizontalScrollbarHeight,
-    required this.textStyle,
-    this.hintTextColor,
-    this.backgroundColor,
-    required this.selectionColor,
-    required this.highlightColor,
-    required this.cursorColor,
-    this.cursorLineColor,
-    this.chunkIndicatorColor,
-    required this.cursorWidth,
-    required this.showCursorWhenReadOnly,
-    required this.padding,
-    required this.margin,
-    required this.sperator,
-    this.border,
-    this.borderRadius,
-    this.clipBehavior = Clip.none,
-    this.onChanged,
-    required this.focusNode,
-    required this.controller,
-    required this.inputController,
-    required this.floatingCursorController,
-    required this.codeTheme,
-    required this.readOnly,
-    required this.autofocus,
-    required this.wordWrap,
-    this.maxLengthSingleLineRendering,
-    required this.findController,
-    required this.scrollController,
-    required this.chunkController,
-    required this.startHandleLayerLink,
-    required this.endHandleLayerLink,
-    required this.toolbarLayerLink,
-    required this.selectionOverlayController,
-  });
-
   @override
   State<StatefulWidget> createState() => _CodeEditableState();
-
 }
 
-class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveClientMixin<_CodeEditable>, SingleTickerProviderStateMixin {
-
+class _CodeEditableState extends State<_CodeEditable>
+    with
+        AutomaticKeepAliveClientMixin<_CodeEditable>,
+        SingleTickerProviderStateMixin {
   late bool _didAutoFocus;
   late final _CodeCursorBlinkController _cursorController;
 
@@ -203,7 +202,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
             viewportBuilder: (context, ViewportOffset horizontal) {
               return _buildCodeField(vertical, horizontal);
             },
-            scrollbarBuilder: widget.scrollbarBuilder
+            scrollbarBuilder: widget.scrollbarBuilder,
           );
         }
         if (widget.controller.value.isInitial) {
@@ -213,17 +212,16 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
               children: [
                 codeField,
                 IgnorePointer(
-                  ignoring: true,
                   child: Padding(
                     padding: widget.padding,
                     child: Text(
                       hint,
                       style: widget.textStyle.copyWith(
-                        color: widget.hintTextColor
+                        color: widget.hintTextColor,
                       ),
                     ),
-                  )
-                )
+                  ),
+                ),
               ],
             );
           }
@@ -232,8 +230,9 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           context,
           widget.controller,
           widget.chunkController,
-          _codeIndicatorValueNotifier
+          _codeIndicatorValueNotifier,
         );
+
         return Container(
           decoration: BoxDecoration(
             border: widget.border,
@@ -245,24 +244,23 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (indicator != null)
-                indicator,
-              if (widget.sperator != null)
-                widget.sperator!,
+              if (indicator != null) indicator,
+              if (widget.sperator != null) widget.sperator!,
               Expanded(
                 child: RepaintBoundary(
                   child: CompositedTransformTarget(
                     link: widget.toolbarLayerLink,
-                    child: codeField
+                    child: codeField,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         );
       },
-      scrollbarBuilder: widget.scrollbarBuilder
+      scrollbarBuilder: widget.scrollbarBuilder,
     );
+
     return CodeEditorTapRegion(
       onTapOutside: (_) {
         widget.focusNode.unfocus();
@@ -272,10 +270,11 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           if (notification is ScrollStartNotification) {
             widget.selectionOverlayController.hideToolbar();
           }
+
           return false;
         },
-        child: child
-      )
+        child: child,
+      ),
     );
   }
 
@@ -284,8 +283,10 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       key: widget.editorKey,
       verticalViewport: vertical,
       horizontalViewport: horizontal,
-      verticalScrollbarWidth: widget.verticalScrollbarWidth ?? _kScrollbarThickness,
-      horizontalScrollbarHeight: widget.horizontalScrollbarHeight ?? _kScrollbarThickness,
+      verticalScrollbarWidth:
+          widget.verticalScrollbarWidth ?? _kScrollbarThickness,
+      horizontalScrollbarHeight:
+          widget.horizontalScrollbarHeight ?? _kScrollbarThickness,
       selection: widget.controller.selection,
       highlightSelections: widget.findController.allMatchSelections,
       codes: widget.controller.codeLines,
@@ -297,7 +298,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       onRenderParagraphsChanged: (paragraphs) {
         _codeIndicatorValueNotifier.value = CodeIndicatorValue(
           paragraphs: paragraphs,
-          focusedIndex: widget.controller.selection.extentIndex
+          focusedIndex: widget.controller.selection.extentIndex,
         );
       },
       selectionColor: widget.selectionColor,
@@ -309,7 +310,10 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       padding: widget.padding,
       readOnly: widget.readOnly,
       // Enable long text rendering when the find is on.
-      maxLengthSingleLineRendering: widget.findController.value != null ? null : widget.maxLengthSingleLineRendering,
+      maxLengthSingleLineRendering:
+          widget.findController.value != null
+              ? null
+              : widget.maxLengthSingleLineRendering,
       startHandleLayerLink: widget.startHandleLayerLink,
       endHandleLayerLink: widget.endHandleLayerLink,
     );
@@ -337,15 +341,14 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     }
     widget.onChanged?.call(widget.controller.value);
     if (widget.controller.codeLines != widget.controller.preValue?.codeLines &&
-      widget.controller.preValue != null) {
+        widget.controller.preValue != null) {
       widget.selectionOverlayController.hideHandle();
       widget.selectionOverlayController.hideToolbar();
     } else {
       _updateAutoCompleteState(false);
     }
     _updateCursorState();
-    setState(() {
-    });
+    setState(() {});
   }
 
   void _onCodeUserInputChanged() {
@@ -365,29 +368,35 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     final CodeFindValue? value = widget.findController.value;
     if (value == null) {
       widget.focusNode.requestFocus();
+
       return;
     }
     if (widget.focusNode.hasFocus) {
       return;
     }
-    final CodeLineSelection? currentMatch = widget.findController.currentMatchSelection;
+    final CodeLineSelection? currentMatch =
+        widget.findController.currentMatchSelection;
     if (currentMatch == null) {
       widget.controller.selection = const CodeLineSelection.zero();
+
       return;
     }
     widget.controller.selection = currentMatch;
     if (currentMatch.isSameLine) {
-      widget.controller.makePositionCenterIfInvisible(CodeLinePosition(
-        index: currentMatch.start.index,
-        offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1
-      ));
+      widget.controller.makePositionCenterIfInvisible(
+        CodeLinePosition(
+          index: currentMatch.start.index,
+          offset: (currentMatch.startOffset + currentMatch.endOffset) >> 1,
+        ),
+      );
     } else {
       widget.controller.makePositionCenterIfInvisible(currentMatch.start);
     }
   }
 
   void _updateCursorState() {
-    if (widget.focusNode.hasFocus && (!widget.readOnly || widget.showCursorWhenReadOnly)) {
+    if (widget.focusNode.hasFocus &&
+        (!widget.readOnly || widget.showCursorWhenReadOnly)) {
       _cursorController.startBlink();
     } else {
       _cursorController.stopBlink();
@@ -398,26 +407,37 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
     if (!mounted) {
       return;
     }
-    final _CodeAutocompleteState? autocompleteState = context.findAncestorStateOfType<_CodeAutocompleteState>();
+    final _CodeAutocompleteState? autocompleteState =
+        context.findAncestorStateOfType<_CodeAutocompleteState>();
     if (autocompleteState == null) {
       return;
     }
     if (!isCodeLineChanged) {
       autocompleteState.dismiss();
+
       return;
     }
-    if (widget.controller.isComposing || !widget.controller.selection.isCollapsed) {
+    if (widget.controller.isComposing ||
+        !widget.controller.selection.isCollapsed) {
       autocompleteState.dismiss();
+
       return;
     }
-    final _CodeFieldRender? render = widget.editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render =
+        widget.editorKey.currentContext?.findRenderObject()
+            as _CodeFieldRender?;
     if (render == null) {
       autocompleteState.dismiss();
+
       return;
     }
-    final Offset? position = render.calculateTextPositionScreenOffset(widget.controller.selection.extent, true);
+    final Offset? position = render.calculateTextPositionScreenOffset(
+      widget.controller.selection.extent,
+      true,
+    );
     if (position == null) {
       autocompleteState.dismiss();
+
       return;
     }
     autocompleteState.show(
@@ -428,24 +448,24 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       onAutocomplete: (value) {
         autocompleteState.dismiss();
         final CodeLineSelection selection = widget.controller.selection;
-        widget.controller.replaceSelection(value.word, selection.copyWith(
-          baseOffset: selection.baseOffset - value.input.length,
-        ));
+        widget.controller.replaceSelection(
+          value.word,
+          selection.copyWith(
+            baseOffset: selection.baseOffset - value.input.length,
+          ),
+        );
         widget.controller.selection = selection.copyWith(
           baseOffset: selection.baseOffset + value.selection.baseOffset,
           extentOffset: selection.extentOffset + value.selection.extentOffset,
         );
-      }
+      },
     );
   }
-
 }
 
 class _CodeCursorBlinkController extends ValueNotifier<bool> {
-
-  Timer? _timer;
-
   _CodeCursorBlinkController() : super(false);
+  Timer? _timer;
 
   void startBlink() {
     if (_timer != null) {
@@ -480,5 +500,4 @@ class _CodeCursorBlinkController extends ValueNotifier<bool> {
     stopBlink();
     super.dispose();
   }
-
 }

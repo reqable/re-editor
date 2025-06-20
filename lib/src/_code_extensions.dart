@@ -1,7 +1,6 @@
-part of re_editor;
+part of 're_editor.dart';
 
 extension _InlineSpanExtension on InlineSpan {
-
   int get length => _computeLength();
 
   int _computeLength() {
@@ -11,13 +10,12 @@ extension _InlineSpanExtension on InlineSpan {
     } else {
       len += toPlainText(includePlaceholders: false).length;
     }
+
     return len;
   }
-
 }
 
 extension _TextSpanExtension on TextSpan {
-
   int get length => _computeLength();
 
   int _computeLength() {
@@ -30,15 +28,13 @@ extension _TextSpanExtension on TextSpan {
         len += span.length;
       }
     }
+    
     return len;
   }
-
 }
 
 extension _OffsetExtension on Offset {
-
   bool isSamePosition(Offset offset) {
     return (this - offset).distance < 10;
   }
-
 }

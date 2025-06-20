@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 enum CodeShortcutType {
   selectAll,
@@ -54,23 +54,21 @@ enum CodeShortcutType {
 }
 
 abstract class CodeShortcutsActivatorsBuilder {
-
   const CodeShortcutsActivatorsBuilder();
 
   List<ShortcutActivator>? build(CodeShortcutType type);
-
 }
 
-class DefaultCodeShortcutsActivatorsBuilder extends CodeShortcutsActivatorsBuilder {
-
+class DefaultCodeShortcutsActivatorsBuilder
+    extends CodeShortcutsActivatorsBuilder {
   const DefaultCodeShortcutsActivatorsBuilder();
 
   @override
   List<ShortcutActivator>? build(CodeShortcutType type) {
-    return kIsMacOS ? _kDefaultMacCodeShortcutsActivators[type] :
-      _kDefaultCommonCodeShortcutsActivators[type];
+    return kIsMacOS
+        ? _kDefaultMacCodeShortcutsActivators[type]
+        : _kDefaultCommonCodeShortcutsActivators[type];
   }
-
 }
 
 abstract class CodeShortcutEditableIntent extends Intent {
@@ -110,13 +108,13 @@ class ShortcutLineDeleteIntent extends CodeShortcutEditableIntent {
 }
 
 class ShortcutLineMoveIntent extends CodeShortcutEditableIntent {
-  final VerticalDirection direction;
   const ShortcutLineMoveIntent(this.direction);
+  final VerticalDirection direction;
 }
 
 class ShortcutLineDeleteDirectionIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const ShortcutLineDeleteDirectionIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutIndentIntent extends CodeShortcutEditableIntent {
@@ -128,63 +126,63 @@ class CodeShortcutOutdentIntent extends CodeShortcutEditableIntent {
 }
 
 class CodeShortcutCommentIntent extends CodeShortcutEditableIntent {
-  final bool single;
   const CodeShortcutCommentIntent(this.single);
+  final bool single;
 }
 
 class CodeShortcutCursorMoveIntent extends Intent {
-  final AxisDirection direction;
   const CodeShortcutCursorMoveIntent(this.direction);
+  final AxisDirection direction;
 }
 
 class CodeShortcutCursorMoveLineEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveLineEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMoveDocEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveDocEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMovePageIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMovePageIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutCursorMoveWordBoundaryIntent extends Intent {
-  final bool forward;
   const CodeShortcutCursorMoveWordBoundaryIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendIntent extends Intent {
-  final AxisDirection direction;
   const CodeShortcutSelectionExtendIntent(this.direction);
+  final AxisDirection direction;
 }
 
 class CodeShortcutSelectionExtendLineEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendLineEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendPageEdgeIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendPageEdgeIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutSelectionExtendWordBoundaryIntent extends Intent {
-  final bool forward;
   const CodeShortcutSelectionExtendWordBoundaryIntent(this.forward);
+  final bool forward;
 }
 
 class ShortcutWordDeleteDirectionIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const ShortcutWordDeleteDirectionIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutDeleteIntent extends CodeShortcutEditableIntent {
-  final bool forward;
   const CodeShortcutDeleteIntent(this.forward);
+  final bool forward;
 }
 
 class CodeShortcutNewLineIntent extends CodeShortcutEditableIntent {
@@ -235,27 +233,55 @@ const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.lineMoveUp: ShortcutLineMoveIntent(VerticalDirection.up),
   CodeShortcutType.lineMoveDown: ShortcutLineMoveIntent(VerticalDirection.down),
   CodeShortcutType.cursorMoveUp: CodeShortcutCursorMoveIntent(AxisDirection.up),
-  CodeShortcutType.cursorMoveDown: CodeShortcutCursorMoveIntent(AxisDirection.down),
-  CodeShortcutType.cursorMoveForward: CodeShortcutCursorMoveIntent(AxisDirection.right),
-  CodeShortcutType.cursorMoveBackward: CodeShortcutCursorMoveIntent(AxisDirection.left),
-  CodeShortcutType.cursorMoveLineStart: CodeShortcutCursorMoveLineEdgeIntent(false),
-  CodeShortcutType.cursorMoveLineEnd: CodeShortcutCursorMoveLineEdgeIntent(true),
-  CodeShortcutType.cursorMovePageStart: CodeShortcutCursorMoveDocEdgeIntent(false),
+  CodeShortcutType.cursorMoveDown: CodeShortcutCursorMoveIntent(
+    AxisDirection.down,
+  ),
+  CodeShortcutType.cursorMoveForward: CodeShortcutCursorMoveIntent(
+    AxisDirection.right,
+  ),
+  CodeShortcutType.cursorMoveBackward: CodeShortcutCursorMoveIntent(
+    AxisDirection.left,
+  ),
+  CodeShortcutType.cursorMoveLineStart: CodeShortcutCursorMoveLineEdgeIntent(
+    false,
+  ),
+  CodeShortcutType.cursorMoveLineEnd: CodeShortcutCursorMoveLineEdgeIntent(
+    true,
+  ),
+  CodeShortcutType.cursorMovePageStart: CodeShortcutCursorMoveDocEdgeIntent(
+    false,
+  ),
   CodeShortcutType.cursorMovePageEnd: CodeShortcutCursorMoveDocEdgeIntent(true),
   CodeShortcutType.cursorMovePageUp: CodeShortcutCursorMovePageIntent(false),
   CodeShortcutType.cursorMovePageDown: CodeShortcutCursorMovePageIntent(true),
-  CodeShortcutType.cursorMoveWordBoundaryForward: CodeShortcutCursorMoveWordBoundaryIntent(true),
-  CodeShortcutType.cursorMoveWordBoundaryBackward: CodeShortcutCursorMoveWordBoundaryIntent(false),
-  CodeShortcutType.selectionExtendUp: CodeShortcutSelectionExtendIntent(AxisDirection.up),
-  CodeShortcutType.selectionExtendDown: CodeShortcutSelectionExtendIntent(AxisDirection.down),
-  CodeShortcutType.selectionExtendForward: CodeShortcutSelectionExtendIntent(AxisDirection.right),
-  CodeShortcutType.selectionExtendBackward: CodeShortcutSelectionExtendIntent(AxisDirection.left),
-  CodeShortcutType.selectionExtendLineStart: CodeShortcutSelectionExtendLineEdgeIntent(false),
-  CodeShortcutType.selectionExtendLineEnd: CodeShortcutSelectionExtendLineEdgeIntent(true),
-  CodeShortcutType.selectionExtendPageStart: CodeShortcutSelectionExtendPageEdgeIntent(false),
-  CodeShortcutType.selectionExtendPageEnd: CodeShortcutSelectionExtendPageEdgeIntent(true),
-  CodeShortcutType.selectionExtendWordBoundaryForward: CodeShortcutSelectionExtendWordBoundaryIntent(true),
-  CodeShortcutType.selectionExtendWordBoundaryBackward: CodeShortcutSelectionExtendWordBoundaryIntent(false),
+  CodeShortcutType.cursorMoveWordBoundaryForward:
+      CodeShortcutCursorMoveWordBoundaryIntent(true),
+  CodeShortcutType.cursorMoveWordBoundaryBackward:
+      CodeShortcutCursorMoveWordBoundaryIntent(false),
+  CodeShortcutType.selectionExtendUp: CodeShortcutSelectionExtendIntent(
+    AxisDirection.up,
+  ),
+  CodeShortcutType.selectionExtendDown: CodeShortcutSelectionExtendIntent(
+    AxisDirection.down,
+  ),
+  CodeShortcutType.selectionExtendForward: CodeShortcutSelectionExtendIntent(
+    AxisDirection.right,
+  ),
+  CodeShortcutType.selectionExtendBackward: CodeShortcutSelectionExtendIntent(
+    AxisDirection.left,
+  ),
+  CodeShortcutType.selectionExtendLineStart:
+      CodeShortcutSelectionExtendLineEdgeIntent(false),
+  CodeShortcutType
+      .selectionExtendLineEnd: CodeShortcutSelectionExtendLineEdgeIntent(true),
+  CodeShortcutType.selectionExtendPageStart:
+      CodeShortcutSelectionExtendPageEdgeIntent(false),
+  CodeShortcutType
+      .selectionExtendPageEnd: CodeShortcutSelectionExtendPageEdgeIntent(true),
+  CodeShortcutType.selectionExtendWordBoundaryForward:
+      CodeShortcutSelectionExtendWordBoundaryIntent(true),
+  CodeShortcutType.selectionExtendWordBoundaryBackward:
+      CodeShortcutSelectionExtendWordBoundaryIntent(false),
   CodeShortcutType.wordDeleteForward: ShortcutWordDeleteDirectionIntent(true),
   CodeShortcutType.wordDeleteBackward: ShortcutWordDeleteDirectionIntent(false),
   CodeShortcutType.indent: CodeShortcutIndentIntent(),
@@ -272,66 +298,59 @@ const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.esc: CodeShortcutEscIntent(),
 };
 
-const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsActivators = {
+const Map<CodeShortcutType, List<ShortcutActivator>>
+_kDefaultMacCodeShortcutsActivators = {
   CodeShortcutType.selectAll: [
-    SingleActivator(LogicalKeyboardKey.keyA, meta: true)
+    SingleActivator(LogicalKeyboardKey.keyA, meta: true),
   ],
-  CodeShortcutType.cut: [
-    SingleActivator(LogicalKeyboardKey.keyX, meta: true)
-  ],
-  CodeShortcutType.copy: [
-    SingleActivator(LogicalKeyboardKey.keyC, meta: true)
-  ],
+  CodeShortcutType.cut: [SingleActivator(LogicalKeyboardKey.keyX, meta: true)],
+  CodeShortcutType.copy: [SingleActivator(LogicalKeyboardKey.keyC, meta: true)],
   CodeShortcutType.paste: [
-    SingleActivator(LogicalKeyboardKey.keyV, meta: true)
+    SingleActivator(LogicalKeyboardKey.keyV, meta: true),
   ],
   CodeShortcutType.delete: [
-    SingleActivator(LogicalKeyboardKey.delete,),
+    SingleActivator(LogicalKeyboardKey.delete),
     SingleActivator(LogicalKeyboardKey.delete, shift: true),
   ],
   CodeShortcutType.backspace: [
-    SingleActivator(LogicalKeyboardKey.backspace,),
+    SingleActivator(LogicalKeyboardKey.backspace),
     SingleActivator(LogicalKeyboardKey.backspace, shift: true),
   ],
-  CodeShortcutType.undo: [
-    SingleActivator(LogicalKeyboardKey.keyZ, meta: true)
-  ],
+  CodeShortcutType.undo: [SingleActivator(LogicalKeyboardKey.keyZ, meta: true)],
   CodeShortcutType.redo: [
-    SingleActivator(LogicalKeyboardKey.keyZ, meta: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.keyZ, meta: true, shift: true),
   ],
   CodeShortcutType.lineSelect: [
-    SingleActivator(LogicalKeyboardKey.keyL, meta: true)
+    SingleActivator(LogicalKeyboardKey.keyL, meta: true),
   ],
   CodeShortcutType.lineDelete: [
-    SingleActivator(LogicalKeyboardKey.keyD, meta: true)
+    SingleActivator(LogicalKeyboardKey.keyD, meta: true),
   ],
   CodeShortcutType.lineDeleteForward: [
-    SingleActivator(LogicalKeyboardKey.delete, meta: true)
+    SingleActivator(LogicalKeyboardKey.delete, meta: true),
   ],
   CodeShortcutType.lineDeleteBackward: [
-    SingleActivator(LogicalKeyboardKey.backspace, meta: true)
+    SingleActivator(LogicalKeyboardKey.backspace, meta: true),
   ],
   CodeShortcutType.lineMoveUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowUp, alt: true),
   ],
   CodeShortcutType.lineMoveDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowDown, alt: true),
   ],
-  CodeShortcutType.cursorMoveUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp)
-  ],
+  CodeShortcutType.cursorMoveUp: [SingleActivator(LogicalKeyboardKey.arrowUp)],
   CodeShortcutType.cursorMoveDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown)
+    SingleActivator(LogicalKeyboardKey.arrowDown),
   ],
   CodeShortcutType.cursorMoveForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight)
+    SingleActivator(LogicalKeyboardKey.arrowRight),
   ],
   CodeShortcutType.cursorMoveBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft)
+    SingleActivator(LogicalKeyboardKey.arrowLeft),
   ],
   CodeShortcutType.cursorMoveLineStart: [
     SingleActivator(LogicalKeyboardKey.arrowLeft, meta: true),
-    SingleActivator(LogicalKeyboardKey.home)
+    SingleActivator(LogicalKeyboardKey.home),
   ],
   CodeShortcutType.cursorMoveLineEnd: [
     SingleActivator(LogicalKeyboardKey.arrowRight, meta: true),
@@ -339,211 +358,214 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsAc
   ],
   CodeShortcutType.cursorMovePageStart: [
     SingleActivator(LogicalKeyboardKey.arrowUp, meta: true),
-    SingleActivator(LogicalKeyboardKey.home, control: true)
+    SingleActivator(LogicalKeyboardKey.home, control: true),
+  ],
+  CodeShortcutType.cursorMovePageUp: [
+    SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
+  ],
+  CodeShortcutType.cursorMovePageDown: [
+    SingleActivator(LogicalKeyboardKey.arrowDown, control: true),
   ],
   CodeShortcutType.cursorMovePageEnd: [
     SingleActivator(LogicalKeyboardKey.arrowDown, meta: true),
-    SingleActivator(LogicalKeyboardKey.end, control: true)
+    SingleActivator(LogicalKeyboardKey.end, control: true),
   ],
   CodeShortcutType.cursorMoveWordBoundaryBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true),
   ],
   CodeShortcutType.cursorMoveWordBoundaryForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, alt: true),
   ],
   CodeShortcutType.selectionExtendUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowUp, shift: true),
   ],
   CodeShortcutType.selectionExtendDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowDown, shift: true),
   ],
   CodeShortcutType.selectionExtendForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true),
   ],
   CodeShortcutType.selectionExtendBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true),
   ],
   CodeShortcutType.selectionExtendPageStart: [
     SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, meta: true),
-    SingleActivator(LogicalKeyboardKey.home, shift: true, meta: true)
+    SingleActivator(LogicalKeyboardKey.home, shift: true, meta: true),
   ],
   CodeShortcutType.selectionExtendPageEnd: [
     SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, meta: true),
-    SingleActivator(LogicalKeyboardKey.end, shift: true, meta: true)
+    SingleActivator(LogicalKeyboardKey.end, shift: true, meta: true),
   ],
   CodeShortcutType.selectionExtendLineStart: [
     SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, meta: true),
-    SingleActivator(LogicalKeyboardKey.home, shift: true)
+    SingleActivator(LogicalKeyboardKey.home, shift: true),
   ],
   CodeShortcutType.selectionExtendLineEnd: [
     SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, meta: true),
-    SingleActivator(LogicalKeyboardKey.end, shift: true)
+    SingleActivator(LogicalKeyboardKey.end, shift: true),
   ],
   CodeShortcutType.selectionExtendWordBoundaryForward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true),
   ],
   CodeShortcutType.selectionExtendWordBoundaryBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true),
   ],
   CodeShortcutType.wordDeleteForward: [
     SingleActivator(LogicalKeyboardKey.delete, alt: true),
     SingleActivator(LogicalKeyboardKey.delete, alt: true, shift: true),
-    SingleActivator(LogicalKeyboardKey.delete, meta: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.delete, meta: true, shift: true),
   ],
   CodeShortcutType.wordDeleteBackward: [
     SingleActivator(LogicalKeyboardKey.backspace, alt: true),
     SingleActivator(LogicalKeyboardKey.backspace, alt: true, shift: true),
-    SingleActivator(LogicalKeyboardKey.backspace, meta: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.backspace, meta: true, shift: true),
   ],
-  CodeShortcutType.indent: [
-    SingleActivator(LogicalKeyboardKey.tab)
-  ],
+  CodeShortcutType.indent: [SingleActivator(LogicalKeyboardKey.tab)],
   CodeShortcutType.outdent: [
-    SingleActivator(LogicalKeyboardKey.tab, shift: true)
+    SingleActivator(LogicalKeyboardKey.tab, shift: true),
   ],
   CodeShortcutType.newLine: [
     SingleActivator(LogicalKeyboardKey.enter),
     SingleActivator(LogicalKeyboardKey.enter, shift: true),
     SingleActivator(LogicalKeyboardKey.enter, meta: true),
-    SingleActivator(LogicalKeyboardKey.enter, meta: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.enter, meta: true, shift: true),
   ],
   CodeShortcutType.transposeCharacters: [
-    SingleActivator(LogicalKeyboardKey.keyT, control: true)
+    SingleActivator(LogicalKeyboardKey.keyT, control: true),
   ],
   CodeShortcutType.singleLineComment: [
-    SingleActivator(LogicalKeyboardKey.slash, meta: true)
+    SingleActivator(LogicalKeyboardKey.slash, meta: true),
   ],
   CodeShortcutType.multiLineComment: [
-    SingleActivator(LogicalKeyboardKey.slash, meta: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.slash, meta: true, shift: true),
   ],
-  CodeShortcutType.find: [
-    SingleActivator(LogicalKeyboardKey.keyF, meta: true)
-  ],
+  CodeShortcutType.find: [SingleActivator(LogicalKeyboardKey.keyF, meta: true)],
   CodeShortcutType.findToggleMatchCase: [
-    SingleActivator(LogicalKeyboardKey.keyC, meta: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyC, meta: true, alt: true),
   ],
   CodeShortcutType.findToggleRegex: [
-    SingleActivator(LogicalKeyboardKey.keyR, meta: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyR, meta: true, alt: true),
   ],
   CodeShortcutType.replace: [
-    SingleActivator(LogicalKeyboardKey.keyF, meta: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyF, meta: true, alt: true),
   ],
-  CodeShortcutType.save: [
-    SingleActivator(LogicalKeyboardKey.keyS, meta: true)
-  ],
-  CodeShortcutType.esc: [
-    SingleActivator(LogicalKeyboardKey.escape)
-  ],
+  CodeShortcutType.save: [SingleActivator(LogicalKeyboardKey.keyS, meta: true)],
+  CodeShortcutType.esc: [SingleActivator(LogicalKeyboardKey.escape)],
 };
 
-const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcutsActivators = {
+const Map<CodeShortcutType, List<ShortcutActivator>>
+_kDefaultCommonCodeShortcutsActivators = {
   CodeShortcutType.selectAll: [
-    SingleActivator(LogicalKeyboardKey.keyA, control: true)
+    SingleActivator(LogicalKeyboardKey.keyA, control: true),
   ],
   CodeShortcutType.cut: [
-    SingleActivator(LogicalKeyboardKey.keyX, control: true)
+    SingleActivator(LogicalKeyboardKey.keyX, control: true),
   ],
   CodeShortcutType.copy: [
-    SingleActivator(LogicalKeyboardKey.keyC, control: true)
+    SingleActivator(LogicalKeyboardKey.keyC, control: true),
   ],
   CodeShortcutType.paste: [
-    SingleActivator(LogicalKeyboardKey.keyV, control: true)
+    SingleActivator(LogicalKeyboardKey.keyV, control: true),
   ],
   CodeShortcutType.delete: [
-    SingleActivator(LogicalKeyboardKey.delete,),
+    SingleActivator(LogicalKeyboardKey.delete),
     SingleActivator(LogicalKeyboardKey.delete, shift: true),
   ],
   CodeShortcutType.backspace: [
-    SingleActivator(LogicalKeyboardKey.backspace,),
+    SingleActivator(LogicalKeyboardKey.backspace),
     SingleActivator(LogicalKeyboardKey.backspace, shift: true),
   ],
   CodeShortcutType.undo: [
-    SingleActivator(LogicalKeyboardKey.keyZ, control: true)
+    SingleActivator(LogicalKeyboardKey.keyZ, control: true),
   ],
   CodeShortcutType.redo: [
-    SingleActivator(LogicalKeyboardKey.keyZ, control: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.keyZ, control: true, shift: true),
   ],
   CodeShortcutType.lineSelect: [
-    SingleActivator(LogicalKeyboardKey.keyL, control: true)
+    SingleActivator(LogicalKeyboardKey.keyL, control: true),
   ],
   CodeShortcutType.lineDelete: [
-    SingleActivator(LogicalKeyboardKey.keyD, control: true)
+    SingleActivator(LogicalKeyboardKey.keyD, control: true),
   ],
   CodeShortcutType.lineDeleteForward: [
-    SingleActivator(LogicalKeyboardKey.delete, control: true)
+    SingleActivator(LogicalKeyboardKey.delete, control: true),
   ],
   CodeShortcutType.lineDeleteBackward: [
-    SingleActivator(LogicalKeyboardKey.backspace, control: true)
+    SingleActivator(LogicalKeyboardKey.backspace, control: true),
   ],
   CodeShortcutType.lineMoveUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowUp, alt: true),
   ],
   CodeShortcutType.lineMoveDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowDown, alt: true),
   ],
-  CodeShortcutType.cursorMoveUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp)
-  ],
+  CodeShortcutType.cursorMoveUp: [SingleActivator(LogicalKeyboardKey.arrowUp)],
   CodeShortcutType.cursorMoveDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown)
+    SingleActivator(LogicalKeyboardKey.arrowDown),
   ],
   CodeShortcutType.cursorMoveForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight)
+    SingleActivator(LogicalKeyboardKey.arrowRight),
   ],
   CodeShortcutType.cursorMoveBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft)
+    SingleActivator(LogicalKeyboardKey.arrowLeft),
   ],
   CodeShortcutType.cursorMoveLineStart: [
     SingleActivator(LogicalKeyboardKey.arrowLeft, control: true),
-    SingleActivator(LogicalKeyboardKey.home)
+    SingleActivator(LogicalKeyboardKey.home),
   ],
   CodeShortcutType.cursorMoveLineEnd: [
     SingleActivator(LogicalKeyboardKey.arrowRight, control: true),
-    SingleActivator(LogicalKeyboardKey.end)
+    SingleActivator(LogicalKeyboardKey.end),
   ],
   CodeShortcutType.cursorMovePageStart: [
     SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
-    SingleActivator(LogicalKeyboardKey.home, control: true)
+    SingleActivator(LogicalKeyboardKey.home, control: true),
+  ],
+  CodeShortcutType.cursorMovePageUp: [
+    SingleActivator(LogicalKeyboardKey.arrowUp, control: true),
+  ],
+  CodeShortcutType.cursorMovePageDown: [
+    SingleActivator(LogicalKeyboardKey.arrowDown, control: true),
   ],
   CodeShortcutType.cursorMovePageEnd: [
     SingleActivator(LogicalKeyboardKey.arrowDown, control: true),
-    SingleActivator(LogicalKeyboardKey.end, control: true)
+    SingleActivator(LogicalKeyboardKey.end, control: true),
   ],
   CodeShortcutType.cursorMoveWordBoundaryBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true),
   ],
   CodeShortcutType.cursorMoveWordBoundaryForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, alt: true),
   ],
   CodeShortcutType.selectionExtendUp: [
-    SingleActivator(LogicalKeyboardKey.arrowUp, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowUp, shift: true),
   ],
   CodeShortcutType.selectionExtendDown: [
-    SingleActivator(LogicalKeyboardKey.arrowDown, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowDown, shift: true),
   ],
   CodeShortcutType.selectionExtendForward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true),
   ],
   CodeShortcutType.selectionExtendBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true),
   ],
   CodeShortcutType.selectionExtendPageStart: [
-    SingleActivator(LogicalKeyboardKey.home, shift: true, control: true)
+    SingleActivator(LogicalKeyboardKey.home, shift: true, control: true),
   ],
   CodeShortcutType.selectionExtendPageEnd: [
-    SingleActivator(LogicalKeyboardKey.end, shift: true, control: true)
+    SingleActivator(LogicalKeyboardKey.end, shift: true, control: true),
   ],
   CodeShortcutType.selectionExtendLineStart: [
-    SingleActivator(LogicalKeyboardKey.home, shift: true)
+    SingleActivator(LogicalKeyboardKey.home, shift: true),
   ],
   CodeShortcutType.selectionExtendLineEnd: [
-    SingleActivator(LogicalKeyboardKey.end, shift: true)
+    SingleActivator(LogicalKeyboardKey.end, shift: true),
   ],
   CodeShortcutType.selectionExtendWordBoundaryForward: [
-    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true),
   ],
   CodeShortcutType.selectionExtendWordBoundaryBackward: [
-    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.arrowRight, shift: true, alt: true),
   ],
   CodeShortcutType.wordDeleteForward: [
     SingleActivator(LogicalKeyboardKey.delete, alt: true),
@@ -555,43 +577,39 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcut
     SingleActivator(LogicalKeyboardKey.backspace, alt: true, shift: true),
     SingleActivator(LogicalKeyboardKey.backspace, control: true),
   ],
-  CodeShortcutType.indent: [
-    SingleActivator(LogicalKeyboardKey.tab)
-  ],
+  CodeShortcutType.indent: [SingleActivator(LogicalKeyboardKey.tab)],
   CodeShortcutType.outdent: [
-    SingleActivator(LogicalKeyboardKey.tab, shift: true)
+    SingleActivator(LogicalKeyboardKey.tab, shift: true),
   ],
   CodeShortcutType.newLine: [
     SingleActivator(LogicalKeyboardKey.enter),
     SingleActivator(LogicalKeyboardKey.enter, shift: true),
     SingleActivator(LogicalKeyboardKey.enter, control: true),
-    SingleActivator(LogicalKeyboardKey.enter, control: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.enter, control: true, shift: true),
   ],
   CodeShortcutType.transposeCharacters: [
-    SingleActivator(LogicalKeyboardKey.keyT, control: true)
+    SingleActivator(LogicalKeyboardKey.keyT, control: true),
   ],
   CodeShortcutType.singleLineComment: [
-    SingleActivator(LogicalKeyboardKey.slash, control: true)
+    SingleActivator(LogicalKeyboardKey.slash, control: true),
   ],
   CodeShortcutType.multiLineComment: [
-    SingleActivator(LogicalKeyboardKey.slash, control: true, shift: true)
+    SingleActivator(LogicalKeyboardKey.slash, control: true, shift: true),
   ],
   CodeShortcutType.find: [
-    SingleActivator(LogicalKeyboardKey.keyF, control: true)
+    SingleActivator(LogicalKeyboardKey.keyF, control: true),
   ],
   CodeShortcutType.findToggleMatchCase: [
-    SingleActivator(LogicalKeyboardKey.keyC, control: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyC, control: true, alt: true),
   ],
   CodeShortcutType.findToggleRegex: [
-    SingleActivator(LogicalKeyboardKey.keyR, control: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyR, control: true, alt: true),
   ],
   CodeShortcutType.replace: [
-    SingleActivator(LogicalKeyboardKey.keyF, control: true, alt: true)
+    SingleActivator(LogicalKeyboardKey.keyF, control: true, alt: true),
   ],
   CodeShortcutType.save: [
-    SingleActivator(LogicalKeyboardKey.keyS, control: true)
+    SingleActivator(LogicalKeyboardKey.keyS, control: true),
   ],
-  CodeShortcutType.esc: [
-    SingleActivator(LogicalKeyboardKey.escape)
-  ],
+  CodeShortcutType.esc: [SingleActivator(LogicalKeyboardKey.escape)],
 };

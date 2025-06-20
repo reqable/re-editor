@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 // The time the animation of the floating cursor snapping to the final cursor position will take.
 const Duration floatingCursorSnapDuration = Duration(milliseconds: 300);
@@ -6,18 +6,18 @@ const Duration floatingCursorSnapDuration = Duration(milliseconds: 300);
 // Class containing the floating cursor control logic.
 class _CodeFloatingCursorController
     extends ValueNotifier<_FloatingCursorState> {
+  _CodeFloatingCursorController() : super(const _FloatingCursorState());
   late final _CodeCursorBlinkController _blinkController;
   late final AnimationController _animationController;
 
-  _CodeFloatingCursorController() : super(const _FloatingCursorState());
-
   /// Sets the [Offset] and [CodeLineSelection] of the cursors. Setting either one of these offsets
   /// to null is equivalent to turning off the corresponding cursor.
-  void setFloatingCursorPositions(
-      {Offset? floatingCursorOffset,
-      Offset? previewCursorOffset,
-      Offset? finalCursorOffset,
-      CodeLineSelection? finalCursorSelection}) {
+  void setFloatingCursorPositions({
+    Offset? floatingCursorOffset,
+    Offset? previewCursorOffset,
+    Offset? finalCursorOffset,
+    CodeLineSelection? finalCursorSelection,
+  }) {
     if (value.floatingCursorOffset != null && floatingCursorOffset == null) {
       // Starting the floating cursor, stop blinking of the normal cursor
       _blinkController.startBlink();
@@ -51,24 +51,36 @@ class _CodeFloatingCursorController
       disableFloatingCursor();
     } else {
       final double lerpValue = _animationController.value;
-      final double lerpX = ui.lerpDouble(value.floatingCursorOffset!.dx,
-          value.finalCursorOffset!.dx, lerpValue)!;
-      final double lerpY = ui.lerpDouble(value.floatingCursorOffset!.dy,
-          value.finalCursorOffset!.dy, lerpValue)!;
+      final double lerpX =
+          ui.lerpDouble(
+            value.floatingCursorOffset!.dx,
+            value.finalCursorOffset!.dx,
+            lerpValue,
+          )!;
+      final double lerpY =
+          ui.lerpDouble(
+            value.floatingCursorOffset!.dy,
+            value.finalCursorOffset!.dy,
+            lerpValue,
+          )!;
 
       setFloatingCursorPositions(
-          floatingCursorOffset: Offset(lerpX, lerpY),
-          previewCursorOffset: value.previewCursorOffset,
-          finalCursorOffset: value.finalCursorOffset,
-          finalCursorSelection: value.finalCursorSelection);
+        floatingCursorOffset: Offset(lerpX, lerpY),
+        previewCursorOffset: value.previewCursorOffset,
+        finalCursorOffset: value.finalCursorOffset,
+        finalCursorSelection: value.finalCursorSelection,
+      );
     }
   }
 
   /// Performs the "snapping" animation and turns of the floating cursor.
   void animateDisableFloatingCursor() {
     _animationController.value = 0.0;
-    _animationController.animateTo(1,
-        duration: floatingCursorSnapDuration, curve: Curves.decelerate);
+    _animationController.animateTo(
+      1,
+      duration: floatingCursorSnapDuration,
+      curve: Curves.decelerate,
+    );
   }
 
   @override
@@ -95,6 +107,13 @@ class _CodeFloatingCursorController
 }
 
 class _FloatingCursorState {
+  const _FloatingCursorState({
+    this.floatingCursorOffset,
+    this.previewCursorOffset,
+    this.finalCursorOffset,
+    this.finalCursorSelection,
+  });
+
   /// The offset of the floating cursor.
   final Offset? floatingCursorOffset;
 
@@ -107,12 +126,6 @@ class _FloatingCursorState {
   final Offset? finalCursorOffset;
 
   final CodeLineSelection? finalCursorSelection;
-
-  const _FloatingCursorState(
-      {this.floatingCursorOffset,
-      this.previewCursorOffset,
-      this.finalCursorOffset,
-      this.finalCursorSelection});
 
   /// Creates a copy of this instance with the specified values overridden.
   _FloatingCursorState copyWith({
@@ -144,6 +157,10 @@ class _FloatingCursorState {
           finalCursorSelection == other.finalCursorSelection);
 
   @override
-  int get hashCode => Object.hash(floatingCursorOffset, previewCursorOffset,
-      finalCursorOffset, finalCursorSelection);
+  int get hashCode => Object.hash(
+    floatingCursorOffset,
+    previewCursorOffset,
+    finalCursorOffset,
+    finalCursorSelection,
+  );
 }

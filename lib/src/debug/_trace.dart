@@ -1,7 +1,6 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _Trace {
-
   static final Map<String, DateTime> _timestamps = {};
 
   static void begin(String name) {
@@ -12,11 +11,14 @@ class _Trace {
     final DateTime? time = _timestamps.remove(name);
     if (time != null) {
       if (microsecond) {
-        print('[${DateTime.now()}] $name costs ${DateTime.now().microsecondsSinceEpoch - time.microsecondsSinceEpoch} us');
+        print(
+          '[${DateTime.now()}] $name costs ${DateTime.now().microsecondsSinceEpoch - time.microsecondsSinceEpoch} us',
+        );
       } else {
-        print('[${DateTime.now()}] $name costs ${DateTime.now().millisecondsSinceEpoch - time.millisecondsSinceEpoch} ms');
+        print(
+          '[${DateTime.now()}] $name costs ${DateTime.now().millisecondsSinceEpoch - time.millisecondsSinceEpoch} ms',
+        );
       }
     }
   }
-
 }

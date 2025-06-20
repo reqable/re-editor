@@ -1,7 +1,15 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeSelectionGestureDetector extends StatefulWidget {
-
+  const _CodeSelectionGestureDetector({
+    required this.controller,
+    required this.inputController,
+    required this.chunkController,
+    required this.editorKey,
+    required this.selectionOverlayController,
+    required this.child,
+    this.behavior,
+  });
   final CodeLineEditingController controller;
   final _CodeInputController inputController;
   final CodeChunkController chunkController;
@@ -10,22 +18,12 @@ class _CodeSelectionGestureDetector extends StatefulWidget {
   final _SelectionOverlayController selectionOverlayController;
   final Widget child;
 
-  const _CodeSelectionGestureDetector({
-    required this.controller,
-    required this.inputController,
-    required this.chunkController,
-    this.behavior,
-    required this.editorKey,
-    required this.selectionOverlayController,
-    required this.child,
-  });
-
   @override
   State<StatefulWidget> createState() => _CodeSelectionGestureDetectorState();
-
 }
 
-class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDetector> {
+class _CodeSelectionGestureDetectorState
+    extends State<_CodeSelectionGestureDetector> {
   Offset? _dragPosition;
   bool _dragging = false;
   DateTime? _pointerTapTimestamp;
@@ -34,7 +32,8 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   bool _longPressOnSelection = false;
   CodeLineSelection? _anchorSelection;
 
-  _CodeFieldRender get render => widget.editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+  _CodeFieldRender get render =>
+      widget.editorKey.currentContext!.findRenderObject()! as _CodeFieldRender;
 
   bool _tapping = false;
 
@@ -43,7 +42,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     if (_isMobile) {
       return GestureDetector(
         onLongPressMoveUpdate: (details) {
-          if (_longPressOnSelection == true) {
+          if (_longPressOnSelection) {
             return;
           }
           if (details.localOffsetFromOrigin.distance < 1) {
@@ -55,18 +54,26 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         onLongPressStart: (details) {
           _dragPosition = details.globalPosition;
           widget.inputController.ensureInput();
-          _longPressOnSelection = _isPositionOnSelection(details.globalPosition);
-          if (_longPressOnSelection != true) {
+          _longPressOnSelection = _isPositionOnSelection(
+            details.globalPosition,
+          );
+          if (!_longPressOnSelection) {
             _onMobileLongPressedStart(details.globalPosition);
             _autoScrollWhenDragging();
           } else {
-            widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+            widget.selectionOverlayController.showToolbar(
+              context,
+              details.globalPosition,
+            );
           }
           widget.selectionOverlayController.showHandle(context);
         },
         onLongPressEnd: (details) {
-          if (_longPressOnSelection != true) {
-            widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+          if (!_longPressOnSelection) {
+            widget.selectionOverlayController.showToolbar(
+              context,
+              details.globalPosition,
+            );
           }
           _dragPosition = null;
           _longPressOnSelection = false;
@@ -163,11 +170,15 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
 
   bool get _isMobile => kIsAndroid || kIsIOS;
 
-  bool get _isShiftPressed => _isMobile ? false : HardwareKeyboard.instance.logicalKeysPressed
-    .any(<LogicalKeyboardKey>{
-      LogicalKeyboardKey.shiftLeft,
-      LogicalKeyboardKey.shiftRight,
-    }.contains);
+  bool get _isShiftPressed =>
+      _isMobile
+          ? false
+          : HardwareKeyboard.instance.logicalKeysPressed.any(
+            <LogicalKeyboardKey>{
+              LogicalKeyboardKey.shiftLeft,
+              LogicalKeyboardKey.shiftRight,
+            }.contains,
+          );
 
   void _onMobileTapDown(Offset position) {
     _selectPosition(position, _SelectionChangedCause.tapDown);
@@ -177,8 +188,12 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
 
   void _onMobileTapUp(Offset position) {
     final DateTime now = DateTime.now();
-    if (_pointerTapTimestamp != null && (now.millisecondsSinceEpoch - _pointerTapTimestamp!.millisecondsSinceEpoch) <
-      kDoubleTapTimeout.inMilliseconds && _pointerTapPosition != null && _pointerTapPosition!.isSamePosition(position)) {
+    if (_pointerTapTimestamp != null &&
+        (now.millisecondsSinceEpoch -
+                _pointerTapTimestamp!.millisecondsSinceEpoch) <
+            kDoubleTapTimeout.inMilliseconds &&
+        _pointerTapPosition != null &&
+        _pointerTapPosition!.isSamePosition(position)) {
       _onDoubleTap(position);
       widget.selectionOverlayController.showHandle(context);
       widget.selectionOverlayController.showToolbar(context, position);
@@ -193,14 +208,12 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   }
 
   void _onMobileLongPressedStart(Offset position) {
-    final CodeLineRange? range = render.selectWord(
-      position: position,
-    );
+    final CodeLineRange? range = render.selectWord(position: position);
     if (range == null) {
       return;
     }
     final CodeLineSelection selection = CodeLineSelection.fromRange(
-      range: range
+      range: range,
     );
     widget.controller.selection = selection;
     widget.controller.makeCursorVisible();
@@ -214,13 +227,18 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     final DateTime now = DateTime.now();
-    if (_pointerTapTimestamp != null && (now.millisecondsSinceEpoch - _pointerTapTimestamp!.millisecondsSinceEpoch) <
-      kDoubleTapTimeout.inMilliseconds && _pointerTapPosition != null && _pointerTapPosition!.isSamePosition(position)) {
+    if (_pointerTapTimestamp != null &&
+        (now.millisecondsSinceEpoch -
+                _pointerTapTimestamp!.millisecondsSinceEpoch) <
+            kDoubleTapTimeout.inMilliseconds &&
+        _pointerTapPosition != null &&
+        _pointerTapPosition!.isSamePosition(position)) {
       _onDoubleTap(position);
     } else {
       if (widget.controller.selection.baseOffset != -1) {
         if (_isShiftPressed) {
           _extendSelection(position, _SelectionChangedCause.tapDown);
+
           return;
         }
       }
@@ -243,27 +261,25 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   }
 
   void _onDoubleTap(Offset position) {
-    final CodeLineRange? range = render.selectWord(
-      position: position,
-    );
+    final CodeLineRange? range = render.selectWord(position: position);
     if (range == null) {
       return;
     }
     final CodeLineSelection selection;
-    if (_isShiftPressed && widget.controller.selection.base.offset <= range.start) {
+    if (_isShiftPressed &&
+        widget.controller.selection.base.offset <= range.start) {
       selection = widget.controller.selection.copyWith(
         extentIndex: range.index,
-        extentOffset: range.end
+        extentOffset: range.end,
       );
-    } else if (_isShiftPressed && widget.controller.selection.base.offset >= range.end) {
+    } else if (_isShiftPressed &&
+        widget.controller.selection.base.offset >= range.end) {
       selection = widget.controller.selection.copyWith(
         extentIndex: range.index,
-        extentOffset: range.start
+        extentOffset: range.start,
       );
     } else {
-      selection = CodeLineSelection.fromRange(
-        range: range
-      );
+      selection = CodeLineSelection.fromRange(range: range);
     }
     widget.controller.selection = selection;
     widget.controller.makeCursorVisible();
@@ -302,11 +318,15 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     widget.controller.clearComposing();
-    widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+    widget.selectionOverlayController.showToolbar(
+      context,
+      details.globalPosition,
+    );
   }
 
   void _extendSelection(Offset offset, _SelectionChangedCause cause) {
-    if (cause == _SelectionChangedCause.tapDown || cause == _SelectionChangedCause.tapUp) {
+    if (cause == _SelectionChangedCause.tapDown ||
+        cause == _SelectionChangedCause.tapUp) {
       if (expandChunkIfNeeded(render.chunkIndicatorHitIndex(offset))) {
         return;
       }
@@ -331,14 +351,13 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   }
 
   void _selectPosition(Offset offset, _SelectionChangedCause cause) {
-    if (cause == _SelectionChangedCause.tapDown || cause == _SelectionChangedCause.tapUp) {
+    if (cause == _SelectionChangedCause.tapDown ||
+        cause == _SelectionChangedCause.tapUp) {
       if (expandChunkIfNeeded(render.chunkIndicatorHitIndex(offset))) {
         return;
       }
     }
-    final CodeLineSelection? selection = render.setPositionAt(
-      position: offset,
-    );
+    final CodeLineSelection? selection = render.setPositionAt(position: offset);
     if (selection == null) {
       return;
     }
@@ -347,8 +366,10 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     }
 
     if (cause == _SelectionChangedCause.tapDown) {
-      if (!widget.controller.selection.isCollapsed && widget.controller.selection.contains(selection)) {
+      if (!widget.controller.selection.isCollapsed &&
+          widget.controller.selection.contains(selection)) {
         _handleByNextEvent = true;
+
         return;
       }
     }
@@ -369,12 +390,13 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     if (widget.controller.selection == selection) {
       return false;
     }
+
     return widget.controller.selection.contains(selection);
   }
 
   void _autoScrollWhenDragging() {
     final Offset? position = _dragPosition;
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (_dragPosition == null || position == null) {
         return;
       }
@@ -383,7 +405,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         _extendSelection(_dragPosition!, _SelectionChangedCause.drag);
       }
       _autoScrollWhenDragging();
-    }));
+    });
   }
 
   bool expandChunkIfNeeded(int index) {
@@ -391,9 +413,9 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return false;
     }
     widget.chunkController.expand(index);
+
     return true;
   }
-
 }
 
 enum _SelectionChangedCause {
@@ -408,11 +430,9 @@ enum _SelectionChangedCause {
   /// The user used the mouse to change the selection by dragging over a piece
   /// of text.
   drag,
-
 }
 
 abstract class _SelectionOverlayController {
-
   void showHandle(BuildContext context);
 
   void hideHandle();
@@ -422,28 +442,29 @@ abstract class _SelectionOverlayController {
   void hideToolbar();
 
   void dispose();
-
 }
 
-typedef OnToolbarShow = void Function(BuildContext context, TextSelectionToolbarAnchors anchors, Rect? renderRect);
+typedef OnToolbarShow =
+    void Function(
+      BuildContext context,
+      TextSelectionToolbarAnchors anchors,
+      Rect? renderRect,
+    );
 
-class _DesktopSelectionOverlayController implements _SelectionOverlayController {
-
+class _DesktopSelectionOverlayController
+    implements _SelectionOverlayController {
+  const _DesktopSelectionOverlayController({
+    required this.onShowToolbar,
+    required this.onHideToolbar,
+  });
   final OnToolbarShow onShowToolbar;
   final VoidCallback onHideToolbar;
 
-  const _DesktopSelectionOverlayController({
-    required this.onShowToolbar,
-    required this.onHideToolbar
-  });
+  @override
+  void hideHandle() {}
 
   @override
-  void hideHandle() {
-  }
-
-  @override
-  void showHandle(BuildContext context) {
-  }
+  void showHandle(BuildContext context) {}
 
   @override
   void hideToolbar() {
@@ -455,19 +476,32 @@ class _DesktopSelectionOverlayController implements _SelectionOverlayController 
     if (position == null) {
       return;
     }
-    onShowToolbar(context, TextSelectionToolbarAnchors(
-      primaryAnchor: position
-    ), null);
+    onShowToolbar(
+      context,
+      TextSelectionToolbarAnchors(primaryAnchor: position),
+      null,
+    );
   }
 
   @override
-  void dispose() {
-  }
-
+  void dispose() {}
 }
 
 class _MobileSelectionOverlayController implements _SelectionOverlayController {
-
+  _MobileSelectionOverlayController({
+    required BuildContext context,
+    required this.controller,
+    required this.editorKey,
+    required this.startHandleLayerLink,
+    required this.endHandleLayerLink,
+    required this.toolbarVisibility,
+    required this.focusNode,
+    required this.onShowToolbar,
+    required this.onHideToolbar,
+  }) {
+    _context = context;
+    controller.addListener(_updateTextSelectionHandle);
+  }
   final CodeLineEditingController controller;
   final GlobalKey editorKey;
   final LayerLink startHandleLayerLink;
@@ -480,8 +514,11 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   bool _inited = false;
   bool _handlesVisible = false;
 
-  final ValueNotifier<bool> _effectiveStartHandleVisibility = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> _effectiveEndHandleVisibility = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _effectiveStartHandleVisibility =
+      ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _effectiveEndHandleVisibility = ValueNotifier<bool>(
+    false,
+  );
 
   late BuildContext _context;
   // The contact position of the gesture at the current start handle location.
@@ -507,21 +544,6 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   List<OverlayEntry>? _handles;
   bool? _handleCollapsed;
 
-  _MobileSelectionOverlayController({
-    required BuildContext context,
-    required this.controller,
-    required this.editorKey,
-    required this.startHandleLayerLink,
-    required this.endHandleLayerLink,
-    required this.toolbarVisibility,
-    required this.focusNode,
-    required this.onShowToolbar,
-    required this.onHideToolbar,
-  }) {
-    _context = context;
-    controller.addListener(_updateTextSelectionHandle);
-  }
-
   TextSelectionControls get selectionControls {
     if (kIsAndroid) {
       return materialTextSelectionControls;
@@ -546,7 +568,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     _handlesVisible = false;
     _handleCollapsed = null;
     if (_handles != null) {
-      _handles![0].remove();
+      _handles!.first.remove();
       _handles![1].remove();
       _handles = null;
     }
@@ -559,7 +581,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
 
   @override
   void showToolbar(BuildContext context, Offset globalPosition) {
-    globalPosition = _clampPosition(globalPosition);
+    final Offset gPosition = _clampPosition(globalPosition);
     final Rect editingRegion = Rect.fromPoints(
       ensureRender.localToGlobal(Offset.zero),
       ensureRender.localToGlobal(ensureRender.size.bottomRight(Offset.zero)),
@@ -568,46 +590,60 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     final TextSelectionToolbarAnchors anchors;
     if (selection.isCollapsed) {
       anchors = TextSelectionToolbarAnchors(
-        primaryAnchor: ensureRender.calculateTextPositionScreenOffset(selection.start, false) ?? globalPosition,
+        primaryAnchor:
+            ensureRender.calculateTextPositionScreenOffset(
+              selection.start,
+              false,
+            ) ??
+            gPosition,
       );
     } else {
-      Offset startPosition = ensureRender.calculateTextPositionScreenOffset(selection.start, false) ?? editingRegion.topLeft;
-      Offset endPosition = ensureRender.calculateTextPositionScreenOffset(selection.end, true) ?? editingRegion.bottomRight;
+      Offset startPosition =
+          ensureRender.calculateTextPositionScreenOffset(
+            selection.start,
+            false,
+          ) ??
+          editingRegion.topLeft;
+      Offset endPosition =
+          ensureRender.calculateTextPositionScreenOffset(selection.end, true) ??
+          editingRegion.bottomRight;
       if (startPosition.dy < editingRegion.top) {
         startPosition = Offset(startPosition.dx, editingRegion.top);
       }
       if (endPosition.dy > editingRegion.bottom) {
         endPosition = Offset(endPosition.dx, editingRegion.bottom);
       }
-      if (startPosition.dy <= editingRegion.top + lineHeight && endPosition.dy >= editingRegion.bottom - lineHeight) {
-        anchors = TextSelectionToolbarAnchors(
-          primaryAnchor: globalPosition,
-        );
+      if (startPosition.dy <= editingRegion.top + lineHeight &&
+          endPosition.dy >= editingRegion.bottom - lineHeight) {
+        anchors = TextSelectionToolbarAnchors(primaryAnchor: gPosition);
       } else {
-        final double distanceToStart = (globalPosition - startPosition).distance;
-        final double distanceToEnd = (globalPosition - endPosition).distance;
+        final double distanceToStart = (gPosition - startPosition).distance;
+        final double distanceToEnd = (gPosition - endPosition).distance;
         if (distanceToStart < distanceToEnd) {
           anchors = TextSelectionToolbarAnchors(
             primaryAnchor: startPosition,
-            secondaryAnchor: endPosition
+            secondaryAnchor: endPosition,
           );
         } else {
           anchors = TextSelectionToolbarAnchors(
             // This is trick, make secondary anchor takes effect
             primaryAnchor: const Offset(-10000, -10000),
-            secondaryAnchor: endPosition
+            secondaryAnchor: endPosition,
           );
         }
       }
-
     }
     onShowToolbar(context, anchors, editingRegion);
   }
 
   void init() {
     _inited = true;
-    ensureRender.selectionStartInViewport.addListener(_updateTextSelectionOverlayVisibilities);
-    ensureRender.selectionEndInViewport.addListener(_updateTextSelectionOverlayVisibilities);
+    ensureRender.selectionStartInViewport.addListener(
+      _updateTextSelectionOverlayVisibilities,
+    );
+    ensureRender.selectionEndInViewport.addListener(
+      _updateTextSelectionOverlayVisibilities,
+    );
   }
 
   @override
@@ -618,28 +654,38 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     controller.removeListener(_updateTextSelectionHandle);
     _effectiveStartHandleVisibility.dispose();
     _effectiveEndHandleVisibility.dispose();
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render =
+        editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
     if (render == null) {
       return;
     }
-    render.selectionStartInViewport.removeListener(_updateTextSelectionOverlayVisibilities);
-    render.selectionEndInViewport.removeListener(_updateTextSelectionOverlayVisibilities);
+    render.selectionStartInViewport.removeListener(
+      _updateTextSelectionOverlayVisibilities,
+    );
+    render.selectionEndInViewport.removeListener(
+      _updateTextSelectionOverlayVisibilities,
+    );
   }
 
   double get lineHeight {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render =
+        editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
     if (render == null) {
       return 0;
     }
+
     return render.lineHeight;
   }
 
   bool get attached {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render =
+        editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+
     return render != null && render.attached;
   }
 
-  _CodeFieldRender get ensureRender => editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+  _CodeFieldRender get ensureRender =>
+      editorKey.currentContext!.findRenderObject()! as _CodeFieldRender;
 
   void _updateTextSelectionHandle() {
     if (!_handlesVisible) {
@@ -652,12 +698,15 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   void _updateTextSelectionOverlayVisibilities() {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render =
+        editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
     if (render == null) {
       return;
     }
-    _effectiveStartHandleVisibility.value = _handlesVisible && render.selectionStartInViewport.value;
-    _effectiveEndHandleVisibility.value = _handlesVisible && render.selectionEndInViewport.value;
+    _effectiveStartHandleVisibility.value =
+        _handlesVisible && render.selectionStartInViewport.value;
+    _effectiveEndHandleVisibility.value =
+        _handlesVisible && render.selectionEndInViewport.value;
   }
 
   void _buildHandles(BuildContext context) {
@@ -667,17 +716,31 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     }
     _handleCollapsed = isCollapsed;
     if (_handles != null) {
-      _handles![0].remove();
+      _handles!.first.remove();
       _handles![1].remove();
       _handles = null;
     }
     _handles = <OverlayEntry>[
-      OverlayEntry(builder: (context) {
-        return _buildStartHandle(context, isCollapsed ? TextSelectionHandleType.collapsed : TextSelectionHandleType.left);
-      }),
-      OverlayEntry(builder: (context) {
-        return _buildEndHandle(context, isCollapsed ? TextSelectionHandleType.collapsed : TextSelectionHandleType.right);
-      }),
+      OverlayEntry(
+        builder: (context) {
+          return _buildStartHandle(
+            context,
+            isCollapsed
+                ? TextSelectionHandleType.collapsed
+                : TextSelectionHandleType.left,
+          );
+        },
+      ),
+      OverlayEntry(
+        builder: (context) {
+          return _buildEndHandle(
+            context,
+            isCollapsed
+                ? TextSelectionHandleType.collapsed
+                : TextSelectionHandleType.right,
+          );
+        },
+      ),
     ];
     Overlay.of(context, rootOverlay: true).insertAll(_handles!);
   }
@@ -686,13 +749,18 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     if (kIsIOS && type == TextSelectionHandleType.collapsed) {
       type = TextSelectionHandleType.right;
     }
+
     return CodeEditorTapRegion(
       child: ExcludeSemantics(
         child: _SelectionHandleOverlay(
           type: type,
           handleLayerLink: startHandleLayerLink,
           onSelectionHandleTapped: () {
-            final Offset? position = ensureRender.calculateTextPositionScreenOffset(controller.selection.start, false);
+            final Offset? position = ensureRender
+                .calculateTextPositionScreenOffset(
+                  controller.selection.start,
+                  false,
+                );
             if (position == null) {
               return;
             }
@@ -709,7 +777,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
           selectionControls: selectionControls,
           visibility: _effectiveStartHandleVisibility,
           preferredLineHeight: lineHeight,
-        )
+        ),
       ),
     );
   }
@@ -724,7 +792,11 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         type: type,
         handleLayerLink: endHandleLayerLink,
         onSelectionHandleTapped: () {
-          final Offset? position = ensureRender.calculateTextPositionScreenOffset(controller.selection.end, false);
+          final Offset? position = ensureRender
+              .calculateTextPositionScreenOffset(
+                controller.selection.end,
+                false,
+              );
           if (position == null) {
             return;
           }
@@ -743,20 +815,22 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         preferredLineHeight: lineHeight,
       );
     }
-    return CodeEditorTapRegion(
-      child: ExcludeSemantics(
-        child: handle,
-      ),
-    );
+
+    return CodeEditorTapRegion(child: ExcludeSemantics(child: handle));
   }
 
   void _handleStartHandleDragStart(DragStartDetails details) {
     _startHandleDragging = true;
     _startHandleDragLastPosition = details.globalPosition;
     _startHandleDragPosition = details.globalPosition.dy;
-    final Offset startPoint = ensureRender.localToGlobal(ensureRender.calculateTextPositionViewportOffset(controller.selection.start)!);
+    final Offset startPoint = ensureRender.localToGlobal(
+      ensureRender.calculateTextPositionViewportOffset(
+        controller.selection.start,
+      )!,
+    );
     final double centerOfLine = startPoint.dy + ensureRender.lineHeight / 2;
-    _startHandleDragPositionToCenterOfLine = centerOfLine - _startHandleDragPosition;
+    _startHandleDragPositionToCenterOfLine =
+        centerOfLine - _startHandleDragPosition;
     toolbarVisibility.value = false;
     _autoScrollWhenStartHandleDragging();
   }
@@ -765,25 +839,31 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     if (!attached) {
       return;
     }
-    _startHandleDragPosition = _getHandleDy(offset.dy, _startHandleDragPosition);
+    _startHandleDragPosition = _getHandleDy(
+      offset.dy,
+      _startHandleDragPosition,
+    );
     _startHandleDragLastPosition = offset;
-    final Offset adjustedOffset = ensureRender.globalToLocal(Offset(
-      offset.dx,
-      _startHandleDragPosition + _startHandleDragPositionToCenterOfLine,
-    ));
-    final CodeLinePosition? position = ensureRender.calculateTextPosition(adjustedOffset);
+    final Offset adjustedOffset = ensureRender.globalToLocal(
+      Offset(
+        offset.dx,
+        _startHandleDragPosition + _startHandleDragPositionToCenterOfLine,
+      ),
+    );
+    final CodeLinePosition? position = ensureRender.calculateTextPosition(
+      adjustedOffset,
+    );
     if (position == null) {
       return;
     }
     final CodeLineSelection newSelection;
     if (controller.selection.isCollapsed) {
-      newSelection = CodeLineSelection.fromPosition(
-        position : position
-      );
+      newSelection = CodeLineSelection.fromPosition(position: position);
       if (controller.selection != newSelection) {
         HapticFeedback.selectionClick();
       }
       controller.selection = newSelection;
+
       return;
     }
     if (kIsAndroid) {
@@ -793,9 +873,10 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         baseAffinity: position.affinity,
         extentIndex: controller.selection.endIndex,
         extentOffset: controller.selection.endOffset,
-        extentAffinity: controller.selection.end.affinity
+        extentAffinity: controller.selection.end.affinity,
       );
-      if (position.index >= controller.selection.endIndex && position.offset >= controller.selection.endOffset) {
+      if (position.index >= controller.selection.endIndex &&
+          position.offset >= controller.selection.endOffset) {
         // Don't allow order swapping.
         return;
       }
@@ -811,7 +892,8 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         extentOffset: position.offset,
         extentAffinity: position.affinity,
       );
-      if (newSelection.extentIndex >= controller.selection.endIndex && newSelection.extentOffset >= controller.selection.endOffset) {
+      if (newSelection.extentIndex >= controller.selection.endIndex &&
+          newSelection.extentOffset >= controller.selection.endOffset) {
         // Don't allow order swapping.
         return;
       }
@@ -831,10 +913,14 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     _endHandleDragging = true;
     _endHandleDragPosition = details.globalPosition.dy;
     _endHandleDragLastPosition = details.globalPosition;
-    final Offset endPoint =
-        ensureRender.localToGlobal(ensureRender.calculateTextPositionViewportOffset(controller.selection.end)!);
+    final Offset endPoint = ensureRender.localToGlobal(
+      ensureRender.calculateTextPositionViewportOffset(
+        controller.selection.end,
+      )!,
+    );
     final double centerOfLine = endPoint.dy + ensureRender.lineHeight / 2;
-    _endHandleDragPositionToCenterOfLine = centerOfLine - _endHandleDragPosition;
+    _endHandleDragPositionToCenterOfLine =
+        centerOfLine - _endHandleDragPosition;
     toolbarVisibility.value = false;
     _autoScrollWhenEndHandleDragging();
   }
@@ -845,23 +931,26 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     }
     _endHandleDragPosition = _getHandleDy(offset.dy, _endHandleDragPosition);
     _endHandleDragLastPosition = offset;
-    final Offset adjustedOffset = ensureRender.globalToLocal(Offset(
-      offset.dx,
-      _endHandleDragPosition + _endHandleDragPositionToCenterOfLine,
-    ));
-    final CodeLinePosition? position = ensureRender.calculateTextPosition(adjustedOffset);
+    final Offset adjustedOffset = ensureRender.globalToLocal(
+      Offset(
+        offset.dx,
+        _endHandleDragPosition + _endHandleDragPositionToCenterOfLine,
+      ),
+    );
+    final CodeLinePosition? position = ensureRender.calculateTextPosition(
+      adjustedOffset,
+    );
     if (position == null) {
       return;
     }
     final CodeLineSelection newSelection;
     if (controller.selection.isCollapsed) {
-      newSelection = CodeLineSelection.fromPosition(
-        position : position
-      );
+      newSelection = CodeLineSelection.fromPosition(position: position);
       if (controller.selection != newSelection) {
         HapticFeedback.selectionClick();
       }
       controller.selection = newSelection;
+
       return;
     }
 
@@ -874,7 +963,8 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         extentOffset: position.offset,
         extentAffinity: position.affinity,
       );
-      if (newSelection.baseIndex >= newSelection.extentIndex && newSelection.baseOffset >= newSelection.extentOffset) {
+      if (newSelection.baseIndex >= newSelection.extentIndex &&
+          newSelection.baseOffset >= newSelection.extentOffset) {
         // Don't allow order swapping.
         return;
       }
@@ -890,7 +980,8 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         baseOffset: controller.selection.startOffset,
         baseAffinity: controller.selection.start.affinity,
       );
-      if (position.index <= controller.selection.startIndex && position.offset <= controller.selection.startOffset) {
+      if (position.index <= controller.selection.startIndex &&
+          position.offset <= controller.selection.startOffset) {
         // Don't allow order swapping.
         return;
       }
@@ -905,25 +996,25 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   void _autoScrollWhenStartHandleDragging() {
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (!_startHandleDragging) {
         return;
       }
       ensureRender.autoScrollWhenDragging(_startHandleDragLastPosition);
       _handleStartHandleDragUpdate(_startHandleDragLastPosition);
       _autoScrollWhenStartHandleDragging();
-    }));
+    });
   }
 
   void _autoScrollWhenEndHandleDragging() {
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (!_endHandleDragging) {
         return;
       }
       ensureRender.autoScrollWhenDragging(_endHandleDragLastPosition);
       _handleEndHandleDragUpdate(_endHandleDragLastPosition);
       _autoScrollWhenEndHandleDragging();
-    }));
+    });
   }
 
   /// Given a handle position and drag position, returns the position of handle
@@ -937,16 +1028,23 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     final double distanceDragged = dragDy - handleDy;
     final int dragDirection = distanceDragged < 0.0 ? -1 : 1;
     final int linesDragged =
-        dragDirection * (distanceDragged.abs() / ensureRender.lineHeight).floor();
+        dragDirection *
+        (distanceDragged.abs() / ensureRender.lineHeight).floor();
+
     return handleDy + linesDragged * ensureRender.lineHeight;
   }
 
   Offset _clampPosition(Offset position) {
-    final RenderBox box = _context.findRenderObject() as RenderBox;
+    final RenderBox box = _context.findRenderObject()! as RenderBox;
     final Offset offset = box.globalToLocal(position);
-    return box.localToGlobal(Offset(min(max(0, offset.dx), box.size.width), min(max(0, offset.dy), box.size.height)));
-  }
 
+    return box.localToGlobal(
+      Offset(
+        min(max(0, offset.dx), box.size.width),
+        min(max(0, offset.dy), box.size.height),
+      ),
+    );
+  }
 }
 
 class _SelectionHandleOverlay extends StatefulWidget {
@@ -954,14 +1052,14 @@ class _SelectionHandleOverlay extends StatefulWidget {
   const _SelectionHandleOverlay({
     required this.type,
     required this.handleLayerLink,
+    required this.selectionControls,
+    required this.preferredLineHeight,
     this.onSelectionHandleTapped,
     this.onSelectionHandleDragStart,
     this.onSelectionHandleDragUpdate,
     this.onSelectionHandleDragEnd,
     this.onSelectionHandleDragCancel,
-    required this.selectionControls,
     this.visibility,
-    required this.preferredLineHeight,
   });
 
   final LayerLink handleLayerLink;
@@ -976,18 +1074,22 @@ class _SelectionHandleOverlay extends StatefulWidget {
   final TextSelectionHandleType type;
 
   @override
-  State<_SelectionHandleOverlay> createState() => _SelectionHandleOverlayState();
+  State<_SelectionHandleOverlay> createState() =>
+      _SelectionHandleOverlayState();
 }
 
-class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay> with SingleTickerProviderStateMixin {
-
+class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   Animation<double> get _opacity => _controller.view;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: SelectionOverlay.fadeDuration, vsync: this);
+    _controller = AnimationController(
+      duration: SelectionOverlay.fadeDuration,
+      vsync: this,
+    );
 
     _handleVisibilityChanged();
     widget.visibility?.addListener(_handleVisibilityChanged);
@@ -1035,7 +1137,10 @@ class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay> with S
 
     // Make sure the GestureDetector is big enough to be easily interactive.
     final Rect interactiveRect = handleRect.expandToInclude(
-      Rect.fromCircle(center: handleRect.center, radius: kMinInteractiveDimension/ 2),
+      Rect.fromCircle(
+        center: handleRect.center,
+        radius: kMinInteractiveDimension / 2,
+      ),
     );
     final RelativeRect padding = RelativeRect.fromLTRB(
       max((interactiveRect.width - handleRect.width) / 2, 0),
@@ -1057,7 +1162,9 @@ class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay> with S
           child: RawGestureDetector(
             behavior: HitTestBehavior.translucent,
             gestures: <Type, GestureRecognizerFactory>{
-              PanGestureRecognizer: GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
+              PanGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+                PanGestureRecognizer
+              >(
                 () => PanGestureRecognizer(
                   debugOwner: this,
                   // Mouse events select the text and do not drag the cursor.
@@ -1098,14 +1205,11 @@ class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay> with S
   }
 }
 
-class _MobileSelectionToolbarController implements MobileSelectionToolbarController {
-
+class _MobileSelectionToolbarController
+    implements MobileSelectionToolbarController {
+  _MobileSelectionToolbarController({required this.builder});
   final ToolbarMenuBuilder builder;
   OverlayEntry? _entry;
-
-  _MobileSelectionToolbarController({
-    required this.builder
-  });
 
   @override
   void hide(BuildContext context) {
@@ -1118,9 +1222,9 @@ class _MobileSelectionToolbarController implements MobileSelectionToolbarControl
     required BuildContext context,
     required CodeLineEditingController controller,
     required TextSelectionToolbarAnchors anchors,
-    Rect? renderRect,
     required LayerLink layerLink,
     required ValueNotifier<bool> visibility,
+    Rect? renderRect,
   }) {
     hide(context);
     final OverlayState? overlay = Overlay.maybeOf(context, rootOverlay: true);
@@ -1128,34 +1232,34 @@ class _MobileSelectionToolbarController implements MobileSelectionToolbarControl
       return;
     }
     final OverlayEntry entry = OverlayEntry(
-      builder: (_) => _SelectionToolbarWrapper(
-        visibility: visibility,
-        layerLink: layerLink,
-        offset: -renderRect!.topLeft,
-        child: builder(
-          context: context,
-          anchors: anchors,
-          controller: controller,
-          onDismiss: () {
-            hide(context);
-          },
-          onRefresh: () {
-            show(
+      builder:
+          (_) => _SelectionToolbarWrapper(
+            visibility: visibility,
+            layerLink: layerLink,
+            offset: -renderRect!.topLeft,
+            child: builder(
               context: context,
-              controller: controller,
               anchors: anchors,
-              renderRect: renderRect,
-              layerLink: layerLink,
-              visibility: visibility
-            );
-          },
-        )
-      )
+              controller: controller,
+              onDismiss: () {
+                hide(context);
+              },
+              onRefresh: () {
+                show(
+                  context: context,
+                  controller: controller,
+                  anchors: anchors,
+                  renderRect: renderRect,
+                  layerLink: layerLink,
+                  visibility: visibility,
+                );
+              },
+            ),
+          ),
     );
     overlay.insert(entry);
     _entry = entry;
   }
-
 }
 
 // TODO(justinmc): Currently this fades in but not out on all platforms. It
@@ -1166,10 +1270,10 @@ class _MobileSelectionToolbarController implements MobileSelectionToolbarControl
 // TextSelectionControls.buildToolbar.
 class _SelectionToolbarWrapper extends StatefulWidget {
   const _SelectionToolbarWrapper({
-    this.visibility,
     required this.layerLink,
     required this.offset,
     required this.child,
+    this.visibility,
   });
 
   final Widget child;
@@ -1178,10 +1282,12 @@ class _SelectionToolbarWrapper extends StatefulWidget {
   final ValueListenable<bool>? visibility;
 
   @override
-  State<_SelectionToolbarWrapper> createState() => _SelectionToolbarWrapperState();
+  State<_SelectionToolbarWrapper> createState() =>
+      _SelectionToolbarWrapperState();
 }
 
-class _SelectionToolbarWrapperState extends State<_SelectionToolbarWrapper> with SingleTickerProviderStateMixin {
+class _SelectionToolbarWrapperState extends State<_SelectionToolbarWrapper>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   Animation<double> get _opacity => _controller.view;
 
@@ -1189,7 +1295,10 @@ class _SelectionToolbarWrapperState extends State<_SelectionToolbarWrapper> with
   void initState() {
     super.initState();
 
-    _controller = AnimationController(duration: SelectionOverlay.fadeDuration, vsync: this);
+    _controller = AnimationController(
+      duration: SelectionOverlay.fadeDuration,
+      vsync: this,
+    );
 
     _toolbarVisibilityChanged();
     widget.visibility?.addListener(_toolbarVisibilityChanged);

@@ -1,44 +1,48 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _DefaultCodeCommentFormatter implements DefaultCodeCommentFormatter {
-
+  const _DefaultCodeCommentFormatter({
+    this.singleLinePrefix,
+    this.multiLinePrefix,
+    this.multiLineSuffix,
+  });
   final String? singleLinePrefix;
   final String? multiLinePrefix;
   final String? multiLineSuffix;
 
-  const _DefaultCodeCommentFormatter({
-    this.singleLinePrefix,
-    this.multiLinePrefix,
-    this.multiLineSuffix
-  });
-
   @override
-  CodeLineEditingValue format(CodeLineEditingValue value, String indent, bool single) {
+  CodeLineEditingValue format(
+    CodeLineEditingValue value,
+    String indent,
+    bool single,
+  ) {
     if (single && (singleLinePrefix == null || singleLinePrefix!.isEmpty)) {
       return value;
     }
-    if (!single && (multiLinePrefix == null || multiLinePrefix!.isEmpty) && (multiLineSuffix == null || multiLineSuffix!.isEmpty)) {
+    if (!single &&
+        (multiLinePrefix == null || multiLinePrefix!.isEmpty) &&
+        (multiLineSuffix == null || multiLineSuffix!.isEmpty)) {
       return value;
     }
     final _DefaultCommentFormatter formatter;
     if (single) {
       formatter = _DefaultSingleLineCommentFormatter(singleLinePrefix!);
     } else {
-      formatter = _DefaultMultiLineCommentFormatter(multiLinePrefix!,  multiLineSuffix!);
+      formatter = _DefaultMultiLineCommentFormatter(
+        multiLinePrefix!,
+        multiLineSuffix!,
+      );
     }
+
     return formatter.format(value, indent);
   }
-
 }
 
 abstract class _DefaultCommentFormatter {
-
+  const _DefaultCommentFormatter(this.symbol);
   final String symbol;
 
-  const _DefaultCommentFormatter(this.symbol);
-
   CodeLineEditingValue format(CodeLineEditingValue value, String indent);
-
 }
 
 class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
@@ -54,8 +58,12 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     }
   }
 
-  CodeLineEditingValue _formatSelectedCodeLine(CodeLineEditingValue value, String indent) {
-    final String trimCode = value.codeLines[value.selection.baseIndex].text.trimLeft();
+  CodeLineEditingValue _formatSelectedCodeLine(
+    CodeLineEditingValue value,
+    String indent,
+  ) {
+    final String trimCode =
+        value.codeLines[value.selection.baseIndex].text.trimLeft();
     if (trimCode.startsWith('$symbol ')) {
       return _uncommentSelectedCodeLine(value, '$symbol ');
     } else if (trimCode.startsWith(symbol)) {
@@ -65,7 +73,10 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     }
   }
 
-  CodeLineEditingValue _uncommentSelectedCodeLine(CodeLineEditingValue value, String prefix) {
+  CodeLineEditingValue _uncommentSelectedCodeLine(
+    CodeLineEditingValue value,
+    String prefix,
+  ) {
     final CodeLineSelection selection = value.selection;
     final CodeLines codeLines = value.codeLines;
     final int lineIndex = selection.baseIndex;
@@ -73,7 +84,9 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     final int index = codeLine.text.indexOf(prefix);
     final CodeLines newCodeLines = CodeLines.from(codeLines);
     newCodeLines[lineIndex] = codeLine.copyWith(
-      text: codeLine.text.substring(0, index) + codeLine.text.substring(index + prefix.length)
+      text:
+          codeLine.text.substring(0, index) +
+          codeLine.text.substring(index + prefix.length),
     );
     int relocation(int offset) {
       if (offset <= index) {
@@ -82,16 +95,21 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
         return max(index, offset - prefix.length);
       }
     }
+
     return value.copyWith(
       codeLines: newCodeLines,
       selection: selection.copyWith(
         baseOffset: relocation(selection.baseOffset),
         extentOffset: relocation(selection.extentOffset),
-      )
+      ),
     );
   }
 
-  CodeLineEditingValue _commentSelectedCodeLine(CodeLineEditingValue value, String indent, String prefix) {
+  CodeLineEditingValue _commentSelectedCodeLine(
+    CodeLineEditingValue value,
+    String indent,
+    String prefix,
+  ) {
     final CodeLineSelection selection = value.selection;
     final CodeLines codeLines = value.codeLines;
     final int lineIndex = selection.baseIndex;
@@ -99,7 +117,7 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     final int index = codeLine.text.getOffsetWithoutIndent(indent);
     final CodeLines newCodeLines = CodeLines.from(codeLines);
     newCodeLines[lineIndex] = codeLine.copyWith(
-      text: codeLine.text.insert(prefix, index)
+      text: codeLine.text.insert(prefix, index),
     );
     final int baseOffset;
     final int extentOffset;
@@ -126,16 +144,20 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
         extentOffset = selection.extentOffset;
       }
     }
+
     return value.copyWith(
       codeLines: newCodeLines,
       selection: selection.copyWith(
         baseOffset: baseOffset,
         extentOffset: extentOffset,
-      )
+      ),
     );
   }
 
-  CodeLineEditingValue _formatSelectedCodeLines(CodeLineEditingValue value, String indent) {
+  CodeLineEditingValue _formatSelectedCodeLines(
+    CodeLineEditingValue value,
+    String indent,
+  ) {
     final CodeLineSelection selection = value.selection;
     final CodeLines codeLines = value.codeLines;
     final List<String> texts = [];
@@ -156,7 +178,11 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
     }
   }
 
-  CodeLineEditingValue _commentSelectedCodeLines(CodeLineEditingValue value, String indent, String prefix) {
+  CodeLineEditingValue _commentSelectedCodeLines(
+    CodeLineEditingValue value,
+    String indent,
+    String prefix,
+  ) {
     final CodeLineSelection selection = value.selection;
     final CodeLines codeLines = value.codeLines;
     int? index;
@@ -183,14 +209,15 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
       }
       final newChunks = _commentChunks(codeLine, prefix, index);
       newCodeLines[i] = codeLine.copyWith(
-        text: codeLine.text.insert(prefix, index), 
-        chunks: newChunks
+        text: codeLine.text.insert(prefix, index),
+        chunks: newChunks,
       );
     }
     final int baseOffset;
     final int extentOffset;
     if (selection.baseIndex < selection.extentIndex) {
-      if (selection.baseOffset < index || newCodeLines[selection.baseIndex].text.isEmpty) {
+      if (selection.baseOffset < index ||
+          newCodeLines[selection.baseIndex].text.isEmpty) {
         baseOffset = selection.baseOffset;
       } else {
         baseOffset = selection.baseOffset + prefix.length;
@@ -206,23 +233,25 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
       } else {
         baseOffset = selection.baseOffset + prefix.length;
       }
-      if (selection.extentOffset < index || newCodeLines[selection.extentIndex].text.isEmpty) {
+      if (selection.extentOffset < index ||
+          newCodeLines[selection.extentIndex].text.isEmpty) {
         extentOffset = selection.extentOffset;
       } else {
         extentOffset = selection.extentOffset + prefix.length;
       }
     }
+
     return value.copyWith(
       codeLines: newCodeLines,
       selection: selection.copyWith(
         baseOffset: baseOffset,
         extentOffset: extentOffset,
-      )
+      ),
     );
   }
 
   List<CodeLine> _commentChunks(CodeLine codeLine, String prefix, int index) {
-    final List<CodeLine> newCodeChunks = List.from(codeLine.chunks);
+    final List<CodeLine> newCodeChunks = List.of(codeLine.chunks);
     for (int j = 0; j < newCodeChunks.length; j++) {
       final CodeLine codeLineChunk = newCodeChunks[j];
       if (codeLineChunk.text.isEmpty) {
@@ -230,13 +259,19 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
       }
       final newCodeLineChunks = _commentChunks(codeLineChunk, prefix, index);
       newCodeChunks[j] = codeLineChunk.copyWith(
-          text: codeLineChunk.text.insert(prefix, index),
-          chunks: newCodeLineChunks);
+        text: codeLineChunk.text.insert(prefix, index),
+        chunks: newCodeLineChunks,
+      );
     }
+
     return newCodeChunks;
   }
 
-  CodeLineEditingValue _uncommentSelectedCodeLines(CodeLineEditingValue value, String indent, String prefix) {
+  CodeLineEditingValue _uncommentSelectedCodeLines(
+    CodeLineEditingValue value,
+    String indent,
+    String prefix,
+  ) {
     final CodeLineSelection selection = value.selection;
     final CodeLines newCodeLines = CodeLines.from(value.codeLines);
     int? baseOffset;
@@ -256,8 +291,10 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
       final int index = codeLine.text.indexOf(deletion);
       final codeChunks = _uncommentChunks(codeLine, deletion, index);
       newCodeLines[i] = codeLine.copyWith(
-        text: codeLine.text.substring(0, index) + codeLine.text.substring(index + deletion.length),
-        chunks: codeChunks
+        text:
+            codeLine.text.substring(0, index) +
+            codeLine.text.substring(index + deletion.length),
+        chunks: codeChunks,
       );
       if (i == selection.baseIndex) {
         if (selection.baseOffset > index) {
@@ -270,40 +307,49 @@ class _DefaultSingleLineCommentFormatter extends _DefaultCommentFormatter {
         }
       }
     }
+
     return value.copyWith(
       codeLines: newCodeLines,
       selection: selection.copyWith(
         baseOffset: baseOffset,
         extentOffset: extentOffset,
-      )
+      ),
     );
   }
 
   List<CodeLine> _uncommentChunks(
-      CodeLine codeLine, String deletion, int index) {
-    final List<CodeLine> newCodeChunks = List.from(codeLine.chunks);
+    CodeLine codeLine,
+    String deletion,
+    int index,
+  ) {
+    final List<CodeLine> newCodeChunks = List.of(codeLine.chunks);
     for (int j = 0; j < newCodeChunks.length; j++) {
       final CodeLine codeLineChunk = newCodeChunks[j];
       if (codeLineChunk.text.isEmpty) {
         continue;
       }
-      final newCodeLineChunks =
-          _uncommentChunks(codeLineChunk, deletion, index);
+      final newCodeLineChunks = _uncommentChunks(
+        codeLineChunk,
+        deletion,
+        index,
+      );
       newCodeChunks[j] = codeLineChunk.copyWith(
-          text: codeLineChunk.text.substring(0, index) +
-              codeLineChunk.text.substring(index + deletion.length),
-          chunks: newCodeLineChunks);
+        text:
+            codeLineChunk.text.substring(0, index) +
+            codeLineChunk.text.substring(index + deletion.length),
+        chunks: newCodeLineChunks,
+      );
     }
+
     return newCodeChunks;
   }
 }
 
 class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
-
+  _DefaultMultiLineCommentFormatter(this.prefix, this.suffix)
+    : super(prefix + suffix);
   final String prefix;
   final String suffix;
-
-  _DefaultMultiLineCommentFormatter(this.prefix, this.suffix) : super(prefix + suffix);
 
   @override
   CodeLineEditingValue format(CodeLineEditingValue value, String indent) {
@@ -339,18 +385,10 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
     final int prefixIndex;
     final int suffixIndex = codeLine.indexOf(suffix, extent);
 
-    prefixIndex = _getIndexOfPrefix(
-      codeLine,
-      base,
-    );
+    prefixIndex = _getIndexOfPrefix(codeLine, base);
 
     if (prefixIndex == -1 || suffixIndex == -1 || base < prefixIndex) {
-      return _commentSelectedCodeLine(
-        value,
-        indent,
-        '$prefix ',
-        ' $suffix',
-      );
+      return _commentSelectedCodeLine(value, indent, '$prefix ', ' $suffix');
     }
 
     if (codeLine.startsWith('$prefix ', prefixIndex) &&
@@ -392,12 +430,7 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
         suffixIndex,
       );
     } else {
-      return _commentSelectedCodeLine(
-        value,
-        indent,
-        '$prefix ',
-        ' $suffix',
-      );
+      return _commentSelectedCodeLine(value, indent, '$prefix ', ' $suffix');
     }
   }
 
@@ -416,7 +449,8 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
     final CodeLines newCodeLines = CodeLines.from(codeLines);
 
     newCodeLines[lineIndex] = codeLine.copyWith(
-      text: codeLine.text.substring(0, prefixIndex) +
+      text:
+          codeLine.text.substring(0, prefixIndex) +
           codeLine.text.substring(prefixIndex + prefix.length, suffixIndex) +
           codeLine.text.substring(suffixIndex + suffix.length),
     );
@@ -555,18 +589,10 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
     final int prefixIndex;
     final int suffixIndex = codeLastLine.indexOf(suffix, extent);
 
-    prefixIndex = _getIndexOfPrefix(
-      codeFirstLine,
-      base,
-    );
+    prefixIndex = _getIndexOfPrefix(codeFirstLine, base);
 
     if (prefixIndex == -1 || suffixIndex == -1 || base < prefixIndex) {
-      return _commentSelectedCodeLines(
-        value,
-        indent,
-        '$prefix ',
-        ' $suffix',
-      );
+      return _commentSelectedCodeLines(value, indent, '$prefix ', ' $suffix');
     }
 
     if (codeFirstLine.startsWith('$prefix ', prefixIndex) &&
@@ -608,12 +634,7 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
         suffixIndex,
       );
     } else {
-      return _commentSelectedCodeLines(
-        value,
-        indent,
-        '$prefix ',
-        ' $suffix',
-      );
+      return _commentSelectedCodeLines(value, indent, '$prefix ', ' $suffix');
     }
   }
 
@@ -642,12 +663,14 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
       codeLastLine = codeLines[extentIndex];
 
       newCodeLines[baseIndex] = codeFirstLine.copyWith(
-        text: codeFirstLine.text.substring(0, prefixIndex) +
+        text:
+            codeFirstLine.text.substring(0, prefixIndex) +
             codeFirstLine.text.substring(prefixIndex + prefix.length),
       );
 
       newCodeLines[extentIndex] = codeLastLine.copyWith(
-        text: codeLastLine.text.substring(0, suffixIndex) +
+        text:
+            codeLastLine.text.substring(0, suffixIndex) +
             codeLastLine.text.substring(suffixIndex + suffix.length),
       );
 
@@ -669,12 +692,14 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
       codeLastLine = codeLines[baseIndex];
 
       newCodeLines[extentIndex] = codeFirstLine.copyWith(
-        text: codeFirstLine.text.substring(0, prefixIndex) +
+        text:
+            codeFirstLine.text.substring(0, prefixIndex) +
             codeFirstLine.text.substring(prefixIndex + prefix.length),
       );
 
       newCodeLines[baseIndex] = codeLastLine.copyWith(
-        text: codeLastLine.text.substring(0, suffixIndex) +
+        text:
+            codeLastLine.text.substring(0, suffixIndex) +
             codeLastLine.text.substring(suffixIndex + suffix.length),
       );
 
@@ -762,13 +787,10 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
     );
   }
 
-  int _getIndexOfPrefix(
-    String text,
-    int baseIndex,
-  ) {
+  int _getIndexOfPrefix(String text, int baseIndex) {
     int index = -1;
-    int prefixLength = prefix.length - 1;
-    int suffixLength = suffix.length - 1;
+    final int prefixLength = prefix.length - 1;
+    final int suffixLength = suffix.length - 1;
 
     if (baseIndex >= text.length - 1) {
       return index;
@@ -791,5 +813,4 @@ class _DefaultMultiLineCommentFormatter extends _DefaultCommentFormatter {
 
     return index;
   }
-
 }

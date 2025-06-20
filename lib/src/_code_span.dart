@@ -1,17 +1,15 @@
-part of re_editor;
+part of 're_editor.dart';
 
 @immutable
 class _MouseTrackerAnnotationTextSpan extends TextSpan {
-
-  final int id;
-  final MouseTrackerAnnotationTextSpan span;
-  final List<Rect> rects;
-
   const _MouseTrackerAnnotationTextSpan({
     required this.id,
     required this.rects,
     required this.span,
   });
+  final int id;
+  final MouseTrackerAnnotationTextSpan span;
+  final List<Rect> rects;
 
   @override
   PointerEnterEventListener? get onEnter => (event) {
@@ -31,8 +29,9 @@ class _MouseTrackerAnnotationTextSpan extends TextSpan {
     if (identical(this, other)) {
       return true;
     }
-    return other is _MouseTrackerAnnotationTextSpan && span == other.span &&
-      id == other.id;
-  }
 
+    return other is _MouseTrackerAnnotationTextSpan &&
+        span == other.span &&
+        id == other.id;
+  }
 }
