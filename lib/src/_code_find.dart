@@ -423,14 +423,22 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
       previousValue.addAll(element.flat());
       return previousValue;
     });
+    final List<int> rawCodeLinePrefixSums = rawCodeLines.fold([], (previousValue, element) {
+      if (previousValue.isEmpty) {
+        previousValue.add(element.length);
+      } else {
+        previousValue.add(previousValue.last + element.length + 1);
+      }
+      return previousValue;
+    });
     final Iterable<Match> matches = regExp.allMatches(rawCodeLines.join(TextLineBreak.lf.value));
     if (matches.isEmpty) {
       return null;
     }
     final List<CodeLineSelection> selections = [];
     for (final Match match in matches) {
-      final CodeLinePosition start = _findPosition(rawCodeLines, match.start);
-      final CodeLinePosition end = _findPosition(rawCodeLines, match.end);
+      final CodeLinePosition start = _findPosition(rawCodeLines, rawCodeLinePrefixSums, match.start);
+      final CodeLinePosition end = _findPosition(rawCodeLines, rawCodeLinePrefixSums, match.end);
       selections.add(CodeLineSelection(
         baseIndex: start.index,
         baseOffset: start.offset,
@@ -460,21 +468,28 @@ class _CodeFindControllerImpl extends ValueNotifier<CodeFindValue?> implements C
     );
   }
 
-  static CodeLinePosition _findPosition(List<String> codeLines, int index) {
-    int start = 0;
+  static CodeLinePosition _findPosition(List<String> codeLines, List<int> codeLinePrefixSums, int index) {
     int line = 0;
     int offset = -1;
-    for (; line < codeLines.length; line++) {
-      if (index <= start + codeLines[line].length) {
-        offset = index - start;
-        break;
+
+    {
+      int l = 0;
+      int r = codeLinePrefixSums.length - 1;
+
+      while (l <= r) {
+        int m = (l + r) >> 1;
+
+        if (index <= codeLinePrefixSums[m]) {
+          line = m;
+          offset = index - (codeLinePrefixSums[m] - codeLines[m].length);
+
+          r = m - 1;
+        } else {
+          l = m + 1;
+        }
       }
-      start += codeLines[line].length + 1;
     }
-    return CodeLinePosition(
-      index: line,
-      offset: offset
-    );
+    return CodeLinePosition(index: line, offset: offset);
   }
 
 }
