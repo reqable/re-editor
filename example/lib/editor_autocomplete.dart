@@ -93,7 +93,7 @@ class AutoCompleteEditor extends StatefulWidget {
 
 class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
 
-  final CodeLineEditingController _controller = CodeLineEditingController();
+  final CodeLineEditingController _controller = CodeLineEditingController(contextMenuDelegate: ContextMenuDelegateImpl());
 
   @override
   void initState() {

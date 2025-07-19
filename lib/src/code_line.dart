@@ -53,10 +53,12 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
     CodeLines codeLines = _kInitialCodeLines,
     CodeLineOptions options = const CodeLineOptions(),
     CodeLineSpanBuilder? spanBuilder,
+    ContextMenuDelegate? contextMenuDelegate,
   }) => _CodeLineEditingControllerImpl(
     codeLines: codeLines,
     options: options,
     spanBuilder: spanBuilder,
+    contextMenuDelegate: contextMenuDelegate
   );
 
   /// Creates a controller for a given text.
@@ -373,6 +375,11 @@ abstract class CodeLineEditingController extends ValueNotifier<CodeLineEditingVa
     required TextSpan textSpan,
     required TextStyle style,
   });
+
+  /// for context menu ,only support desktop
+  MenuController get  menuController;
+  /// for context menu ,only support desktop
+  ContextMenuDelegate? get  contextMenuDelegate;
 }
 
 /// A delegate controller for an editor field.
