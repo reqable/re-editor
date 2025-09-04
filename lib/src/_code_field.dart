@@ -708,6 +708,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   }
 
   void forceRepaint() {
+    _highlighter.clearCache();
     _displayParagraphs.clear();
     _updateDisplayRenderParagraphs();
     markNeedsPaint();

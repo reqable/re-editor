@@ -58,6 +58,10 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     ), maxWidth);
   }
 
+  void clearCache() {
+    _provider.clearCache();
+  }
+
   @override
   void dispose() {
     _controller.removeListener(_onCodesChanged);
