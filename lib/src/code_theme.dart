@@ -9,7 +9,8 @@ class CodeHighlightTheme {
 
   const CodeHighlightTheme({
     required this.languages,
-    required this.theme
+    required this.theme,
+    this.plugins = const [],
   });
 
   /// Supported syntax highlighting language rules.
@@ -18,8 +19,11 @@ class CodeHighlightTheme {
   /// The syntax highlighting style theme.
   final Map<String, TextStyle> theme;
 
+  /// The plugins for syntax highlighting.
+  final List<HLPlugin> plugins;
+
   @override
-  int get hashCode => Object.hash(languages, theme);
+  int get hashCode => Object.hash(languages, theme, plugins);
 
   @override
   bool operator ==(Object other) {
@@ -28,7 +32,8 @@ class CodeHighlightTheme {
     }
     return other is CodeHighlightTheme
         && mapEquals(other.languages, languages)
-        && mapEquals(other.theme, theme);
+        && mapEquals(other.theme, theme)
+        && listEquals(other.plugins, plugins);
   }
 
 }

@@ -708,6 +708,7 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   }
 
   void forceRepaint() {
+    _highlighter.clearCache();
     _displayParagraphs.clear();
     _updateDisplayRenderParagraphs();
     markNeedsPaint();
@@ -856,6 +857,8 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
       }
       if (_chunkIndicators.where((chunk) => chunk.canExpand && chunk.region.contains(position)).isNotEmpty) {
         _cursor = SystemMouseCursors.click;
+      } else if (span is TextSpan && span.mouseCursor != MouseCursor.defer) {
+        _cursor = span.mouseCursor;
       } else {
         _cursor = SystemMouseCursors.text;
       }

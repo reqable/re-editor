@@ -58,6 +58,10 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     ), maxWidth);
   }
 
+  void clearCache() {
+    _provider.clearCache();
+  }
+
   @override
   void dispose() {
     _controller.removeListener(_onCodesChanged);
@@ -191,6 +195,9 @@ class _CodeHighlightEngine {
     } else {
       final Highlight highlight = Highlight();
       highlight.registerLanguages(modes.map((key, value) => MapEntry(key, value.mode)));
+      for (final HLPlugin plugin in _theme!.plugins) {
+        highlight.addPlugin(plugin);
+      }
       _highlight = highlight;
     }
   }
