@@ -78,3 +78,12 @@
 * Fix makePositionCenterIfInvisible was called infinitely.
 * Clamp code line substring.
 * Fixed a bug: type 'Null' is not a subtype of type '_CodeFieldRender'.
+
+## 0.8.0
+* Add code syntax highlight plugin support.
+* Opt mouse cursor display when using the TextSpan with a custom mouse cursor.
+* Fix a bug where the highlight span cache was not clean in force repaint.
+* Add the fontFamilyFallback param in CodeEditorStyle.
+* API makePositionCenterIfInvisible will consider top and bottom padding.
+* Fix IME pastes multiline text issue.
+* Fix PlatformException issue on new flutter version.
