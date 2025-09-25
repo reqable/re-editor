@@ -7,6 +7,7 @@ class CodeEditorStyle {
   const CodeEditorStyle({
     this.fontSize,
     this.fontFamily,
+    this.fontFamilyFallback,
     this.fontHeight,
     this.textColor,
     this.hintTextColor,
@@ -46,6 +47,29 @@ class CodeEditorStyle {
   /// family. When neither is provided, then the default platform font will
   /// be used.
   final String? fontFamily;
+
+  /// The ordered list of font families to fall back on when a glyph cannot be
+  /// found in a higher priority font family.
+  ///
+  /// The value provided in [fontFamily] will act as the preferred/first font
+  /// family that glyphs are looked for in, followed in order by the font families
+  /// in [fontFamilyFallback]. If all font families are exhausted and no match
+  /// was found, the default platform font family will be used instead.
+  ///
+  /// When [fontFamily] is null or not provided, the first value in [fontFamilyFallback]
+  /// acts as the preferred/first font family. When neither is provided, then
+  /// the default platform font will be used. Providing an empty list or null
+  /// for this property is the same as omitting it.
+  ///
+  /// For example, if a glyph is not found in [fontFamily], then each font family
+  /// in [fontFamilyFallback] will be searched in order until it is found. If it
+  /// is not found, then a box will be drawn in its place.
+  ///
+  /// If the font is defined in a package, each font family in the list will be
+  /// prefixed with 'packages/package_name/' (e.g. 'packages/cool_fonts/Roboto').
+  /// The package name should be provided by the `package` argument in the
+  /// constructor.
+  final List<String>? fontFamilyFallback;
 
   /// The height of this text span, as a multiple of the font size.
   ///
@@ -294,7 +318,7 @@ class CodeEditor extends StatefulWidget {
 
   /// The maximum number of characters per line to render.
   ///
-  /// Due to the performance limitations of the Skia text engine, 
+  /// Due to the performance limitations of the Skia text engine,
   /// setting a reasonable length can improve the performance of the editor.
   ///
   /// If null, there is no limit.
@@ -470,6 +494,7 @@ class _CodeEditorState extends State<CodeEditor> {
     final TextStyle baseStyle = TextStyle(
       fontSize: widget.style?.fontSize ?? _kDefaultTextSize,
       fontFamily: widget.style?.fontFamily,
+      fontFamilyFallback: widget.style?.fontFamilyFallback,
       height: widget.style?.fontHeight ?? _kDefaultFontHeight,
     );
     final bool readOnly = widget.readOnly ?? false;
