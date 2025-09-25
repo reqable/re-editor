@@ -132,6 +132,8 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
 
   late final _CodeAutocompleteNavigateAction _navigateAction;
   late final _CodeAutocompleteAction _selectAction;
+  late final _CodeAutocompleteVisibleAction _visibleAction;
+  
 
   ValueChanged<CodeAutocompleteResult>? _onAutocomplete;
   OverlayEntry? _overlayEntry;
@@ -173,6 +175,12 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
         return intent;
       },
     );
+    _visibleAction = _CodeAutocompleteVisibleAction<CodeShortcutEscIntent>(
+      onInvoke: (intent) {
+        dismiss();
+        return intent;
+      },
+    );
   }
 
   @override
@@ -186,6 +194,7 @@ class _CodeAutocompleteState extends State<_CodeAutocomplete> {
       actions: {
         CodeShortcutCursorMoveIntent: _navigateAction,
         CodeShortcutNewLineIntent: _selectAction,
+        CodeShortcutEscIntent: _visibleAction,
       },
       child: widget.child
     );
@@ -285,6 +294,23 @@ class _CodeAutocompleteAction<T extends Intent> extends CallbackAction<T> {
   @override
   bool get isActionEnabled => _isEnabled;
 
+}
+
+class _CodeAutocompleteVisibleAction<T extends Intent> extends CallbackAction<T> {
+  
+  bool _isEnabled = true;
+  
+  _CodeAutocompleteVisibleAction({
+    required super.onInvoke
+  });
+  
+  void setEnabled(bool enabled) {
+    _isEnabled = enabled;
+  }
+  
+  @override
+  bool get isActionEnabled => _isEnabled;
+  
 }
 
 class _CodeAutocompleteNavigateAction extends _CodeAutocompleteAction<CodeShortcutCursorMoveIntent> {

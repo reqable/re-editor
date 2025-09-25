@@ -10,7 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  re_highlight: ^0.0.3
+  re_highlight:
+    git:
+      url: https://github.com/CorvusYe/antlr-highlight
+      ref: a64b1162a5765f184a12d4bbb004137b7be50fe4
   isolate_manager: ^4.1.5+1
 
 dev_dependencies:
