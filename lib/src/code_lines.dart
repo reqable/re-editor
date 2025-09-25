@@ -13,7 +13,7 @@ class CodeLines {
   }
 
   factory CodeLines.fromText(String text) {
-    return CodeLineUtils.toCodeLines(text);
+    return text.codeLines;
   }
 
   factory CodeLines.from(CodeLines codeLines) {

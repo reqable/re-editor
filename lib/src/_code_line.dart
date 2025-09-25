@@ -33,7 +33,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     CodeLineOptions options = const CodeLineOptions()
   ]) {
     return _CodeLineEditingControllerImpl(
-      codeLines: CodeLineUtils.toCodeLines(text ?? ''),
+      codeLines: text?.codeLines ?? _kInitialCodeLines,
       options: options
     );
   }
@@ -45,7 +45,9 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
       codeLines: _kInitialCodeLines,
       options: options
     );
-    CodeLineUtils.toCodeLinesAsync(text ?? '').then((value) => controller.codeLines = value);
+    if (text != null && text.isNotEmpty) {
+      text.codeLinesAsync.then((value) => controller.codeLines = value);
+    }
     return controller;
   }
 
@@ -173,14 +175,14 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   set text(String value) {
     runRevocableOp(() {
       this.value = CodeLineEditingValue(
-        codeLines: CodeLineUtils.toCodeLines(value)
+        codeLines: value.codeLines
       );
     });
   }
 
   @override
   set textAsync(String value) {
-    CodeLineUtils.toCodeLinesAsync(value).then((value) {
+    value.codeLinesAsync.then((value) {
       runRevocableOp(() {
         this.value = CodeLineEditingValue(
           codeLines: value
@@ -198,6 +200,20 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
 
   @override
   void edit(TextEditingValue newValue) {
+    if (newValue.text.isMultiline) {
+      final String replacement;
+      final String beforeText = _codeTextBefore(selection.start);
+      final String endText = _codeTextAfter(selection.end);
+      if (beforeText.isNotEmpty && !newValue.text.startsWith(beforeText)) {
+        replacement = newValue.text;
+      } else if (endText.isNotEmpty && !newValue.text.endsWith(endText)) {
+        replacement = newValue.text;
+      } else {
+        replacement = newValue.text.substring(beforeText.length, newValue.text.length - endText.length);
+      }
+      _replaceRange(replacement);
+      return;
+    }
     final CodeLines newCodeLines;
     final TextSelection newSelection;
     final TextRange newComposing;
@@ -1749,7 +1765,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     if (replacement.isEmpty && range.isCollapsed) {
       return;
     }
-    final List<String> replaceCodeLines = CodeLineUtils.toTextLines(replacement);
+    final List<String> replaceCodeLines = replacement.textLines;
     final CodeLines newCodeLines = codeLines.sublines(0, range.startIndex);
     int index = 0;
     int offset = 0;
@@ -1808,7 +1824,7 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
     if (preText == newText) {
       return;
     }
-    final CodeLines newCodeLines = CodeLineUtils.toCodeLines(newText);
+    final CodeLines newCodeLines = newText.codeLines;
     int newExtentIndex = 0;
     int newExtentOffset = 0;
     int start = 0;

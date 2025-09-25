@@ -1165,21 +1165,28 @@ extension TextLineBreakExtension on TextLineBreak {
 
 }
 
-class CodeLineUtils {
+extension CodeLineExtension on String {
 
-  static List<String> toTextLines(String text) {
-    return text.replaceAll('\r\n', '\n').replaceAll('\r', '\n').split('\n');
+  bool get isMultiline {
+    return contains('\n') || contains('\r');
   }
 
-  static CodeLines toCodeLines(String text) {
-    return CodeLines.of(toTextLines(text).map((e) => CodeLine(e)));
+  List<String> get textLines {
+    return replaceAll('\r\n', '\n').replaceAll('\r', '\n').split('\n');
   }
 
-  static Future<CodeLines> toCodeLinesAsync(String text) async {
-    if (text.isEmpty) {
+  CodeLines get codeLines {
+    if (isEmpty) {
       return _kInitialCodeLines;
     }
-    return compute<String, CodeLines>((message) => toCodeLines(message), text);
+    return CodeLines.of(textLines.map(CodeLine.new));
+  }
+
+  Future<CodeLines> get codeLinesAsync async {
+    if (isEmpty) {
+      return _kInitialCodeLines;
+    }
+    return compute<String, CodeLines>((message) => message.codeLines, this);
   }
 
 }

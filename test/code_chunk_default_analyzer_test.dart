@@ -418,7 +418,7 @@ void main() {
 
     test('Parse a json string', () {
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_pretty.json')).readAsStringSync());
+        final CodeLines codeLines = File(join('test', 'data', 'json_pretty.json')).readAsStringSync().codeLines;
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
           CodeChunkSymbol('{', 1),
@@ -435,7 +435,7 @@ void main() {
         ]);
       }
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_flatted.json')).readAsStringSync());
+        final CodeLines codeLines = File(join('test', 'data', 'json_flatted.json')).readAsStringSync().codeLines;
         expect(analyzer.parse(codeLines), const [
           CodeChunkSymbol('{', 0),
           CodeChunkSymbol('{', 0),
@@ -590,7 +590,7 @@ void main() {
     });
     test('Parse a json string', () {
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_pretty.json')).readAsStringSync());
+        final CodeLines codeLines = File(join('test', 'data', 'json_pretty.json')).readAsStringSync().codeLines;
         expect(analyzer.run(codeLines), const [
           CodeChunk(0, 17),
           CodeChunk(1, 5),
@@ -601,7 +601,7 @@ void main() {
         ]);
       }
       {
-        final CodeLines codeLines = CodeLineUtils.toCodeLines(File(join('test', 'data', 'json_flatted.json')).readAsStringSync());
+        final CodeLines codeLines = File(join('test', 'data', 'json_flatted.json')).readAsStringSync().codeLines;
         expect(analyzer.run(codeLines), const []);
       }
     });
