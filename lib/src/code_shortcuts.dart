@@ -51,6 +51,10 @@ enum CodeShortcutType {
   replace,
   save,
   esc,
+  execute,
+  executeNewTab,
+  executeScript,
+  format
 }
 
 abstract class CodeShortcutsActivatorsBuilder {
@@ -218,6 +222,19 @@ class CodeShortcutSaveIntent extends Intent {
 class CodeShortcutEscIntent extends Intent {
   const CodeShortcutEscIntent();
 }
+class CodeShortcutExecuteIntent extends Intent {
+  const CodeShortcutExecuteIntent();
+}
+class CodeShortcutExecuteNewTabIntent extends Intent {
+  const CodeShortcutExecuteNewTabIntent();
+}
+class CodeShortcutExecuteScriptIntent extends Intent {
+  const CodeShortcutExecuteScriptIntent();
+}
+class CodeShortcutFormatIntent extends Intent {
+  const CodeShortcutFormatIntent();
+}
+
 
 const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.selectAll: CodeShortcutSelectAllIntent(),
@@ -270,6 +287,10 @@ const Map<CodeShortcutType, Intent> kCodeShortcutIntents = {
   CodeShortcutType.replace: CodeShortcutReplaceIntent(),
   CodeShortcutType.save: CodeShortcutSaveIntent(),
   CodeShortcutType.esc: CodeShortcutEscIntent(),
+  CodeShortcutType.execute: CodeShortcutExecuteIntent(),
+  CodeShortcutType.executeNewTab: CodeShortcutExecuteNewTabIntent(),
+  CodeShortcutType.executeScript: CodeShortcutExecuteScriptIntent(),
+  CodeShortcutType.format: CodeShortcutFormatIntent(),
 };
 
 const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsActivators = {
@@ -434,6 +455,18 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultMacCodeShortcutsAc
   CodeShortcutType.esc: [
     SingleActivator(LogicalKeyboardKey.escape)
   ],
+  CodeShortcutType.execute: [
+    SingleActivator(LogicalKeyboardKey.enter,meta: true)
+  ],
+  CodeShortcutType.executeNewTab: [
+    SingleActivator(LogicalKeyboardKey.backslash,meta: true)
+  ],
+  CodeShortcutType.executeScript: [
+    SingleActivator(LogicalKeyboardKey.keyX,alt: true)
+  ],
+  CodeShortcutType.format: [
+    SingleActivator(LogicalKeyboardKey.keyF,meta: true,shift: true)
+  ],
 };
 
 const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcutsActivators = {
@@ -593,5 +626,17 @@ const Map<CodeShortcutType, List<ShortcutActivator>> _kDefaultCommonCodeShortcut
   ],
   CodeShortcutType.esc: [
     SingleActivator(LogicalKeyboardKey.escape)
+  ],
+  CodeShortcutType.execute: [
+    SingleActivator(LogicalKeyboardKey.enter,control: true)
+  ],
+  CodeShortcutType.executeNewTab: [
+    SingleActivator(LogicalKeyboardKey.backslash,control: true)
+  ],
+  CodeShortcutType.executeScript: [
+    SingleActivator(LogicalKeyboardKey.keyX,alt: true)
+  ],
+  CodeShortcutType.format: [
+    SingleActivator(LogicalKeyboardKey.keyF,control: true,shift: true)
   ],
 };
