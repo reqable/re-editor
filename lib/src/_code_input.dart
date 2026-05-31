@@ -132,6 +132,9 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   }
 
   @override
+  bool onFocusReceived() => false;
+
+  @override
   void updateEditingValueWithDeltas(List<TextEditingDelta> textEditingDeltas) {
     if (_updateCausedByFloatingCursor) {
       // This is necessary because otherwise the content of the line where the floating cursor was started
