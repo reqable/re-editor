@@ -93,6 +93,9 @@ class _CodeInputController extends ChangeNotifier
   void connectionClosed() {}
 
   @override
+  bool onFocusReceived() => false;
+
+  @override
   AutofillScope? get currentAutofillScope => null;
 
   @override

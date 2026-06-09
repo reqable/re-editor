@@ -5,17 +5,17 @@ publish_to: none
 version: 1.0.0
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: '>=2.17.0 <3.0.0'
+  flutter: '>=1.17.0'
 
 dependencies:
   collection: ^1.17.1
   flutter:
     sdk: flutter
   re_editor:
-    path: ../
+    git: https://github.com/sgehrman/re-editor.git
   re_highlight:
-    git: https://github.com/sgehrman/re-highlight
+    git: https://github.com/sgehrman/re-highlight.git
 
 dev_dependencies:
   flutter_lints: ^2.0.3
@@ -24,7 +24,6 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

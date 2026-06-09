@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: async
-      sha256: "758e6d74e971c3e5aceb4110bfd6698efc7f501675bcfe0c775459a8140750eb"
+      sha256: e2eb0491ba5ddb6177742d2da23904574082139b07c1e33b8503b9f46f3e1a37
       url: "https://pub.dev"
     source: hosted
-    version: "2.13.0"
+    version: "2.13.1"
   characters:
     dependency: transitive
     description:
       name: characters
-      sha256: f71061c654a3380576a52b451dd5532377954cf9dbd272a78fc8479606670803
+      sha256: faf38497bda5ead2a8c7615f4f7939df04333478bf32e4173fcb06d428b5716b
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "1.4.1"
   collection:
     dependency: "direct main"
     description:
@@ -42,10 +42,10 @@ packages:
     dependency: transitive
     description:
       name: isolate_manager
-      sha256: "470582fcde05989877f3d7a2dd5ff798249fdf709f14c06bb6c876ae9f51a27d"
+      sha256: "806b6195a60f17bcb23e3c6d2f4da1f29e7376c4295b061d135f59613586ad1d"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0+2"
+    version: "6.3.2"
   lints:
     dependency: transitive
     description:
@@ -58,18 +58,18 @@ packages:
     dependency: transitive
     description:
       name: material_color_utilities
-      sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
+      sha256: "9c337007e82b1889149c82ed242ed1cb24a66044e30979c44912381e9be4c48b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.1"
+    version: "0.13.0"
   meta:
     dependency: transitive
     description:
       name: meta
-      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
+      sha256: "1741988757a65eb6b36abe716829688cf01910bbf91c34354ff7ec1c3de2b349"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.18.0"
   path:
     dependency: transitive
     description:
@@ -81,17 +81,19 @@ packages:
   re_editor:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "455c5f2f4ed15f235157cd3af8577639ae7730fd"
+      url: "https://github.com/sgehrman/re-editor.git"
+    source: git
     version: "0.7.0"
   re_highlight:
     dependency: "direct main"
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "49ca075fdb0b8114bc153357275314700e1307ed"
-      url: "https://github.com/sgehrman/re-highlight"
+      resolved-ref: "933191bd2577e6fc964d566121776a5f4858bfcf"
+      url: "https://github.com/sgehrman/re-highlight.git"
     source: git
     version: "0.0.3"
   sky_engine:
@@ -111,10 +113,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
+      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.2.0"
   web:
     dependency: transitive
     description:
@@ -124,5 +126,5 @@ packages:
     source: hosted
     version: "1.1.1"
 sdks:
-  dart: ">=3.7.2 <4.0.0"
+  dart: ">=3.10.0-0 <4.0.0"
   flutter: ">=1.17.0"
