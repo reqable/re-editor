@@ -60,13 +60,13 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
             _onMobileLongPressedStart(details.globalPosition);
             _autoScrollWhenDragging();
           } else {
-            widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+            widget.selectionOverlayController.showToolbar(context, details.globalPosition,details.localPosition);
           }
           widget.selectionOverlayController.showHandle(context);
         },
         onLongPressEnd: (details) {
           if (_longPressOnSelection != true) {
-            widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+            widget.selectionOverlayController.showToolbar(context, details.globalPosition,details.localPosition);
           }
           _dragPosition = null;
           _longPressOnSelection = false;
@@ -155,7 +155,13 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
             _pointerTapPosition = null;
           },
           behavior: widget.behavior ?? HitTestBehavior.translucent,
-          child: widget.child,
+          child: MenuAnchor(
+            consumeOutsideTap: true,
+            anchorTapClosesMenu: true,
+            controller: widget.controller.menuController,
+            menuChildren: widget.controller.contextMenuDelegate == null ? [] : widget.controller.contextMenuDelegate!.buildMenuItems(controller: widget.controller, context: context),
+            child: widget.child,
+          ),
         ),
       );
     }
@@ -181,7 +187,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       kDoubleTapTimeout.inMilliseconds && _pointerTapPosition != null && _pointerTapPosition!.isSamePosition(position)) {
       _onDoubleTap(position);
       widget.selectionOverlayController.showHandle(context);
-      widget.selectionOverlayController.showToolbar(context, position);
+      widget.selectionOverlayController.showToolbar(context, position ,null);
     } else {
       _pointerTapTimestamp = now;
       _pointerTapPosition = position;
@@ -302,7 +308,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
       return;
     }
     widget.controller.clearComposing();
-    widget.selectionOverlayController.showToolbar(context, details.globalPosition);
+    widget.selectionOverlayController.showToolbar(context, details.globalPosition,details.localPosition);
   }
 
   void _extendSelection(Offset offset, _SelectionChangedCause cause) {
@@ -425,7 +431,7 @@ abstract class _SelectionOverlayController {
 
   void hideHandle();
 
-  void showToolbar(BuildContext context, Offset position);
+  void showToolbar(BuildContext context, Offset position, Offset? localPosition);
 
   void hideToolbar();
 
@@ -459,12 +465,13 @@ class _DesktopSelectionOverlayController implements _SelectionOverlayController 
   }
 
   @override
-  void showToolbar(BuildContext context, Offset? position) {
+  void showToolbar(BuildContext context, Offset? position ,Offset? localPosition ) {
     if (position == null) {
       return;
     }
     onShowToolbar(context, TextSelectionToolbarAnchors(
-      primaryAnchor: position
+      primaryAnchor: position,
+      secondaryAnchor: localPosition
     ), null);
   }
 
@@ -566,7 +573,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   @override
-  void showToolbar(BuildContext context, Offset globalPosition) {
+  void showToolbar(BuildContext context, Offset globalPosition, Offset? localPosition) {
     globalPosition = _clampPosition(globalPosition);
     final Rect editingRegion = Rect.fromPoints(
       ensureRender.localToGlobal(Offset.zero),
@@ -704,7 +711,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
             if (position == null) {
               return;
             }
-            showToolbar(_context, position);
+            showToolbar(_context, position, null);
           },
           onSelectionHandleDragStart: _handleStartHandleDragStart,
           onSelectionHandleDragUpdate: (details) {
@@ -736,7 +743,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
           if (position == null) {
             return;
           }
-          showToolbar(_context, position);
+          showToolbar(_context, position, null);
         },
         onSelectionHandleDragStart: _handleEndHandleDragStart,
         onSelectionHandleDragUpdate: (details) {
@@ -830,7 +837,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   void _handleStartHandleDragEnd(DragEndDetails details) {
     _startHandleDragging = false;
     toolbarVisibility.value = true;
-    showToolbar(_context, _startHandleDragLastPosition);
+    showToolbar(_context, _startHandleDragLastPosition, null);
   }
 
   void _handleEndHandleDragStart(DragStartDetails details) {
@@ -909,7 +916,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   void _handleEndHandleDragEnd(DragEndDetails details) {
     _endHandleDragging = false;
     toolbarVisibility.value = true;
-    showToolbar(_context, _endHandleDragLastPosition);
+    showToolbar(_context, _endHandleDragLastPosition, null);
   }
 
   void _autoScrollWhenStartHandleDragging() {

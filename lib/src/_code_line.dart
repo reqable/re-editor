@@ -19,11 +19,16 @@ class _CodeLineEditingControllerImpl extends ValueNotifier<CodeLineEditingValue>
   late int _preEditLineIndex;
   CodeLineEditingValue? _preValue;
   GlobalKey? _editorKey;
+  @override
+  final MenuController menuController = MenuController();
+  @override
+  final ContextMenuDelegate? contextMenuDelegate;
 
   _CodeLineEditingControllerImpl({
     required CodeLines codeLines,
     required this.options,
     this.spanBuilder,
+    this.contextMenuDelegate,
   }) : super(CodeLineEditingValue(codeLines: codeLines)) {
     _cache = _CodeLineEditingCache(this);
     _preEditLineIndex = -1;
@@ -2510,5 +2515,19 @@ class _CodeLineEditingControllerDelegate implements CodeLineEditingController {
   void undo() {
     _delegate.undo();
   }
+
+  @override
+  ContextMenuDelegate? get contextMenuDelegate => delegate.contextMenuDelegate;
+
+  @override
+  MenuController get menuController => delegate.menuController;
+
+}
+
+abstract class ContextMenuDelegate {
+  List<Widget> buildMenuItems({
+    required CodeLineEditingController controller,
+    required BuildContext context,
+  });
 
 }
