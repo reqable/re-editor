@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 const double _kScrollbarThickness = 8.0;
 
@@ -81,18 +81,16 @@ class _RawScrollbar extends RawScrollbar {
 
   const _RawScrollbar({
     required this.physics,
-    required Widget child,
+    required super.child,
     required ScrollController controller,
-    ScrollbarOrientation? scrollbarOrientation,
+    super.scrollbarOrientation,
     required bool thumbVisibility,
   }) : super(
     controller: controller,
-    scrollbarOrientation: scrollbarOrientation,
     thumbVisibility: thumbVisibility,
     thickness: _kScrollbarThickness,
     radius: const Radius.circular(10),
     crossAxisMargin: 2,
-    child: child,
   );
 
   @override

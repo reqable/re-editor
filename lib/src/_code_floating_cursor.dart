@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 // The time the animation of the floating cursor snapping to the final cursor position will take.
 const Duration floatingCursorSnapDuration = Duration(milliseconds: 300);

@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 typedef IsolateRunnable<Req, Res> = Res Function(Req req);
 typedef IsolateCallback<Res> = void Function(Res res);

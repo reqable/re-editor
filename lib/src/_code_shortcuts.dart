@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeShortcuts extends StatefulWidget {
   final CodeShortcutsActivatorsBuilder builder;
@@ -108,7 +108,7 @@ class _CodeShortcutActions extends StatelessWidget {
         DoNothingAndStopPropagationTextIntent:
             DoNothingAction(consumesKey: false),
       },
-      if (overrideActions != null) ...overrideActions!
+      ...?overrideActions
     }, child: child);
   }
 

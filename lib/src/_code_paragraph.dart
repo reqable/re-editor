@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _ParagraphImpl extends IParagraph {
 
@@ -19,10 +19,9 @@ class _ParagraphImpl extends IParagraph {
     required this.text,
     required this.span,
     required this.paragraph,
-    required bool trucated,
+    required this._trucated,
     required double preferredLineHeight,
-  }) : _trucated = trucated,
-    _preferredLineHeight = preferredLineHeight,
+  }) : _preferredLineHeight = preferredLineHeight,
     _lineCount = (paragraph.height / preferredLineHeight).ceil();
 
   int get runeLength => text.runes.length;

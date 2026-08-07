@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 const int _kDefaultMinNumberCount = 3;
 const Size _kDefaultChunkIndicatorSize = Size(7, 7);

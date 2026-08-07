@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class CodeLineNumberRenderObject extends RenderBox {
 
@@ -14,16 +14,12 @@ class CodeLineNumberRenderObject extends RenderBox {
 
   CodeLineNumberRenderObject({
     required CodeLineEditingController controller,
-    required CodeIndicatorValueNotifier notifier,
-    required TextStyle textStyle,
-    required TextStyle focusedTextStyle,
-    required int minNumberCount,
+    required this._notifier,
+    required this._textStyle,
+    required this._focusedTextStyle,
+    required this._minNumberCount,
     String Function(int lineIndex)? custonLineIndex2Text,
   }) : _controller = controller,
-    _notifier = notifier,
-    _textStyle = textStyle,
-    _focusedTextStyle = focusedTextStyle,
-    _minNumberCount = minNumberCount,
     _allLineCount = controller.lineCount,
     _customLineIndex2Text = custonLineIndex2Text,
     _textPainter = TextPainter(
@@ -184,19 +180,13 @@ class CodeChunkIndicatorRenderObject extends RenderBox implements MouseTrackerAn
   MouseCursor _cursor;
 
   CodeChunkIndicatorRenderObject({
-    required double width,
-    required CodeChunkController controller,
-    required CodeIndicatorValueNotifier notifier,
-    required CodeChunkIndicatorPainter painter,
-    required bool collapseIndicatorVisible,
-    required bool expandIndicatorVisible,
-  }) : _width = width,
-    _controller = controller,
-    _notifier = notifier,
-    _painter = painter,
-    _collapseIndicatorVisible = collapseIndicatorVisible,
-    _expandIndicatorVisible = expandIndicatorVisible,
-    _cursor = MouseCursor.defer;
+    required this._width,
+    required this._controller,
+    required this._notifier,
+    required this._painter,
+    required this._collapseIndicatorVisible,
+    required this._expandIndicatorVisible,
+  }) : _cursor = MouseCursor.defer;
 
   set width(double value) {
     if (_width == value) {

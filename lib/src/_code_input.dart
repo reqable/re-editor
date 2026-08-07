@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeInputController extends ChangeNotifier implements DeltaTextInputClient {
 
@@ -18,17 +18,12 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   GlobalKey? _editorKey;
 
   _CodeInputController({
-    required CodeLineEditingController controller,
-    required _CodeFloatingCursorController floatingCursorController,
-    required FocusNode focusNode,
-    required bool readOnly,
-    required bool autocompleteSymbols,
-  }) : _controller = controller,
-    _floatingCursorController = floatingCursorController,
-    _focusNode = focusNode,
-    _readOnly = readOnly,
-    _updateCausedByFloatingCursor = false,
-    _autocompleteSymbols = autocompleteSymbols {
+    required this._controller,
+    required this._floatingCursorController,
+    required this._focusNode,
+    required this._readOnly,
+    required this._autocompleteSymbols,
+  }) : _updateCausedByFloatingCursor = false {
     _controller.addListener(_onCodeEditingChanged);
     _focusNode.addListener(_onFocusChanged);
   }
@@ -320,6 +315,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   void insertContent(KeyboardInsertedContent content) {
   }
 
+  @override
   bool onFocusReceived() => false;
 
   void ensureInput() {

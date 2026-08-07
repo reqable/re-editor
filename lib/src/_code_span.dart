@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 @immutable
 class _MouseTrackerAnnotationTextSpan extends TextSpan {

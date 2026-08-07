@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 typedef CodeFindBuilder = PreferredSizeWidget Function(BuildContext context, CodeFindController controller, bool readonly);
 

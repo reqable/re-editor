@@ -1,5 +1,3 @@
-library re_editor;
-
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -49,4 +47,3 @@ part 'code_scroll.dart';
 part 'code_span.dart';
 part 'code_theme.dart';
 part 'code_toolbar.dart';
-part 'debug/_trace.dart';

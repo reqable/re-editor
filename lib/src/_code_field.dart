@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeField extends SingleChildRenderObjectWidget {
 
@@ -158,54 +158,36 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   late double _preferredLineHeight;
 
   _CodeFieldRender({
-    required ViewportOffset verticalViewport,
-    required ViewportOffset? horizontalViewport,
-    required double verticalScrollbarWidth,
-    required double horizontalScrollbarHeight,
-    required CodeLines codes,
-    required CodeLineSelection selection,
+    required this._verticalViewport,
+    required this._horizontalViewport,
+    required this._verticalScrollbarWidth,
+    required this._horizontalScrollbarHeight,
+    required this._codes,
+    required this._selection,
     required List<CodeLineSelection>? highlightSelections,
-    required TextStyle textStyle,
-    required bool hasFocus,
-    required _CodeHighlighter highlighter,
-    required ValueNotifier<bool> showCursorNotifier,
-    required ValueNotifier<_FloatingCursorState> floatingCursorNotifier,
-    required ValueChanged<List<CodeLineRenderParagraph>> onRenderParagraphsChanged,
+    required this._textStyle,
+    required this._hasFocus,
+    required this._highlighter,
+    required this._showCursorNotifier,
+    required this._floatingCursorNotifier,
+    required this._onRenderParagraphsChanged,
     required Color selectionColor,
     required Color highlightColor,
     required Color cursorColor,
     required Color floatingCursorColor,
     Color? cursorLineColor,
-    Color? chunkIndicatorColor,
+    this._chunkIndicatorColor,
     required double cursorWidth,
     required double floatingCursorWidth,
-    required EdgeInsetsGeometry padding,
-    required bool readOnly,
-    int? maxLengthSingleLineRendering,
-    required LayerLink startHandleLayerLink,
-    required LayerLink endHandleLayerLink,
-  }) : _verticalViewport = verticalViewport,
-    _horizontalViewport = horizontalViewport,
-    _verticalScrollbarWidth = verticalScrollbarWidth,
-    _horizontalScrollbarHeight = horizontalScrollbarHeight,
-    _codes = codes,
-    _selection = selection,
-    _textStyle = textStyle,
-    _hasFocus = hasFocus,
-    _highlighter = highlighter,
-    _showCursorNotifier = showCursorNotifier,
-    _floatingCursorNotifier = floatingCursorNotifier,
-    _onRenderParagraphsChanged = onRenderParagraphsChanged,
-    _padding = padding,
-    _readOnly = readOnly,
-    _maxLengthSingleLineRendering = maxLengthSingleLineRendering,
-    _chunkIndicatorColor = chunkIndicatorColor,
-    _paint = Paint(),
+    required this._padding,
+    required this._readOnly,
+    this._maxLengthSingleLineRendering,
+    required this._startHandleLayerLink,
+    required this._endHandleLayerLink,
+  }) : _paint = Paint(),
     _displayParagraphs = [],
     _chunkIndicators = [],
-    _cursor = SystemMouseCursors.text,
-    _startHandleLayerLink = startHandleLayerLink,
-    _endHandleLayerLink = endHandleLayerLink {
+    _cursor = SystemMouseCursors.text {
     _backgroundRender = _CodeFieldExtraRender(
       painters: [
         _CodeCursorLinePainter(cursorLineColor, _selection),
@@ -1426,7 +1408,7 @@ class _CodeCursorLinePainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (_color == null || _color == Colors.transparent || _color!.alpha == 0) {
+    if (_color == null || _color == Colors.transparent || _color!.a == 0.0) {
       return;
     }
     if (!_selection.isCollapsed) {
@@ -1480,7 +1462,7 @@ abstract class _CodeFieldSelectionsPainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (_color == Colors.transparent || _color.alpha == 0) {
+    if (_color == Colors.transparent || _color.a == 0.0) {
       return;
     }
     final List<CodeLineRenderParagraph> paragraphs = render.displayParagraphs;
@@ -1575,17 +1557,12 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
   bool _willDraw;
 
   _CodeFieldCursorPainter({
-    required CodeLinePosition position,
-    required Color color,
-    required double width,
-    required double height,
-    required bool visible,
-  }) : _position = position,
-    _color = color,
-    _width = width,
-    _height = height,
-    _visible = visible,
-    _willDraw = true,
+    required this._position,
+    required this._color,
+    required this._width,
+    required this._height,
+    required this._visible,
+  }) : _willDraw = true,
     _paint = Paint();
 
   set position(CodeLinePosition value) {
@@ -1640,7 +1617,7 @@ class _CodeFieldCursorPainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (!_visible || !_willDraw || _color == Colors.transparent || _color.alpha == 0) {
+    if (!_visible || !_willDraw || _color == Colors.transparent || _color.a == 0.0) {
       return;
     }
     final CodeLineRenderParagraph? paragraph = render.findDisplayParagraphByLineIndex(_position.index);
@@ -1674,15 +1651,11 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
   double _height;
 
   _CodeFieldFloatingCursorPainter({
-    required _FloatingCursorState position,
-    required Color color,
-    required double width,
-    required double height,
-  }) : _position = position,
-    _color = color,
-    _width = width,
-    _height = height,
-    _paint = Paint();
+    required this._position,
+    required this._color,
+    required this._width,
+    required this._height,
+  }) : _paint = Paint();
 
   set position(_FloatingCursorState value) {
     if (_position == value) {
@@ -1722,7 +1695,7 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
 
   @override
   void paint(Canvas canvas, Size size, _CodeFieldRender render) {
-    if (!_position.isActive() || _color == Colors.transparent || _color.alpha == 0) {
+    if (!_position.isActive() || _color == Colors.transparent || _color.a == 0.0) {
       return;
     }
     _drawFloatingCaret(canvas, _position.floatingCursorOffset!, size);

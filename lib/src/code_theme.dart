@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 /// The code syntax highlighting theme. We use Re-Highlight as the syntax highlighting rule.
 /// Re-Highlight provides some built-in syntax highlighting rules for dozens of programming languages,

@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 typedef PointerEnterEventWithRectListener = void Function(PointerEnterEvent event, int id, List<Rect> rects);
 

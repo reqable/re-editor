@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
 
@@ -10,12 +10,10 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   CodeHighlightTheme? _theme;
 
   _CodeHighlighter({
-    required BuildContext context,
-    required CodeLineEditingController controller,
+    required this._context,
+    required this._controller,
     CodeHighlightTheme? theme,
-  }) : _context = context,
-    _provider = _CodeParagraphProvider(),
-    _controller = controller,
+  }) : _provider = _CodeParagraphProvider(),
     _theme = theme,
     _engine = _CodeHighlightEngine(theme),
     super(const []) {
@@ -122,8 +120,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     }
     return _buildSpanFromNodes([
       ...startNodes,
-      if (midNode != null)
-        midNode,
+      ?midNode,
       ...endNodes
     ], style);
   }

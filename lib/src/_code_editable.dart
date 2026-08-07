@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 const double _kDefaultTextSize = 13.0;
 const double _kDefaultFontHeight = 1.4;
@@ -245,8 +245,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (indicator != null)
-                indicator,
+              ?indicator,
               if (widget.leadingDivider != null)
                 widget.leadingDivider!,
               Expanded(

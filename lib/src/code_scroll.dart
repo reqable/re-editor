@@ -1,4 +1,4 @@
-part of re_editor;
+part of 're_editor.dart';
 
 typedef CodeScrollbarBuilder = Widget Function(BuildContext context, Widget child, ScrollableDetails details);
 
