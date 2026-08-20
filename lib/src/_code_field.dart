@@ -1183,8 +1183,23 @@ class _CodeFieldRender extends RenderBox implements MouseTrackerAnnotation {
   }
 
   void _calculatePreferredLineHeight() {
+    // Measured with the same strut the paragraphs are laid out with, see
+    // `_CodeParagraphProvider.updateBaseStyle`.
+    //
+    // This number is the grid the editor places lines on, so it has to be the
+    // height a line actually gets. Measured without the strut it was three
+    // points taller here, and every line scrolled past added that much to the
+    // correction the layout applies to the scroll offset. Scrolling up by a
+    // page then pushed the offset above the top of the document and the
+    // physics sprang it back — a bounce nobody asked for.
     final TextPainter painter = TextPainter(
       textDirection: TextDirection.ltr,
+      strutStyle: StrutStyle(
+        fontSize: _textStyle.fontSize,
+        fontFamily: _textStyle.fontFamily,
+        height: _textStyle.height,
+        forceStrutHeight: true,
+      ),
     );
     painter.text = TextSpan(
       text: '0',
