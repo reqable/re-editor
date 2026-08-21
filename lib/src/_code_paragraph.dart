@@ -128,7 +128,20 @@ class _ParagraphImpl extends IParagraph {
     if (range.isCollapsed) {
       return const [];
     }
-    return paragraph.getBoxesForRange(range.start, range.end, boxHeightStyle: ui.BoxHeightStyle.max).map((e) => e.toRect()).toList();
+    // Selection boxes span the whole line of the grid rather than the ascent
+    // and descent of the glyphs.
+    //
+    // `BoxHeightStyle.max` measures the runs, and a run is shorter than the
+    // line it sits on, so adjacent boxes did not touch and a selection dragged
+    // over several lines looked striped. An empty line made it obvious: the
+    // branch above returns a box of a full `preferredLineHeight` for it, so
+    // the gap changed depending on whether a line had any text on it.
+    return paragraph.getBoxesForRange(range.start, range.end, boxHeightStyle: ui.BoxHeightStyle.max).map((e) {
+      final Rect rect = e.toRect();
+      final int line = max(0, (rect.center.dy / _preferredLineHeight).floor());
+      final double top = line * _preferredLineHeight;
+      return Rect.fromLTRB(rect.left, top, rect.right, top + _preferredLineHeight);
+    }).toList();
   }
 
   Offset? _getOffsetDownstream(int position) {
@@ -210,19 +223,26 @@ class _CodeParagraphProvider {
     if (uiStyle == _style) {
       return;
     }
+    // One strut for both the paragraph layout and the line height measured
+    // below. Measured without the strut, `_preferredLineHeight` is a different
+    // number than the height a line is actually given: for Consolas 13.09 it
+    // is 21 against 18. Lines are then placed on a grid that is taller than
+    // they are, which shows up as a stripe of background between them.
+    final StrutStyle strutStyle = StrutStyle(
+      fontSize: style.fontSize,
+      fontFamily: style.fontFamily,
+      height: style.height,
+      forceStrutHeight: true,
+    );
     _paragraphStyle = style.getParagraphStyle(
       textAlign: TextAlign.left,
       textDirection: TextDirection.ltr,
-      strutStyle: StrutStyle(
-        fontSize: style.fontSize,
-        fontFamily: style.fontFamily,
-        height: style.height,
-        forceStrutHeight: true,
-      )
+      strutStyle: strutStyle
     );
     _style = uiStyle;
     final TextPainter painter = TextPainter(
       textDirection: TextDirection.ltr,
+      strutStyle: strutStyle,
     );
     painter.text = TextSpan(
       text: '0',
