@@ -6,13 +6,17 @@ class CodeScrollController {
 
   final ScrollController verticalScroller;
   final ScrollController horizontalScroller;
+  final bool _ownsVerticalScroller;
+  final bool _ownsHorizontalScroller;
 
   GlobalKey? _editorKey;
 
   CodeScrollController({
     ScrollController? verticalScroller,
     ScrollController? horizontalScroller,
-  }) : verticalScroller = verticalScroller ?? ScrollController(),
+  }) : _ownsVerticalScroller = verticalScroller == null,
+    _ownsHorizontalScroller = horizontalScroller == null,
+    verticalScroller = verticalScroller ?? ScrollController(),
     horizontalScroller = horizontalScroller ?? ScrollController();
 
   void makeCenterIfInvisible(CodeLinePosition position) {
@@ -31,6 +35,13 @@ class CodeScrollController {
 
   void dispose() {
     _editorKey = null;
+    // Only dispose controllers we allocated; caller-owned instances stay alive.
+    if (_ownsVerticalScroller) {
+      verticalScroller.dispose();
+    }
+    if (_ownsHorizontalScroller) {
+      horizontalScroller.dispose();
+    }
   }
 
 }
