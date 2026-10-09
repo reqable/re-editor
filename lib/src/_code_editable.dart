@@ -415,7 +415,7 @@ class _CodeEditableState extends State<_CodeEditable> with AutomaticKeepAliveCli
       autocompleteState.dismiss();
       return;
     }
-    final _CodeFieldRender? render = widget.editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = widget.editorKey.render;
     if (render == null) {
       autocompleteState.dismiss();
       return;

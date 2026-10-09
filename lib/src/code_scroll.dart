@@ -27,7 +27,7 @@ class CodeScrollController {
     _editorKey = key;
   }
 
-  _CodeFieldRender? get _render => _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+  _CodeFieldRender? get _render => _editorKey?.render;
 
   void dispose() {
     _editorKey = null;

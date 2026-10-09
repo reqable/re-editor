@@ -193,7 +193,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     _updateCausedByFloatingCursor = true;
-    final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = _editorKey?.render;
     if (render == null) {
       return;
     }
@@ -380,7 +380,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     if (!_hasInputConnection) {
       return;
     }
-    final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = _editorKey?.render;
     if (render == null) {
       return;
     }
@@ -409,7 +409,7 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
     if (!_hasInputConnection) {
       return;
     }
-    final _CodeFieldRender? render = _editorKey?.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = _editorKey?.render;
     if (render == null || !render.hasSize) {
       return;
     }

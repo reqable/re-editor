@@ -34,7 +34,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
   bool _longPressOnSelection = false;
   CodeLineSelection? _anchorSelection;
 
-  _CodeFieldRender get render => widget.editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+  _CodeFieldRender get render => widget.editorKey.render!;
 
   bool _tapping = false;
 
@@ -383,11 +383,11 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
         return;
       }
       if (_dragging) {
-        final renderObject = widget.editorKey.currentContext?.findRenderObject();
-        if (renderObject is! _CodeFieldRender) {
+        final _CodeFieldRender? render = widget.editorKey.render;
+        if (render == null) {
           return;
         }
-        renderObject.autoScrollWhenDragging(_dragPosition!);
+        render.autoScrollWhenDragging(_dragPosition!);
         _extendSelection(_dragPosition!, _SelectionChangedCause.drag);
       }
       _autoScrollWhenDragging();
@@ -626,7 +626,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
     controller.removeListener(_updateTextSelectionHandle);
     _effectiveStartHandleVisibility.dispose();
     _effectiveEndHandleVisibility.dispose();
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = editorKey.render;
     if (render == null) {
       return;
     }
@@ -635,7 +635,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   double get lineHeight {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = editorKey.render;
     if (render == null) {
       return 0;
     }
@@ -643,11 +643,11 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   bool get attached {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = editorKey.render;
     return render != null && render.attached;
   }
 
-  _CodeFieldRender get ensureRender => editorKey.currentContext?.findRenderObject() as _CodeFieldRender;
+  _CodeFieldRender get ensureRender => editorKey.render!;
 
   void _updateTextSelectionHandle() {
     if (!_handlesVisible) {
@@ -660,7 +660,7 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
   }
 
   void _updateTextSelectionOverlayVisibilities() {
-    final _CodeFieldRender? render = editorKey.currentContext?.findRenderObject() as _CodeFieldRender?;
+    final _CodeFieldRender? render = editorKey.render;
     if (render == null) {
       return;
     }
@@ -918,11 +918,11 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
         return;
       }
       // Overlay/controller may outlive the field after dispose.
-      final renderObject = editorKey.currentContext?.findRenderObject();
-      if (renderObject is! _CodeFieldRender) {
+      final _CodeFieldRender? render = editorKey.render;
+      if (render == null) {
         return;
       }
-      renderObject.autoScrollWhenDragging(_startHandleDragLastPosition);
+      render.autoScrollWhenDragging(_startHandleDragLastPosition);
       _handleStartHandleDragUpdate(_startHandleDragLastPosition);
       _autoScrollWhenStartHandleDragging();
     }));
@@ -933,11 +933,11 @@ class _MobileSelectionOverlayController implements _SelectionOverlayController {
       if (!_endHandleDragging) {
         return;
       }
-      final renderObject = editorKey.currentContext?.findRenderObject();
-      if (renderObject is! _CodeFieldRender) {
+      final _CodeFieldRender? render = editorKey.render;
+      if (render == null) {
         return;
       }
-      renderObject.autoScrollWhenDragging(_endHandleDragLastPosition);
+      render.autoScrollWhenDragging(_endHandleDragLastPosition);
       _handleEndHandleDragUpdate(_endHandleDragLastPosition);
       _autoScrollWhenEndHandleDragging();
     }));

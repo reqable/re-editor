@@ -1799,3 +1799,21 @@ class _CodeFieldFloatingCursorPainter extends _CodeFieldExtraPainter {
   }
 
 }
+
+extension _GlobalKeyExtension on GlobalKey {
+
+  _CodeFieldRender? get render {
+    final BuildContext? context = currentContext;
+    if (context is! RenderObjectElement || !context.mounted) {
+      return null;
+    }
+
+    final RenderObject render = context.renderObject;
+    if (render is! _CodeFieldRender || !render.attached || !render.hasSize) {
+      return null;
+    }
+
+    return render;
+  }
+
+}
