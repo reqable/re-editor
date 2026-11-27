@@ -340,6 +340,10 @@ class _CodeInputController extends ChangeNotifier implements DeltaTextInputClien
 
   @override
   void dispose() {
+    if (_floatingCursorScrollTimer != null) {
+      _floatingCursorScrollTimer!.cancel();
+      _floatingCursorScrollTimer = null;
+    }
     super.dispose();
     _closeInputConnectionIfNeeded();
     _controller.removeListener(_onCodeEditingChanged);
